@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+  <link rel="icon" href="<%= BASE_URL %>./upea.png" id="ico">
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100;9..40,200;9..40,400&family=Dancing+Script:wght@400;500;600&family=Krub:wght@400;700&family=Staatliches&display=swap"
+    rel="stylesheet">
+  
+  <title id="title-page">UPEA</title>
+
+  <link rel="preload" href="<%= BASE_URL %>./assets/css/normalize.css" as="style">
+  <link rel="stylesheet" href="<%= BASE_URL %>./assets/css/normalize.css">
+  <link rel="preload" href="<%= BASE_URL %>./assets/css/style.css" as="style">
+  <link rel="stylesheet" href="<%= BASE_URL %>./assets/css/vendor.css">
+  <link rel="stylesheet" href="<%= BASE_URL %>./assets/css/style.css">
+  <link rel="stylesheet" href="<%= BASE_URL %>./assets/css/responsive.css">
+</head>
+
+<body>
+  <noscript>
+    <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
+        Please enable it to continue.</strong>
+  </noscript>
+
+  <div class="preloader" id="preloader">
+    <div class="preloader-inner">
+      <div class="spinner">
+        <div class="dot1"></div>
+        <div class="dot2"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="app"></div>
+  
+  <div id="fb-root"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+  
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+<link 
+  rel="stylesheet" 
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+>
+
+  <script src="<%= BASE_URL %>./assets/js/vendor.js"></script>
+  <script src="<%= BASE_URL %>./assets/js/counter.js"></script>
+  <script src="<%= BASE_URL %>./assets/js/main.js"></script>
+  
+
+</body>
+
+</html>
