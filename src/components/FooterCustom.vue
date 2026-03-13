@@ -69,18 +69,20 @@
         </div>
       </div>
 
-      <div class="">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-7 text-md-right align-self-center mt-lg-0 mt-3">
-              <a href="https://utic.upea.bo/" target="_blank">
-                <img src="@/assets/utic.png" width="100" alt="sie" />
-              </a>
-              <p>© Copyright {{ currentYear }} UTIC_UPEA&nbsp;</p>
-            </div>
-          </div>
-        </div>
+<div class="">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 text-center align-self-center mt-3">
+        <a href="https://utic.upea.bo/" target="_blank">
+          <img src="@/assets/utic.png" width="100" alt="sie" />
+        </a>
+        <p class="mb-0">
+          © Copyright {{ currentYear }} UTIC_UPEA&nbsp; | Support by FrehisyM 
+        </p>
       </div>
+    </div>
+  </div>
+</div>
     </footer>
 
     <div class="whatsapp">
@@ -108,6 +110,81 @@
   background-size: 100%;
   position: relative;
 }
+
+/* COPYRIGHT */
+.footer-area p {
+  margin: 0;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+}
+
+.footer-area a img {
+  display: block;
+  margin: 0 auto 0.5rem auto;  
+}
+
+@media (max-width: 768px) {
+  .footer-area p {
+    font-size: 0.85rem;
+    padding: 0 1rem;
+  }
+  
+  .footer-area a img {
+    width: 80px;  
+    height: auto;
+  }
+}
+
+.details.style-icon {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.details.style-icon li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.details.style-icon li:last-child {
+  margin-bottom: 0;
+}
+
+.details.style-icon li i {
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .details.style-icon li {
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .details.style-icon li i {
+    width: 18px;
+  }
+}
+.widget_contact.pr-lg-3 {
+  text-align: center !important;
+}
+
+.widget_contact.pr-lg-3 ul {
+  display: inline-block;
+  text-align: left;
+}
+
+.widget_contact.pr-lg-3 ul li {
+  justify-content: flex-start;
+}
+
 </style>
 
 <script>

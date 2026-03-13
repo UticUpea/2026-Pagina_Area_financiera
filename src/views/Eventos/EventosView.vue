@@ -20,9 +20,149 @@
     <div class="main-team-area pd-top-120 pd-bottom-120">
       <div class="container">
         <div class="row">
-          <div class="col-lg-8 col-12"></div>
+
+          <div class="col-lg-8 col-12">
+            <div class="row justify-content-center" v-if="searchGet">
+              <div class="col-12 text-center" v-if="searchValues.length === 0">
+                <h3>No se encontraron resultados para "{{ search }}"</h3>
+                <button class="btn btn-base mt-3" @click="limpiarBusqueda">
+                  Mostrar todos los eventos
+                </button>
+              </div>
+
+              <div v-else class="col-12 row justify-content-center">
+                <div class="col-12">
+                  <p>{{ searchValues.length }} resultado(s) encontrado(s)</p>
+                  <hr />
+                </div>
+                <div
+                  class="col-lg-6 col-md-6 mb-4"
+                  v-for="(ev, index) of searchValues"
+                  :key="ev.evento_id || index"
+                >
+                  <div class="single-event-inner">
+                    <div class="media">
+                      <div class="media-left">
+                        <router-link :to="'/detalleEvento/' + ev.evento_id">
+                          <img
+                            :src="imageUrl + ev.evento_imagen"
+                            :alt="ev.evento_titulo"
+                            width="200"
+                            loading="lazy"
+                          />
+                        </router-link>
+                      </div>
+                      <div class="details media-body align-self-center">
+                        <div class="date">
+                          <i class="fa fa-calendar"></i>
+                          {{ formatearFecha(ev.evento_fecha) }}
+                          <span v-if="ev.evento_hora" class="hora">
+                            {{ ev.evento_hora }}
+                          </span>
+                        </div>
+                        <p class="location">
+                          <i class="fa fa-map-marker"></i> {{ ev.evento_lugar }}
+                        </p>
+                        <h5>
+                          <router-link :to="'/detalleEvento/' + ev.evento_id">
+                            {{ ev.evento_titulo }}
+                          </router-link>
+                        </h5>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 row justify-content-center" v-else>
+              <div v-if="eventos.length === 0" class="col-12 text-center">
+                <h2>No hay eventos disponibles</h2>
+                <p class="text-muted">Pronto se agregarán nuevos eventos.</p>
+              </div>
+
+              <template v-else>
+                <div
+                  class="col-lg-6 col-md-6 mb-4"
+                  v-for="(ev, index) of eventos"
+                  :key="ev.evento_id || index"
+                  v-show="
+                    (pag - 1) * NUM_RESULTS <= index &&
+                    pag * NUM_RESULTS > index
+                  "
+                >
+                  <div class="single-event-inner">
+                    <div class="media">
+                      <div class="media-left">
+                        <router-link :to="'/detalleEvento/' + ev.evento_id">
+                          <img
+                            :src="imageUrl + ev.evento_imagen"
+                            :alt="ev.evento_titulo"
+                            width="200"
+                            loading="lazy"
+                          />
+                        </router-link>
+                      </div>
+                      <div class="details media-body align-self-center">
+                        <div class="date">
+                          <i class="fa fa-calendar"></i> 
+                          {{ formatearFecha(ev.evento_fecha) }}
+                          <span v-if="ev.evento_hora" class="hora">
+                            {{ ev.evento_hora }}
+                          </span>
+                        </div>
+                        <p class="location">
+                          <i class="fa fa-map-marker"></i> {{ ev.evento_lugar }}
+                        </p>
+                        <h5>
+                          <router-link :to="'/detalleEvento/' + ev.evento_id">
+                            {{ ev.evento_titulo }}
+                          </router-link>
+                        </h5>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <nav class="col-12 td-page-navigation text-center mb-5 mb-lg-0" v-if="pager > 1">
+                  <ul class="pagination">
+                    <li class="pagination-arrow disable">
+                      <a
+                        href="#"
+                        aria-label="Previous"
+                        @click.prevent="pag > 1 ? pag-- : null"
+                      >
+                        <i class="fa fa-angle-double-left"></i>
+                      </a>
+                    </li>
+                    <li v-for="(i, index) of pager" :key="index">
+                      <a
+                        href="#"
+                        :class="[i === pag ? 'active' : '']"
+                        @click.prevent="pag = i"
+                      >
+                        {{ i }}
+                      </a>
+                    </li>
+                    <li class="pagination-arrow">
+                      <a
+                        href="#"
+                        aria-label="Next"
+                        @click.prevent="pag < pager ? pag++ : null"
+                      >
+                        <i class="fa fa-angle-double-right"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </template>
+            </div>
+          </div>
+
           <div class="col-lg-4 col-12">
             <div class="td-sidebar">
+              
+              <!-- Buscador -->
               <div class="widget widget_search">
                 <div class="search-form">
                   <div class="form-group">
@@ -38,153 +178,10 @@
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="row justify-content-center">
-          <div class="col-12 row justify-content-center" v-if="searchGet">
 
-            <div class="col-12 text-center" v-if="searchValues.length === 0">
-              <h3>No se encontraron resultados para "{{ search }}"</h3>
-              <button class="btn btn-base mt-3" @click="limpiarBusqueda">
-                Mostrar todos los eventos
-              </button>
-            </div>
-
-            <div v-else class="col-12 row justify-content-center">
-              <div class="col-12">
-                <p>{{ searchValues.length }} resultado(s) encontrado(s)</p>
-                <hr />
-              </div>
-              <div
-                class="col-lg-6 col-md-6 mb-4"
-                v-for="(ev, index) of searchValues"
-                :key="ev.evento_id || index"
-              >
-                <div class="single-event-inner">
-                  <div class="media">
-                    <div class="media-left">
-                      <router-link :to="'/detalleEvento/' + ev.evento_id">
-
-                        <img
-                          :src="imageUrl + ev.evento_imagen"
-                          :alt="ev.evento_titulo"
-                          width="200"
-                          loading="lazy"
-                        />
-                      </router-link>
-                    </div>
-                    <div class="details media-body align-self-center">
-                      <div class="date">
-                        <i class="fa fa-calendar"></i>
-                        {{ formatearFecha(ev.evento_fecha) }}
-                        <span v-if="ev.evento_hora" class="hora">
-                          {{ ev.evento_hora }}
-                        </span>
-                      </div>
-                      <p class="location">
-                        <i class="fa fa-map-marker"></i> {{ ev.evento_lugar }}
-                      </p>
-                      <h5>
-                        <router-link :to="'/detalleEvento/' + ev.evento_id">
-                          {{ ev.evento_titulo }}
-                        </router-link>
-                      </h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 row justify-content-center" v-else>
-            <div v-if="eventos.length === 0" class="col-12 text-center">
-              <h2>No hay eventos disponibles</h2>
-              <p class="text-muted">Pronto se agregarán nuevos eventos.</p>
-            </div>
-
-            <template v-else>
-              <div
-                class="col-lg-6 col-md-6 mb-4"
-                v-for="(ev, index) of eventos"
-                :key="ev.evento_id || index"
-                v-show="
-                  (pag - 1) * NUM_RESULTS <= index &&
-                  pag * NUM_RESULTS > index
-                "
-              >
-                <div class="single-event-inner">
-                  <div class="media">
-                    <div class="media-left">
-                      <router-link :to="'/detalleEvento/' + ev.evento_id">
-                        <img
-                          :src="imageUrl + ev.evento_imagen"
-                          :alt="ev.evento_titulo"
-                          width="200"
-                          loading="lazy"
-                        />
-                      </router-link>
-                    </div>
-                    <div class="details media-body align-self-center">
-                      <div class="date">
-                        <i class="fa fa-calendar"></i> 
-                        {{ formatearFecha(ev.evento_fecha) }}
-                        <span v-if="ev.evento_hora" class="hora">
-                          {{ ev.evento_hora }}
-                        </span>
-                      </div>
-                      <p class="location">
-                        <i class="fa fa-map-marker"></i> {{ ev.evento_lugar }}
-                      </p>
-                      <h5>
-                        <router-link :to="'/detalleEvento/' + ev.evento_id">
-                          {{ ev.evento_titulo }}
-                        </router-link>
-                      </h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <SidebarCustom></SidebarCustom>
               
-              <!-- Paginación -->
-              <nav class="col-12 td-page-navigation text-center mb-5 mb-lg-0" v-if="pager > 1">
-                <ul class="pagination">
-                  <li class="pagination-arrow disable">
-                    <a
-                      href="#"
-                      aria-label="Previous"
-                      @click.prevent="pag > 1 ? pag-- : null"
-                    >
-                      <i class="fa fa-angle-double-left"></i>
-                    </a>
-                  </li>
-                  <li v-for="(i, index) of pager" :key="index">
-                    <a
-                      href="#"
-                      :class="[i === pag ? 'active' : '']"
-                      @click.prevent="pag = i"
-                    >
-                      {{ i }}
-                    </a>
-                  </li>
-                  <li class="pagination-arrow">
-                    <a
-                      href="#"
-                      aria-label="Next"
-                      @click.prevent="pag < pager ? pag++ : null"
-                    >
-                      <i class="fa fa-angle-double-right"></i>
-                    </a>
-                  </li>
-                </ul>
-              </nav>
-            </template>
-          </div>
-
-          <div class="col-12">
-            <hr />
-            <SidebarCustom></SidebarCustom>
+            </div>
           </div>
           
         </div>
@@ -306,7 +303,7 @@ export default {
     ...mapState(["url_api", "Institucion"]),
 
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo/').trim()
     }
   },
 

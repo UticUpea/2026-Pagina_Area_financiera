@@ -22,11 +22,151 @@
 
     <div class="main-team-area pd-top-120 pd-bottom-120">
       <div class="container">
-        <div class="row justify-content-center">
+        <div class="row">
 
-          <div class="col-lg-8 col-12"></div>
+          <div class="col-lg-8 col-12">
+            
+            <div class="row justify-content-center" v-if="searchGet">
 
-          <!-- Barra de búsqueda -->
+              <div class="col-12 text-center" v-if="searchValues.length === 0">
+                <h3>No se encontraron resultados para "{{ search }}"</h3>
+                <button class="btn btn-base mt-3" @click="limpiarBusqueda">
+                  Mostrar todas las ofertas
+                </button>
+              </div>
+
+              <div v-else class="col-12 row justify-content-center">
+                <div class="col-12">
+                  <p>{{ searchValues.length }} resultado(s) encontrado(s)</p>
+                  <hr />
+                </div>
+                <div
+                  class="col-lg-6 col-md-6 mb-4"
+                  v-for="(ofer, index) of searchValues"
+                  :key="ofer.ofertas_id || index"
+                >
+                  <div class="single-event-inner">
+                    <div class="media">
+                      <div class="media-left">
+                        <router-link
+                          :to="'/detalleOferta/' + ofer.ofertas_id"
+                          @click="$store.commit('clickLink')">
+
+                          <img
+                            :src="imageUrl + ofer.ofertas_imagen"
+                            :alt="ofer.ofertas_titulo"
+                            width="200"
+                            loading="lazy"
+                          />
+                        </router-link>
+                      </div>
+                      <div class="details media-body align-self-center">
+                        <div class="date">
+                          <i class="fa fa-calendar"></i>
+                          Inscripciones hasta el
+                          {{ formatearFecha(ofer.ofertas_inscripciones_fin) }}
+                        </div>
+                        <h5>
+                          <router-link
+                            :to="'/detalleOferta/' + ofer.ofertas_id"
+                            @click="$store.commit('clickLink')"
+                          >
+                            {{ ofer.ofertas_titulo }}
+                          </router-link>
+                        </h5>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 row justify-content-center" v-else>
+              <div v-if="ofertas.length === 0" class="col-12 text-center">
+                <h1>No hay ofertas académicas disponibles</h1>
+                <p class="text-muted">Pronto se agregarán nuevas ofertas.</p>
+              </div>
+
+              <template v-else>
+                <div
+                  class="col-lg-6 col-md-6 mb-4"
+                  v-for="(ofer, index) of ofertas"
+                  :key="ofer.ofertas_id || index"
+                  v-show="
+                    (pag - 1) * NUM_RESULTS <= index &&
+                    pag * NUM_RESULTS > index
+                  "
+                >
+                  <div class="single-event-inner">
+                    <div class="media">
+                      <div class="media-left">
+                        <router-link
+                          :to="'/detalleOferta/' + ofer.ofertas_id"
+                          @click="$store.commit('clickLink')"
+                        >
+
+                          <img
+                            :src="imageUrl + ofer.ofertas_imagen"
+                            :alt="ofer.ofertas_titulo"
+                            width="200"
+                            loading="lazy"
+                          />
+                        </router-link>
+                      </div>
+                      <div class="details media-body align-self-center">
+                        <div class="date">
+                          <i class="fa fa-calendar"></i>
+                          Inscripciones hasta el
+                          {{ formatearFecha(ofer.ofertas_inscripciones_fin) }}
+                        </div>
+                        <h5>
+                          <router-link
+                            :to="'/detalleOferta/' + ofer.ofertas_id"
+                            @click="$store.commit('clickLink')"
+                          >
+                            {{ ofer.ofertas_titulo }}
+                          </router-link>
+                        </h5>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <nav class="col-12 td-page-navigation text-center mb-5 mb-lg-0" v-if="pager > 1">
+                  <ul class="pagination">
+                    <li class="pagination-arrow disable">
+                      <a
+                        href="#"
+                        aria-label="Previous"
+                        @click.prevent="pag > 1 ? pag-- : null"
+                      >
+                        <i class="fa fa-angle-double-left"></i>
+                      </a>
+                    </li>
+                    <li v-for="(i, index) of pager" :key="index">
+                      <a
+                        href="#"
+                        :class="[i === pag ? 'active' : '']"
+                        @click.prevent="pag = i"
+                      >
+                        {{ i }}
+                      </a>
+                    </li>
+                    <li class="pagination-arrow">
+                      <a
+                        href="#"
+                        aria-label="Next"
+                        @click.prevent="pag < pager ? pag++ : null"
+                      >
+                        <i class="fa fa-angle-double-right"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </template>
+            </div>
+          </div>
+
           <div class="col-lg-4 col-12">
             <div class="td-sidebar">
               <div class="widget widget_search">
@@ -44,156 +184,9 @@
                   </button>
                 </div>
               </div>
+              <SidebarCustom></SidebarCustom>
+              
             </div>
-          </div>
-        </div>
-        
-        <div class="row justify-content-center">
-
-          <div class="col-12 row" v-if="searchGet">
-
-            <div class="col-12 text-center" v-if="searchValues.length === 0">
-              <h3>No se encontraron resultados para "{{ search }}"</h3>
-              <button class="btn btn-base mt-3" @click="limpiarBusqueda">
-                Mostrar todas las ofertas
-              </button>
-            </div>
-
-            <div v-else class="col-12 row justify-content-center">
-              <div class="col-12">
-                <p>{{ searchValues.length }} resultado(s) encontrado(s)</p>
-                <hr />
-              </div>
-              <div
-                class="col-lg-6 col-md-6 mb-4"
-                v-for="(ofer, index) of searchValues"
-                :key="ofer.ofertas_id || index"
-              >
-                <div class="single-event-inner">
-                  <div class="media">
-                    <div class="media-left">
-                      <router-link
-                        :to="'/detalleOferta/' + ofer.ofertas_id"
-                        @click="$store.commit('clickLink')">
-
-                        <img
-                          :src="imageUrl + ofer.ofertas_imagen"
-                          :alt="ofer.ofertas_titulo"
-                          width="200"
-                          loading="lazy"
-                        />
-                      </router-link>
-                    </div>
-                    <div class="details media-body align-self-center">
-                      <div class="date">
-                        <i class="fa fa-calendar"></i>
-                        Inscripciones hasta el
-                        {{ formatearFecha(ofer.ofertas_inscripciones_fin) }}
-                      </div>
-                      <h5>
-                        <router-link
-                          :to="'/detalleOferta/' + ofer.ofertas_id"
-                          @click="$store.commit('clickLink')"
-                        >
-                          {{ ofer.ofertas_titulo }}
-                        </router-link>
-                      </h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 row justify-content-center" v-else>
-            <div v-if="ofertas.length === 0" class="col-12 text-center">
-              <h1>No hay ofertas académicas disponibles</h1>
-              <p class="text-muted">Pronto se agregarán nuevas ofertas.</p>
-            </div>
-
-            <template v-else>
-              <div
-                class="col-lg-6 col-md-6 mb-4"
-                v-for="(ofer, index) of ofertas"
-                :key="ofer.ofertas_id || index"
-                v-show="
-                  (pag - 1) * NUM_RESULTS <= index &&
-                  pag * NUM_RESULTS > index
-                "
-              >
-                <div class="single-event-inner">
-                  <div class="media">
-                    <div class="media-left">
-                      <router-link
-                        :to="'/detalleOferta/' + ofer.ofertas_id"
-                        @click="$store.commit('clickLink')"
-                      >
-
-                        <img
-                          :src="imageUrl + ofer.ofertas_imagen"
-                          :alt="ofer.ofertas_titulo"
-                          width="200"
-                          loading="lazy"
-                        />
-                      </router-link>
-                    </div>
-                    <div class="details media-body align-self-center">
-                      <div class="date">
-                        <i class="fa fa-calendar"></i>
-                        Inscripciones hasta el
-                        {{ formatearFecha(ofer.ofertas_inscripciones_fin) }}
-                      </div>
-                      <h5>
-                        <router-link
-                          :to="'/detalleOferta/' + ofer.ofertas_id"
-                          @click="$store.commit('clickLink')"
-                        >
-                          {{ ofer.ofertas_titulo }}
-                        </router-link>
-                      </h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Paginación -->
-              <nav class="col-12 td-page-navigation text-center mb-5 mb-lg-0" v-if="pager > 1">
-                <ul class="pagination">
-                  <li class="pagination-arrow disable">
-                    <a
-                      href="#"
-                      aria-label="Previous"
-                      @click.prevent="pag > 1 ? pag-- : null"
-                    >
-                      <i class="fa fa-angle-double-left"></i>
-                    </a>
-                  </li>
-                  <li v-for="(i, index) of pager" :key="index">
-                    <a
-                      href="#"
-                      :class="[i === pag ? 'active' : '']"
-                      @click.prevent="pag = i"
-                    >
-                      {{ i }}
-                    </a>
-                  </li>
-                  <li class="pagination-arrow">
-                    <a
-                      href="#"
-                      aria-label="Next"
-                      @click.prevent="pag < pager ? pag++ : null"
-                    >
-                      <i class="fa fa-angle-double-right"></i>
-                    </a>
-                  </li>
-                </ul>
-              </nav>
-            </template>
-          </div>
-
-          <div class="col-12">
-            <hr />
-            <SidebarCustom></SidebarCustom>
           </div>
           
         </div>
@@ -204,7 +197,6 @@
 </template>
 
 <style scoped>
-
 .bg-overlay-img {
   background-image: url("@/assets/Fondo2.jpg");
 }
@@ -277,9 +269,7 @@ export default {
   
   data() {
     return {
-
       idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
-
       ofertas: [],
       search: "",
       searchGet: false,
@@ -295,7 +285,7 @@ export default {
     ...mapState(["url_api", "Institucion"]),
 
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo/').trim()
     }
   },
 

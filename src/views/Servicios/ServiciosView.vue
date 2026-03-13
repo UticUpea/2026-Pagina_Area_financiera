@@ -21,11 +21,155 @@
       <div class="container">
         <div class="row">
 
-          <div class="col-lg-8 col-12"></div>
+          <div class="col-lg-8 col-12">
 
-          <!-- Barra de búsqueda -->
+            <div v-if="searchGet" class="pd-bottom-90">
+              <div v-if="searchValues.length === 0" class="col-12 text-center">
+                <h3>No se encontraron resultados para "{{ search }}"</h3>
+                <button class="btn btn-base mt-3" @click="limpiarBusqueda">
+                  Mostrar todos los servicios
+                </button>
+              </div>
+              <div v-else class="row justify-content-center">
+                <div class="col-12">
+                  <p>{{ searchValues.length }} resultado(s) encontrado(s)</p>
+                  <hr />
+                </div>
+                <div
+                  class="col-lg-6 col-md-6 mb-4"
+                  v-for="(serv, index) of searchValues"
+                  :key="serv.serv_id || index"
+                >
+                  <div class="single-event-inner">
+                    <div class="media">
+                      <div class="media-left">
+                        <router-link
+                          :to="'/detalleServicio/' + serv.serv_id"
+                          @click="$store.commit('clickLink')"
+                        >
+                          <img
+                            :src="imageUrl + serv.serv_imagen"
+                            :alt="serv.serv_nombre"
+                            width="300"
+                            loading="lazy"
+                          />
+                        </router-link>
+                      </div>
+                      <div class="details media-body align-self-center">
+                        <div class="date">
+                          <i class="fa fa-calendar"></i>
+                          {{ formatearFecha(serv.serv_registro) }}
+                        </div>
+                        <p class="location">
+                          <i class="fa fa-phone"></i> {{ serv.serv_nro_celular }}
+                        </p>
+                        <h5>
+                          <router-link
+                            :to="'/detalleServicio/' + serv.serv_id"
+                            @click="$store.commit('clickLink')"
+                          >
+                            {{ serv.serv_nombre }}
+                          </router-link>
+                        </h5>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div v-else class="row justify-content-center">
+
+              <div v-if="servicios.length === 0" class="col-12 text-center">
+                <h1>No hay servicios disponibles en este momento</h1>
+              </div>
+
+              <template v-else>
+                <div
+                  class="col-lg-6 col-md-6 mb-4"
+                  v-for="(serv, index) of servicios"
+                  :key="serv.serv_id || index"
+                  v-show="
+                    (pag - 1) * NUM_RESULTS <= index &&
+                    pag * NUM_RESULTS > index
+                  "
+                >
+                  <div class="single-event-inner">
+                    <div class="media">
+                      <div class="media-left">
+                        <router-link
+                          :to="'/detalleServicio/' + serv.serv_id"
+                          @click="$store.commit('clickLink')"
+                        >
+                          <img
+                            :src="imageUrl + serv.serv_imagen"
+                            :alt="serv.serv_nombre"
+                            width="300"
+                            loading="lazy"
+                          />
+                        </router-link>
+                      </div>
+                      <div class="details media-body align-self-center">
+                        <div class="date">
+                          <i class="fa fa-calendar"></i>
+                          {{ formatearFecha(serv.serv_registro) }}
+                        </div>
+                        <p class="location">
+                          <i class="fa fa-phone"></i> {{ serv.serv_nro_celular }}
+                        </p>
+                        <h5>
+                          <router-link
+                            :to="'/detalleServicio/' + serv.serv_id"
+                            @click="$store.commit('clickLink')"
+                          >
+                            {{ serv.serv_nombre }}
+                          </router-link>
+                        </h5>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Paginación -->
+                <nav class="col-12 td-page-navigation text-center mb-5 mb-lg-0" v-if="pager > 1">
+                  <ul class="pagination">
+                    <li class="pagination-arrow disable">
+                      <a
+                        href="#"
+                        aria-label="Previous"
+                        @click.prevent="pag > 1 ? pag-- : null"
+                      >
+                        <i class="fa fa-angle-double-left"></i>
+                      </a>
+                    </li>
+                    <li v-for="(i, index) of pager" :key="index">
+                      <a
+                        href="#"
+                        :class="[i === pag ? 'active' : '']"
+                        @click.prevent="pag = i"
+                      >
+                        {{ i }}
+                      </a>
+                    </li>
+                    <li class="pagination-arrow">
+                      <a
+                        href="#"
+                        aria-label="Next"
+                        @click.prevent="pag < pager ? pag++ : null"
+                      >
+                        <i class="fa fa-angle-double-right"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </template>
+            </div>
+          </div>
+
           <div class="col-lg-4 col-12">
             <div class="td-sidebar">
+              
+              <!-- Buscador -->
               <div class="widget widget_search">
                 <div class="search-form">
                   <div class="form-group">
@@ -42,157 +186,14 @@
                   </button>
                 </div>
               </div>
+              <SidebarCustom></SidebarCustom>
+              
             </div>
-          </div>
-          <div v-if="searchGet" class="col-12 pd-bottom-90">
-            <div v-if="searchValues.length === 0" class="col-12 text-center">
-              <h3>No se encontraron resultados para "{{ search }}"</h3>
-              <button class="btn btn-base mt-3" @click="limpiarBusqueda">
-                Mostrar todos los servicios
-              </button>
-            </div>
-            <div v-else class="row justify-content-center">
-              <div class="col-12">
-                <p>{{ searchValues.length }} resultado(s) encontrado(s)</p>
-                <hr />
-              </div>
-              <div
-                class="col-lg-6 col-md-6 mb-4"
-                v-for="(serv, index) of searchValues"
-                :key="serv.serv_id || index"
-              >
-                <div class="single-event-inner">
-                  <div class="media">
-                    <div class="media-left">
-                      <router-link
-                        :to="'/detalleServicio/' + serv.serv_id"
-                        @click="$store.commit('clickLink')"
-                      >
-                        <img
-                          :src="imageUrl + serv.serv_imagen"
-                          :alt="serv.serv_nombre"
-                          width="300"
-                          loading="lazy"
-                        />
-                      </router-link>
-                    </div>
-                    <div class="details media-body align-self-center">
-                      <div class="date">
-                        <i class="fa fa-calendar"></i>
-                        {{ formatearFecha(serv.serv_registro) }}
-                      </div>
-                      <p class="location">
-                        <i class="fa fa-phone"></i> {{ serv.serv_nro_celular }}
-                      </p>
-                      <h5>
-                        <router-link
-                          :to="'/detalleServicio/' + serv.serv_id"
-                          @click="$store.commit('clickLink')"
-                        >
-                          {{ serv.serv_nombre }}
-                        </router-link>
-                      </h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div v-else class="col-12 row justify-content-center">
-            
-            <!-- Estado vacío -->
-            <div v-if="servicios.length === 0" class="col-12 text-center">
-              <h1>No hay servicios disponibles en este momento</h1>
-            </div>
-
-            <template v-else>
-              <div
-                class="col-lg-6 col-md-6 mb-4"
-                v-for="(serv, index) of servicios"
-                :key="serv.serv_id || index"
-                v-show="
-                  (pag - 1) * NUM_RESULTS <= index &&
-                  pag * NUM_RESULTS > index
-                "
-              >
-                <div class="single-event-inner">
-                  <div class="media">
-                    <div class="media-left">
-                      <router-link
-                        :to="'/detalleServicio/' + serv.serv_id"
-                        @click="$store.commit('clickLink')"
-                      >
-                        <img
-                          :src="imageUrl + serv.serv_imagen"
-                          :alt="serv.serv_nombre"
-                          width="300"
-                          loading="lazy"
-                        />
-                      </router-link>
-                    </div>
-                    <div class="details media-body align-self-center">
-                      <div class="date">
-                        <i class="fa fa-calendar"></i>
-                        {{ formatearFecha(serv.serv_registro) }}
-                      </div>
-                      <p class="location">
-                        <i class="fa fa-phone"></i> {{ serv.serv_nro_celular }}
-                      </p>
-                      <h5>
-                        <router-link
-                          :to="'/detalleServicio/' + serv.serv_id"
-                          @click="$store.commit('clickLink')"
-                        >
-                          {{ serv.serv_nombre }}
-                        </router-link>
-                      </h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <nav class="col-12 td-page-navigation text-center mb-5 mb-lg-0" v-if="pager > 1">
-                <ul class="pagination">
-                  <li class="pagination-arrow disable">
-                    <a
-                      href="#"
-                      aria-label="Previous"
-                      @click.prevent="pag > 1 ? pag-- : null"
-                    >
-                      <i class="fa fa-angle-double-left"></i>
-                    </a>
-                  </li>
-                  <li v-for="(i, index) of pager" :key="index">
-                    <a
-                      href="#"
-                      :class="[i === pag ? 'active' : '']"
-                      @click.prevent="pag = i"
-                    >
-                      {{ i }}
-                    </a>
-                  </li>
-                  <li class="pagination-arrow">
-                    <a
-                      href="#"
-                      aria-label="Next"
-                      @click.prevent="pag < pager ? pag++ : null"
-                    >
-                      <i class="fa fa-angle-double-right"></i>
-                    </a>
-                  </li>
-                </ul>
-              </nav>
-            </template>
-          </div>
-
-          <div class="col-12">
-            <hr />
-            <SidebarCustom></SidebarCustom>
           </div>
           
         </div>
       </div>
     </div>
-    
   </div>
 </template>
 
@@ -280,7 +281,7 @@ export default {
   computed: {
     ...mapState(["url_api", "Institucion"]),
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo/').trim()
     }
   },
 
