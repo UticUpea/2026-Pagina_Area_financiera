@@ -43,7 +43,7 @@
                 >
                   {{ link.nombre }}
                 </a>
-                <a href="https://.upea.bo/" target="_blank">UTIC UPEA</a>
+                <a href="https://utic.upea.bo/" target="_blank">UTIC UPEA</a>
               </div>
             </div>
             <div class="col-lg-5 col-md-4 col-sm-12 pl-lg-5 pr-5 pr-lg-0">
