@@ -40,6 +40,7 @@
               :src="imageUrl + institucion.institucion_logo" 
               alt="logo" 
               style="background:none!important" 
+              class="logo"
             />
           </div>
           <h1 class="title_1" style="text-transform: uppercase!important;">
@@ -782,6 +783,13 @@
   #texto-maquina {
     margin-left: 20px;
   }
+}
+
+.logo {
+  max-width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
 }
 
 </style>
