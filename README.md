@@ -5,14 +5,9 @@
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Id Carrera/Institudion
 ```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
+cp .env.copy .env
 ```
 
 ### Lints and fixes files
@@ -20,10 +15,24 @@ npm run build
 npm run lint
 ```
 
-### Id Carrera/Institudion
+### Compiles and hot-reloads for development
 ```
-cp .env.copy .env
+npm run serve
 ```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+
+
+
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
