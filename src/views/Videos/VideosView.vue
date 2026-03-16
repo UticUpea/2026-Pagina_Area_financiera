@@ -140,7 +140,7 @@
                     <div class="bottom-area">
                       <div class="row">
                         <div class="col-12 text-right">
-                          <!-- ✅ BOTÓN LEER MÁS ESTILIZADO -->
+
                           <router-link
                             :to="'/detalleVideo/' + vid.video_id"
                             class="btn-leer-mas"

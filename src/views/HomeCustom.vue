@@ -533,7 +533,7 @@
                   class="readmore-text"
                   style="color: #fff!important;"
                 >
-                  Leer mas
+                  Leer más
                 </router-link>
               </div>
             </div>
@@ -574,7 +574,7 @@
                   class="readmore-text"
                   style="color: #fff!important;"
                 >
-                  Leer mas
+                  Leer más
                 </router-link>
               </div>
             </div>
@@ -615,7 +615,7 @@
                   class="readmore-text"
                   style="color: #fff!important;"
                 >
-                  Leer mas
+                  Leer más
                 </router-link>
               </div>
             </div>

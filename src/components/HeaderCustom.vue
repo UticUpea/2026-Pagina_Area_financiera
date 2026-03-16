@@ -77,10 +77,10 @@
               <router-link to="/">INICIO</router-link>
             </li>
             <li class="menu-item-has-children" @mouseover="showSubMenu('m_informacion')">
-              <router-link to="/about">INFORMACION</router-link>
+              <router-link to="/about">INFORMACIÓN</router-link>
               <ul class="sub-menu" :style="[m_informacion ? 'display:block' : 'display:none']">
                 <li><a href="#abaut" @click="click_ma()">SOBRE NOSOTROS</a></li>
-                <li><a href="#mision" @click="click_ma()">MISION Y VISION</a></li>
+                <li><a href="#mision" @click="click_ma()">MISIÓN Y VISIÓN</a></li>
                 <li><a href="#autoridades" @click="click_ma()">AUTORIDADES</a></li>
                 <li><a href="#contacto" @click="click_ma()">CONTACTO</a></li>
               </ul>
@@ -96,7 +96,7 @@
               </ul>
             </li>
             <li class="menu-item-has-children" @mouseover="showSubMenu('m_mas')">
-              <a href="#">MAS</a>
+              <a href="#">MÁS</a>
               <ul class="sub-menu" :style="[m_mas ? 'display:block' : 'display:none']">
                 <li v-for="mc of MenuCur" :key="'curso-' + mc.idtipo_curso_otros">
                   <router-link :to="'/cursos/' + mc.idtipo_curso_otros" @click="click_m()">
@@ -112,7 +112,7 @@
                 <li><router-link to="/eventos" @click="click_m()">EVENTOS</router-link></li>
                 <li><router-link to="/videos" @click="click_m()">VIDEOS</router-link></li>
                 <li v-if="idInstitucion === '13'">
-                  <router-link to="/investigacion" @click="click_m()">INSTITUTO DE INVESTIGACION</router-link>
+                  <router-link to="/investigacion" @click="click_m()">INSTITUTO DE INVESTIGACIÓN</router-link>
                 </li>
               </ul>
             </li>
