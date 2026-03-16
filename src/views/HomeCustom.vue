@@ -9,18 +9,19 @@
               :src="imageUrl + institucion.institucion_logo" 
               alt="logo" 
               style="background:none!important" 
+              class="logo_13"
             />
           </div>
-          <div class="row">
-            <div class="col-10">
-              <div class="banner-inner style-white">
+         <div class="row justify-content-center">
+  <div class="col-12 text-center">
+    <div class="banner-inner style-white">
                 <h1>
                   <span id="texto-maquina" class="title" style="text-transform: uppercase!important;"></span>
                   <span id="cursor" class="typed-cursor">|</span>
                 </h1>
                 <br />
                 <div class="cont">
-                  <router-link style="margin-left: 50px;" class="btn btn-base" to="/about">
+  <router-link class="btn btn-base" to="/about">
                     SOBRE NOSOTROS
                   </router-link>
                 </div>
@@ -110,7 +111,8 @@
             <img 
               :src="imageUrl + institucion.institucion_logo" 
               alt="logo" 
-              style="background:none!important" 
+              style="background:none!important"
+              class="logo_23" 
             />
           </div>
           <h1 class="title_1">
@@ -790,6 +792,49 @@
   height: auto;
   max-height: 200px;
   object-fit: contain;
+    display: block;
+    margin: 10px auto 0 auto;
+}
+
+.logo_13 {
+ max-width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+  display: block;
+  margin: 130px auto 0 auto;
+}
+
+/* LOGO- ID 23*/
+.banner-area-1.banner-bg-overlay.banner-img .avatar {
+  margin-top: 40px !important; 
+  margin-bottom: 10px;
+}
+
+.banner-area-1.banner-bg-overlay.banner-img .container.text-center {
+  padding-top: 10px;
+  position: relative;
+  z-index: 10;
+}
+
+.logo_23 {
+  max-width: 100%;
+  height: auto;
+  max-height: 200px; 
+  object-fit: contain;
+  display: block;
+  margin: 0 auto; 
+  position: relative;
+  z-index: 10;
+}
+
+.banner-area-1.banner-bg-overlay.banner-img .title_1 {
+  margin-top: 1rem; 
+  margin-bottom: 0.5rem;
+}
+
+.banner-area-1.banner-bg-overlay.banner-img .container.text-center > div:last-child {
+  margin-top: 0.5rem; 
 }
 
 </style>

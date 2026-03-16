@@ -1,63 +1,84 @@
 <template>
   <div>
     <div class="widget widget_catagory">
-      <h4 class="widget-title">Categorías</h4>
+      <h4 class="widget-title" :style="{ borderBottomColor: colorPrimario }">
+        Categorías
+      </h4>
       <ul class="catagory-items">
         <li v-for="(conv, id_conv) of MenuConv" :key="id_conv">
           <router-link
             :to="'/convocatorias/' + conv.idtipo_conv_comun"
             @click="$store.commit('clickLink')"
           >
-            <i class="fa fa-angle-right"></i>
+            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i>
             {{ conv.tipo_conv_comun_titulo?.charAt(0).toUpperCase() }}{{ conv.tipo_conv_comun_titulo?.slice(1).toLowerCase() }}
           </router-link>
         </li>
         
         <li>
           <router-link to="/servicios" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right"></i> Servicios
+            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Servicios
           </router-link>
         </li>
         <li>
           <router-link to="/ofertas" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right"></i> Ofertas académicas
+            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Ofertas académicas
           </router-link>
         </li>
         <li>
           <router-link to="/publicaciones" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right"></i> Publicaciones
+            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Publicaciones
           </router-link>
         </li>
         <li>
           <router-link to="/gaceta" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right"></i> Gaceta
+            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Gaceta
           </router-link>
         </li>
         <li>
           <router-link to="/eventos" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right"></i> Eventos
+            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Eventos
           </router-link>
         </li>
         <li>
           <router-link to="/videos" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right"></i> Videos
+            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Videos
           </router-link>
         </li>
       </ul>
     </div>
     <hr />
-
-    
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
+
 export default {
   name: "SidebarCustom",
+  
   computed: {
-    ...mapState(["MenuConv", "MenuCur", "Links"]),
+    ...mapState(["MenuConv", "MenuCur", "Links", "Institucion"]),
+    
+    // Obtener colores desde la API (colorinstitucion[0])
+    colorPrimario() {
+      return this.Institucion?.colorinstitucion?.[0]?.color_primario || '#DC0E10'
+    },
+    
+    colorSecundario() {
+      return this.Institucion?.colorinstitucion?.[0]?.color_secundario || '#E9C202'
+    },
+    
+    colorTerciario() {
+      return this.Institucion?.colorinstitucion?.[0]?.color_terciario || '#060705'
+    },
+    
+    // Gradiente para hover usando colores de la API
+    gradientHover() {
+      return `linear-gradient(135deg, ${this.colorPrimario} 0%, ${this.colorSecundario} 100%)`
+    }
   },
+  
   methods: {
     clickBack() {
       this.$store.commit("clickLink");
@@ -66,9 +87,8 @@ export default {
   },
 };
 </script>
+
 <style scoped>
-
-
 .widget_catagory {
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border-radius: 12px;
@@ -89,11 +109,12 @@ export default {
   color: #2c3e50;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 3px solid #ff0f07;
+  border-bottom: 3px solid; /* Color dinámico desde inline style */
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
   position: relative;
+  transition: border-color 0.3s ease;
 }
 
 .widget-title::after {
@@ -104,8 +125,9 @@ export default {
   transform: translateX(-50%);
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, #ff2c07, #ff1e00);
+  background: v-bind(colorPrimario);
   border-radius: 2px;
+  transition: background 0.3s ease;
 }
 
 .catagory-items {
@@ -116,7 +138,6 @@ export default {
   flex-direction: column;
   gap: 1.3rem;
 }
-
 
 .catagory-items li {
   margin: 0;
@@ -141,22 +162,22 @@ export default {
 }
 
 .catagory-items li a:hover {
-  background: linear-gradient(135deg, #ff0707 0%, #ff0000 100%);
-  color: #000;
+  background: v-bind(gradientHover);
+  color: #fff;
   transform: translateX(8px);
   border-color: transparent;
-  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .catagory-items li a i {
   font-size: 1.4rem;
   transition: transform 0.3s ease;
-  color: #f10909;
+  /* Color dinámico desde inline style en el template */
 }
 
 .catagory-items li a:hover i {
   transform: translateX(4px);
-  color: #000;
+  color: #fff;
 }
 
 hr {
@@ -207,7 +228,7 @@ hr {
 }
 
 .catagory-items li a:focus-visible {
-  outline: 2px solid #ec0f0f;
+  outline: 2px solid v-bind(colorPrimario);
   outline-offset: 2px;
 }
 
