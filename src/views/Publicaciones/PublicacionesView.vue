@@ -27,7 +27,7 @@
             <div v-if="searchGet">
               
               <div v-if="searchValues.length === 0" class="text-center">
-                <h3>⚠️ No se encontraron resultados para "{{ search }}"</h3>
+                <h3> No se encontraron resultados para "{{ search }}"</h3>
                 <button class="btn btn-base mt-3" @click="limpiarBusqueda">
                   Mostrar todas las publicaciones
                 </button>
@@ -150,8 +150,7 @@
                     </router-link>
                   </div>
                 </div>
-                
-                <!-- Paginación -->
+
                 <nav class="col-12 td-page-navigation text-center mb-5 mb-lg-0" v-if="pager > 1">
                   <ul class="pagination">
                     <li class="pagination-arrow disable">
@@ -397,7 +396,6 @@
   white-space: nowrap;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .single-blog-inner {
     margin-bottom: 1.5rem;
@@ -417,7 +415,8 @@
 <script>
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "PublicacionesView",
@@ -428,7 +427,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       publicaciones: [],
       search: "",
       searchGet: false,
@@ -442,9 +441,9 @@ export default {
   
   computed: {
     ...mapState(["url_api", "Institucion"]),
-    
+
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim()
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -452,7 +451,8 @@ export default {
     async getPublicaciones() {
       this.loading = true
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/recursos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/recursos`)
         const data = res.data
 
         this.publicaciones = (data.upea_publicaciones || []).map(this._limpiarObjeto)

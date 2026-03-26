@@ -10,7 +10,8 @@
 import HeaderCustom from "@/components/HeaderCustom.vue";
 import FooterCustom from "@/components/FooterCustom.vue";
 import { mapState } from "vuex";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "appWrapper",
@@ -22,8 +23,8 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
-      imageUrl: (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim(),
+      idInstitucion: config.app.idInstitucion || '22',
+      
       sliderInterval: null
     }
   },
@@ -38,6 +39,10 @@ export default {
       "getter",
       "statusImg",
     ]),
+
+    imageUrl() {
+      return config.uploads.baseUrl || ''
+    }
   },
   
   methods: {
@@ -56,7 +61,9 @@ export default {
 
     async getMenuConv() {
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data.convocatorias || []
         const tiposUnicos = {}
         
@@ -86,7 +93,8 @@ export default {
 
     async getMenuCur() {
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data.cursos || []
         const tiposUnicos = {}
         
@@ -116,7 +124,8 @@ export default {
 
     async getLinks() {
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/recursos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/recursos`)
         const data = res.data.linksExternoInterno || []
         
         const filterLinks = data
@@ -131,7 +140,8 @@ export default {
 
     async getInstitucion() {
       try {
-        const res = await api.get(`/institucionesPrincipal/${this.idInstitucion}`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucionesPrincipal/${institucionId}`)
         const data = this._limpiarObjeto(res.data.Descripcion)
         
         this.$store.commit('setInstitucion', data)

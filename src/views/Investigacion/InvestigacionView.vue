@@ -140,6 +140,7 @@
 <script>
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
+import { config } from '@/config/env'
 
 export default {
   name: "InvestigacionView",
@@ -150,8 +151,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
-
+      idInstitucion: config.app.idInstitucion || '22',
       institucion: {},
       loading: false
     };
@@ -165,6 +165,7 @@ export default {
     async getInstitucionData() {
       this.loading = true
       try {
+        
         this.institucion = this.Institucion || {}
       } catch (error) {
         console.error('Error cargando datos:', error)

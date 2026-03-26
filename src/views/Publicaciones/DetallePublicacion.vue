@@ -52,6 +52,7 @@
                 <a
                   :href="imageUrl + publicacion.publicaciones_imagen"
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
 
                   <img
@@ -84,8 +85,7 @@
             </div>
           </div>
         </div>
-        
-        <!-- Sidebar -->
+
         <div class="row justify-content-center mt-5">
           <div class="col-lg-4 col-12">
             <div class="td-sidebar">
@@ -149,7 +149,8 @@
 <script>
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "DetallePublicacion",
@@ -160,9 +161,7 @@ export default {
   
   data() {
     return {
-
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
-
+      idInstitucion: config.app.idInstitucion || '22',
       publicacion: {},
       loading: false,
       errorGet: false,
@@ -171,9 +170,8 @@ export default {
   
   computed: {
     ...mapState(["url_api", "Institucion"]),
-
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -185,8 +183,9 @@ export default {
       
       try {
         const idPub = this.$route.params.idPub
+        const institucionId = this.idInstitucion || config.app.idInstitucion
 
-        const res = await api.get(`/institucion/${this.idInstitucion}/recursos`)
+        const res = await api.get(`/institucion/${institucionId}/recursos`)
         const data = res.data
 
         const lista = data.upea_publicaciones || []

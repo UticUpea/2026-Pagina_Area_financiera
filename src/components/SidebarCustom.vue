@@ -59,8 +59,7 @@ export default {
   
   computed: {
     ...mapState(["MenuConv", "MenuCur", "Links", "Institucion"]),
-    
-    // Obtener colores desde la API (colorinstitucion[0])
+
     colorPrimario() {
       return this.Institucion?.colorinstitucion?.[0]?.color_primario || '#DC0E10'
     },
@@ -72,8 +71,7 @@ export default {
     colorTerciario() {
       return this.Institucion?.colorinstitucion?.[0]?.color_terciario || '#060705'
     },
-    
-    // Gradiente para hover usando colores de la API
+
     gradientHover() {
       return `linear-gradient(135deg, ${this.colorPrimario} 0%, ${this.colorSecundario} 100%)`
     }
@@ -109,7 +107,7 @@ export default {
   color: #2c3e50;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 3px solid; /* Color dinámico desde inline style */
+  border-bottom: 3px solid;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -172,7 +170,6 @@ export default {
 .catagory-items li a i {
   font-size: 1.4rem;
   transition: transform 0.3s ease;
-  /* Color dinámico desde inline style en el template */
 }
 
 .catagory-items li a:hover i {
@@ -239,7 +236,6 @@ hr {
   }
 }
 
-/* Tamaños letras */
 .widget_catagory .widget-title {
   font-size: 1.3rem;  
 }

@@ -56,7 +56,6 @@
         <div class="container">
           <div class="row">
             
-            <!-- Misión -->
             <div class="col-lg-6 align-self-center mt-4 mt-lg-0">
               <div class="section-title style-bg mb-0" style="border: 2px solid #fff; padding: 2rem; border-radius: 20px; background-color: rgba(244, 244, 244, 0.8);">
                 <div class="single-list-inner mt-4">
@@ -126,9 +125,9 @@
                     <li>
                       <a 
                         v-if="autoridad.celular_autoridad"
-
-                        :href="'https://wa.me/' + autoridad.celular_autoridad.replace(/[^0-9]/g, '')" 
+                        :href="'https://wa.me/591' + autoridad.celular_autoridad.replace(/[^0-9]/g, '')" 
                         target="_blank"
+                        rel="noopener noreferrer"
                       >
                         <i class="fa fa-whatsapp" aria-hidden="true"></i>
                       </a>
@@ -136,9 +135,9 @@
                     <li>
                       <a 
                         v-if="autoridad.facebook_autoridad && autoridad.facebook_autoridad !== '_'"
-
                         :href="autoridad.facebook_autoridad?.trim()" 
                         target="_blank"
+                        rel="noopener noreferrer"
                       >
                         <i class="fa fa-facebook" aria-hidden="true"></i>
                       </a>
@@ -149,6 +148,7 @@
                         v-if="autoridad.twiter_autoridad && autoridad.twiter_autoridad !== '_'"
                         :href="autoridad.twiter_autoridad?.trim()" 
                         target="_blank"
+                        rel="noopener noreferrer"
                       >
                         <i class="fa fa-twitter" aria-hidden="true"></i>
                       </a>
@@ -207,14 +207,14 @@
                     </p>
                     <p>
                       <b><i class="fa fa-facebook"></i> Facebook: </b>
-                      <a :href="institucion.institucion_facebook?.trim()" target="_blank">
+                      <a :href="institucion.institucion_facebook?.trim()" target="_blank" rel="noopener noreferrer">
                         {{ institucion.institucion_facebook?.trim() }}
                       </a>
                     </p>
 
                     <p>
                       <b><i class="fa fa-youtube"></i> Youtube: </b>
-                      <a :href="institucion.institucion_youtube?.trim()" target="_blank">
+                      <a :href="institucion.institucion_youtube?.trim()" target="_blank" rel="noopener noreferrer">
                         {{ institucion.institucion_youtube?.trim() }}
                       </a>
                     </p>
@@ -246,7 +246,6 @@
 </template>
 
 <style scoped>
-
 .bg-cover-img {
   background-image: url("@/assets/fondo_upea.jpg");
   background-repeat: no-repeat;
@@ -284,14 +283,15 @@ iframe {
 
 <script>
 import { mapState } from "vuex";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "AboutView",
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
 
       institucion: {},
       autoridades: [],
@@ -310,7 +310,7 @@ export default {
     ...mapState(["Institucion", "url_api"]),
 
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -318,7 +318,8 @@ export default {
     async getInstitucionData() {
       this.loading.institucion = true
       try {
-        const res = await api.get(`/institucionesPrincipal/${this.idInstitucion}`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucionesPrincipal/${institucionId}`)
         const data = res.data.Descripcion
         this.institucion = this._limpiarObjeto(data)
 
@@ -334,7 +335,8 @@ export default {
     async getAutoridades() {
       this.loading.contenido = true
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/contenido`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/contenido`)
         const data = res.data
         
         this.autoridades = data.autoridad?.map(this._limpiarObjeto) || []

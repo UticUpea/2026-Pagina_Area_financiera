@@ -286,7 +286,6 @@
   font-size: 1.30rem;
 }
 
-/* Estilos base compartidos */
 .col-lg-6 {
   min-width: 300px;
 }
@@ -489,13 +488,14 @@
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import { mapState } from "vuex";
 import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "CursosView",
   components: { SidebarCustom },
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       tipo: "CURSOS",
       cursos: [],
       tipoCursoId: null,
@@ -510,8 +510,9 @@ export default {
   },
   computed: {
     ...mapState(["url_api", "Institucion"]),
+
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim()
+      return config.uploads.baseUrl || ''
     }
   },
   watch: {
@@ -542,8 +543,9 @@ export default {
     async cargarDatos(tipoCursoId) {
       this.loading = true
       try {
-        await this.getTipoCur(tipoCursoId)
-        await this.getCursos()
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        await this.getTipoCur(tipoCursoId, institucionId)
+        await this.getCursos(institucionId)
       } catch (error) { 
         console.error('Error cargando datos:', error) 
       } finally { 
@@ -552,7 +554,7 @@ export default {
       }
     },
     
-    async getTipoCur(tipo_cur) {
+    async getTipoCur(tipo_cur, institucionId) {
       try {
         if (!tipo_cur) {
           this.tipo = "CURSOS"
@@ -560,7 +562,7 @@ export default {
           return
         }
         
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const cursos = res.data.cursos || []
         
         const cursoEncontrado = cursos.find(c => {
@@ -590,9 +592,9 @@ export default {
       }
     },
     
-    async getCursos() {
+    async getCursos(institucionId) {
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
         const lista = data.cursos || []
         

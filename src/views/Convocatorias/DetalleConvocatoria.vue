@@ -50,6 +50,7 @@
                 <a
                   :href="imageUrl + convocatoria.con_foto_portada"
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <img
                     :src="imageUrl + convocatoria.con_foto_portada"
@@ -154,7 +155,8 @@
 <script>
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "DetalleConvocatoria",
@@ -165,7 +167,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       convocatoria: {},
       loading: false,
       errorGet: false,
@@ -174,8 +176,9 @@ export default {
   
   computed: {
     ...mapState(["url_api", "Institucion"]),
+
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -186,7 +189,8 @@ export default {
       
       try {
         const idConv = this.$route.params.idConv
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
         const lista = data.convocatorias || []
         this.convocatoria = lista.find(c => c.idconvocatorias == idConv) || {}

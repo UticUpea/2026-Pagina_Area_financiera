@@ -225,13 +225,14 @@
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import { mapState } from "vuex";
 import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "SeminariosView",
   components: { SidebarCustom },
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       tipo: "",
       tipoSeminarioId: null,
       seminarios: [],
@@ -247,7 +248,7 @@ export default {
   computed: {
     ...mapState(["url_api", "Institucion"]),
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return config.uploads.baseUrl || ''
     }
   },
   watch: {
@@ -262,8 +263,9 @@ export default {
     async cargarDatos(tipoSeminarioId) {
       this.loading = true
       try {
-        await this.getTipoSem(tipoSeminarioId)
-        await this.getSeminarios()
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        await this.getTipoSem(tipoSeminarioId, institucionId)
+        await this.getSeminarios(institucionId)
       } catch (error) { 
         console.error('Error:', error) 
       } finally { 
@@ -272,14 +274,14 @@ export default {
       }
     },
 
-    async getTipoSem(tipo_sem) {
+    async getTipoSem(tipo_sem, institucionId) {
       try {
         if (!tipo_sem) {
           this.tipo = "SEMINARIOS"
           return
         }
         
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const cursos = res.data.cursos || []
         const tipos = {}
         
@@ -302,10 +304,10 @@ export default {
       }
     },
     
-    async getSeminarios() {
+    async getSeminarios(institucionId) {
       this.loading = true
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
         
         this.seminarios = data.cursos?.filter(c => {

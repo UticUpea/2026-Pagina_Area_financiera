@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// const array = require('./../pages')
+import { config } from '@/config/env'
 
-// let res = await this.axios.get("/api/cursosAll/" + this.id_carrera);
 const routes = [
   {
     path: '/',
@@ -10,7 +9,7 @@ const routes = [
     children: [
       {
         path: '/',
-        name: 'homeApp',
+        name: 'home',
         component: () => import('@/views/HomeCustom.vue')
       },
       {
@@ -39,7 +38,7 @@ const routes = [
         component: () => import('@/views/Servicios/ServiciosView.vue')
       },
       {
-        path: '/DetalleServicio/:idServ',
+        path: '/detalleServicio/:idServ',
         name: 'detalleServicio',
         component: () => import('@/views/Servicios/DetalleServicio.vue')
       },
@@ -55,7 +54,7 @@ const routes = [
       },
       {
         path: '/publicaciones',
-        name: 'publicacionesView',
+        name: 'publicaciones',
         component: () => import('@/views/Publicaciones/PublicacionesView.vue')
       },
       {
@@ -65,17 +64,17 @@ const routes = [
       },
       {
         path: '/gaceta',
-        name: 'GacetaView',
+        name: 'gaceta',
         component: () => import('@/views/Gaceta/GacetaView.vue')
       },
       {
-        path: '/DetalleGaceta/:idGac',
+        path: '/detalleGaceta/:idGac',
         name: 'detalleGaceta',
         component: () => import('@/views/Gaceta/DetalleGaceta.vue')
       },
       {
         path: '/eventos',
-        name: 'eventosView',
+        name: 'eventos',
         component: () => import('@/views/Eventos/EventosView.vue')
       },
       {
@@ -85,7 +84,7 @@ const routes = [
       },
       {
         path: '/videos',
-        name: 'videosView',
+        name: 'videos',
         component: () => import('@/views/Videos/VideosView.vue')
       },
       {
@@ -94,38 +93,48 @@ const routes = [
         component: () => import('@/views/Videos/DetalleVideo.vue')
       },
       {
+        path: '/seminarios/:tipo_sem',
+        name: 'seminarios',
+        component: () => import('@/views/Seminarios/SeminariosView.vue')
+      },
+      {
+        path: '/detalleSeminario/:idSem',
+        name: 'detalleSeminario',
+        component: () => import('@/views/Seminarios/DetalleSeminario.vue')
+      },
+      {
         path: '/investigacion',
-        name: 'investigacionView',
+        name: 'investigacion',
         component: () => import('@/views/Investigacion/InvestigacionView.vue')
       },
-      // {
-      //   path: '/DetalleGaceta/:idGac',
-      //   name: 'detalleGaceta',
-      //   component: () => import('@/views/Gaceta/DetalleGaceta.vue')
-      // },
       {
         path: '/about',
-        name: 'aboutView',
+        name: 'about',
         component: () => import('@/views/AboutView.vue')
       },
-
     ]
   },
   {
     path: '/:pathMatch(.*)*',
-    name: '404Page',
+    name: 'notFound',
     component: () => import('@/pages/404Page.vue')
   },
   {
     path: '/error_network',
-    name: 'error_network',
+    name: 'networkError',
     component: () => import('@/pages/ErrorNetwork.vue')
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes
+  history: createWebHistory(config.app.baseUrl || process.env.BASE_URL || '/'),
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
+    return { top: 0, behavior: 'smooth' }
+  }
 })
 
 export default router

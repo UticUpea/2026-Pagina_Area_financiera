@@ -413,7 +413,8 @@
 <script>
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import { mapState } from "vuex";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "ConvocatoriasView",
@@ -424,7 +425,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       tipo: "",
       convocatorias: [],
       tipoConvocatoriaId: null,
@@ -441,7 +442,7 @@ export default {
   computed: {
     ...mapState(["url_api", "Institucion"]),
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim()
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -460,8 +461,9 @@ export default {
     async cargarDatos(tipoConvId) {
       this.loading = true
       try {
-        await this.getTipoConv(tipoConvId)
-        await this.getConvocatorias()
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        await this.getTipoConv(tipoConvId, institucionId)
+        await this.getConvocatorias(institucionId)
       } catch (error) {
         console.error('Error cargando datos:', error)
       } finally {
@@ -470,9 +472,9 @@ export default {
       }
     },
 
-    async getTipoConv(tipo_conv) {
+    async getTipoConv(tipo_conv, institucionId) {
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
 
         const convocatorias = data.convocatorias || []
@@ -503,9 +505,9 @@ export default {
       }
     },
 
-    async getConvocatorias() {
+    async getConvocatorias(institucionId) {
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
 
         const lista = data.convocatorias || []

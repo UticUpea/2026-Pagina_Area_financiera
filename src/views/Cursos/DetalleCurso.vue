@@ -24,9 +24,11 @@
         </div>
       </div>
     </div>
-    <div class="main-blog-area pd-top-120 pd-bottom-90">
+
+    <div class="main-blog-area pd-top-120 pd-bottom-120">
       <div class="container">
         <div class="row justify-content-center">
+
           <div class="col-lg-8 col-12" v-if="errorGet">
             <div class="text-center">
               <h1>Curso inexistente</h1>
@@ -36,6 +38,7 @@
               </button>
             </div>
           </div>
+
           <div class="col-lg-8 col-12" v-else-if="loading">
             <div class="text-center">
               <div class="spinner-border text-primary" role="status">
@@ -44,6 +47,7 @@
               <p class="mt-3">Cargando información del curso...</p>
             </div>
           </div>
+
           <div class="col-lg-8 col-12" v-else-if="curso.iddetalle_cursos_academicos">
             <div class="course-details-page">
               <div class="course-details-meta-list">
@@ -94,6 +98,7 @@
                 <a 
                   :href="imageUrl + curso.det_img_portada" 
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <img
                     :src="imageUrl + curso.det_img_portada"
@@ -149,7 +154,7 @@
                     </div>
                     <div v-if="curso.det_grupo_whatssap" class="mt-2">
                       <b><i class="fa fa-whatsapp"></i> Grupo WhatsApp: </b>
-                      <a :href="curso.det_grupo_whatssap" target="_blank">
+                      <a :href="curso.det_grupo_whatssap" target="_blank" rel="noopener noreferrer">
                         Unirse al grupo
                       </a>
                     </div>
@@ -182,6 +187,7 @@
                                 v-if="fac.facebook_facilitador && fac.facebook_facilitador !== '_'"
                                 :href="fac.facebook_facilitador.trim()" 
                                 target="_blank"
+                                rel="noopener noreferrer"
                               >
                                 <i class="fa fa-facebook" aria-hidden="true"></i>
                               </a>
@@ -189,8 +195,9 @@
                             <li>
                               <a 
                                 v-if="fac.celular_facilitador"
-                                :href="'https://wa.me/' + fac.celular_facilitador.replace(/[^0-9]/g, '')" 
+                                :href="'https://wa.me/591' + fac.celular_facilitador.replace(/[^0-9]/g, '')" 
                                 target="_blank"
+                                rel="noopener noreferrer"
                               >
                                 <i class="fa fa-whatsapp" aria-hidden="true"></i>
                               </a>
@@ -211,14 +218,11 @@
                     </div>
                   </div>
                 </div>
-                
               </div>
             </div>
           </div>
-          
         </div>
 
-        <!-- Sidebar -->
         <div class="row justify-content-center mt-5">
           <div class="col-lg-4 col-12">
             <div class="td-sidebar">
@@ -226,10 +230,8 @@
             </div>
           </div>
         </div>
-        
       </div>
     </div>
-    
   </div>
 </template>
 
@@ -346,6 +348,7 @@
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "DetalleCurso",
@@ -356,7 +359,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       curso: {},
       loading: false,
       errorGet: false,
@@ -367,7 +370,7 @@ export default {
     ...mapState(["url_api", "Institucion"]),
 
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim()
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -378,10 +381,11 @@ export default {
       
       try {
         const idCur = this.$route.params.idCur
+        const institucionId = this.idInstitucion || config.app.idInstitucion
         
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
-        
+
         const lista = data.cursos || []
         this.curso = lista.find(c => String(c.iddetalle_cursos_academicos) === String(idCur)) || {}
 

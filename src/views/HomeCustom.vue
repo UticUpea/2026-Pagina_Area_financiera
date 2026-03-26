@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <div v-if="idInstitucion === '13'">
       <div class="banner-area banner-bg-overlay banner-img">
         <div class="container">
@@ -361,26 +360,27 @@
       </div>
     </div>
 
-    <div class="event-area pd-top-50 mg-bottom-120">
-      <div class="container">
-        <div class="section-title text-center">
-          <h5 class="sub-title">Redes Sociales</h5>
-          <h2 class="title">Facebook</h2>
+<div class="event-area pd-top-50 mg-bottom-120">
+  <div class="container">
+    <div class="section-title text-center">
+      <h5 class="sub-title">Redes Sociales</h5>
+      <h2 class="title">Facebook</h2>
+    </div>
+    <div class="row no-gutters">
+      <div class="col-xl-7 col-lg-6 banner-area-3 bg-cover bg-cover-img-fb">
+        <div class="event-section-title">
+          <div class="section-title mb-0 pt-xl-5 style-white"></div>
         </div>
-        <div class="row no-gutters">
-          <div class="col-xl-7 col-lg-6 banner-area-3 bg-cover bg-cover-img-fb">
-            <div class="event-section-title">
-              <div class="section-title mb-0 pt-xl-5 style-white"></div>
-            </div>
-          </div>
-          <div class="col-xl-5 col-lg-7 area-fb">
-            <div class="event-area-inner bg-base-fb">
-              <div class="facebook" id="facebook"></div>
-            </div>
-          </div>
+      </div>
+      <div class="col-xl-5 col-lg-7 area-fb">
+        <div class="event-area-inner bg-base-fb">
+
+          <div class="facebook" id="facebook"></div>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
     <div class="team-area pd-bottom-80">
       <div class="container">
@@ -842,6 +842,7 @@
 <script>
 import { mapState } from "vuex";
 import Typed from 'typed.js';
+import { config } from '@/config/env'
 import api from '@/plugins/axios'
 
 export default {
@@ -849,8 +850,7 @@ export default {
   
   data() {
     return {
-
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       
       texts: [
         "Universidad Pública de El Alto", 
@@ -876,7 +876,6 @@ export default {
       pag: 1,
       pager: 0,
       
-    
       loading: {
         institucion: false,
         contenidos: false,
@@ -884,7 +883,6 @@ export default {
         recursos: false
       },
       
-    
       typedInstance: null
     };
   },
@@ -895,14 +893,13 @@ export default {
     currentText() {
       return this.texts[this.currentIndex];
     },
-    
+
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return config.uploads.baseUrl || ''
     }
   },
 
   methods: {
-    //  efecto Máquina de escribir - Solo institución 13
     iniciarMaquinaDeEscribir() {
       const options = {
         strings: ["Bienvenid@ a: ", "Contaduría Pública"],
@@ -916,8 +913,7 @@ export default {
       if (this.typedInstance) this.typedInstance.destroy()
       this.typedInstance = new Typed("#texto-maquina", options);
     },
-    
-    // Animación de texto fade - Solo institución 24
+
     changeText() {
       this.isFadingOut = true;
       setTimeout(() => {
@@ -930,7 +926,8 @@ export default {
     async getInstitucionData() {
       this.loading.institucion = true
       try {
-        const res = await api.get(`/institucionesPrincipal/${this.idInstitucion}`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucionesPrincipal/${institucionId}`)
         const data = res.data.Descripcion
         this.institucion = this._limpiarObjeto(data)
 
@@ -951,7 +948,8 @@ export default {
     async getContenidosAll() {
       this.loading.contenidos = true
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
         
         this.convocatorias = data.convocatorias?.map(this._limpiarObjeto) || []
@@ -973,7 +971,8 @@ export default {
     async getContenidoExtra() {
       this.loading.contenido = true
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/contenido`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/contenido`)
         const data = res.data
         
         this.autoridades = data.autoridad?.map(this._limpiarObjeto) || []
@@ -988,7 +987,8 @@ export default {
     async getRecursos() {
       this.loading.recursos = true
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/recursos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/recursos`)
         const data = res.data
         
         this.publicaciones = data.upea_publicaciones?.map(this._limpiarObjeto) || []
@@ -1053,16 +1053,44 @@ export default {
       ).length
     },
 
-    _renderFacebookWidget() {
-      const fbUrl = this.institucion?.institucion_facebook?.trim()
-      if (!fbUrl || fbUrl === '_') return
+_renderFacebookWidget() {
+  const fbUrl = this.institucion?.institucion_facebook?.trim()
 
-      const container = document.getElementById("facebook")
-      if (!container) return
-      const fbSrc = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(fbUrl)}&tabs=timeline&width=500&height=700&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`
+  const container = document.getElementById('facebook')
+  if (!container) {
+    console.warn('⚠️  Contenedor #facebook no encontrado, reintentando en 500ms...')
+    setTimeout(() => this._renderFacebookWidget(), 500)
+    return
+  }
 
-      container.innerHTML = `<iframe src="${fbSrc}" width="100%" height="700" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`
-    }
+  if (!fbUrl || fbUrl === '_' || !fbUrl.includes('facebook.com')) {
+    container.innerHTML = '<p class="text-center text-white">Página de Facebook no configurada</p>'
+    return
+  }
+
+  try {
+    const fbSrc = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(fbUrl)}&tabs=timeline&width=500&height=700&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=true`
+
+    container.innerHTML = `
+      <iframe 
+        src="${fbSrc}" 
+        width="100%" 
+        height="700" 
+        style="border:none;overflow:hidden" 
+        scrolling="no" 
+        frameborder="0" 
+        allowfullscreen="true" 
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+        loading="lazy"
+        referrerpolicy="strict-origin-when-cross-origin"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
+      ></iframe>
+    `
+  } catch (error) {
+    console.error('❌ Error renderizando widget de Facebook:', error)
+    container.innerHTML = '<p class="text-center text-white">Error cargando Facebook</p>'
+  }
+}
   },
 
   created() {

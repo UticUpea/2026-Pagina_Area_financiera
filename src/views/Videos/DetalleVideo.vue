@@ -55,6 +55,8 @@
                   frameborder="0"
                   allowfullscreen="allowfullscreen"
                   loading="lazy"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
                 />
               </div>
               <div class="details">
@@ -93,7 +95,6 @@
 </template>
 
 <style scoped>
-
 .bg-overlay-img {
   background-image: url("@/assets/Fondo2.jpg");
 }
@@ -138,7 +139,8 @@
 <script>
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "DetalleVideo",
@@ -149,7 +151,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       video: {},
       loading: false,
       errorGet: false,
@@ -159,21 +161,22 @@ export default {
   computed: {
     ...mapState(["url_api", "Institucion"]),
 
+
     resourceUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo/uploads/'
+      return config.uploads.baseUrl || ''
     }
   },
 
   methods: {
-
     async getVideoOne() {
       this.loading = true
       this.errorGet = false
       
       try {
         const idVid = this.$route.params.idVid
+        const institucionId = this.idInstitucion || config.app.idInstitucion
 
-        const res = await api.get(`/institucion/${this.idInstitucion}/contenido`)
+        const res = await api.get(`/institucion/${institucionId}/contenido`)
         const data = res.data
         
         const lista = data.upea_videos || []
@@ -181,14 +184,14 @@ export default {
 
         if (!this.video.video_id) {
           this.errorGet = true
-          console.warn('⚠️ Video no encontrado con ID:', idVid)
+          console.warn('Video no encontrado con ID:', idVid)
           return
         }
         
         this.video = this._limpiarObjeto(this.video)
         
       } catch (error) {
-        console.error('❌ Error cargando video:', error)
+        console.error('Error cargando video:', error)
         this.errorGet = true
 
         if (error.response?.status === 404) {

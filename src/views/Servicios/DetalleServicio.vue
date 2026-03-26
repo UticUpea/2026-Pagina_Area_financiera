@@ -87,10 +87,12 @@
                           pag * NUM_RESULTS > index
                         "
                       >
+
                         <a
                           :href="imageUrl + img.serv_imagen"
                           class="single-gallery"
                           target="_blank"
+                          rel="noopener noreferrer"
                         >
                           <img
                             :src="imageUrl + img.serv_imagen"
@@ -142,7 +144,6 @@
           
         </div>
 
-        <!-- Sidebar -->
         <div class="row justify-content-center mt-5">
           <div class="col-lg-4 col-12">
             <SidebarCustom></SidebarCustom>
@@ -199,7 +200,8 @@
 <script>
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "DetalleServicio",
@@ -210,7 +212,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       servicio: {},
       loading: false,
       errorGet: false,
@@ -222,8 +224,9 @@ export default {
   
   computed: {
     ...mapState(["url_api", "Institucion"]),
+
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -234,7 +237,9 @@ export default {
       
       try {
         const idServ = this.$route.params.idServ
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
         
         const lista = data.serviciosCarrera || []

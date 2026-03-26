@@ -255,7 +255,8 @@
 <script>
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import { mapState } from "vuex";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "ServiciosView",
@@ -266,7 +267,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       servicios: [],
       search: "",
       searchGet: false,
@@ -280,8 +281,9 @@ export default {
   
   computed: {
     ...mapState(["url_api", "Institucion"]),
+
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo/').trim()
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -289,7 +291,8 @@ export default {
     async getServiciosAll() {
       this.loading = true
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
         const lista = data.serviciosCarrera || []
         this.servicios = lista

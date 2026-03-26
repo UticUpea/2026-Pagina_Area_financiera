@@ -1,8 +1,11 @@
 import { createStore } from 'vuex'
+import { config } from '@/config/env'
 
 export default createStore({
   state: {
-    url_api: process.env.VUE_APP_API_ROOT || 'https://apiadministrador.upea.bo',
+    // ✅ Fallback minimalista: fail-fast en producción
+    url_api: config.api.root || '',
+    
     getter: true,
     MenuConv: [],
     MenuCur: [],
@@ -11,16 +14,32 @@ export default createStore({
     statusImg: true,
   },
   
-  getters: {},
+  getters: {
+    apiUrl: (state) => state.url_api,
+    isConfigLoaded: (state) => !!state.url_api
+  },
   
   mutations: {
     loadOn() {
-      document.querySelector("#preloader").style.visibility = "visible";
-      window.scrollTo(0, 0);
+      const preloader = document.querySelector("#preloader")
+      if (preloader) {
+        preloader.style.visibility = "visible"
+      }
+      window.scrollTo(0, 0)
     },
     
     loading() {
-      document.querySelector("#preloader").style.visibility = "hidden";
+      const preloader = document.querySelector("#preloader")
+      if (preloader) {
+        preloader.style.visibility = "hidden"
+      }
+    },
+    
+    loadOff() {
+      const preloader = document.querySelector("#preloader")
+      if (preloader) {
+        preloader.style.visibility = "hidden"
+      }
     },
     
     setInstitucion(state, data) {
@@ -36,27 +55,28 @@ export default createStore({
     },
     
     clickLink(state) {
-      window.scrollTo(0, 0);
+      window.scrollTo(0, 0)
       state.getter = true
     },
     
     idEncrypt() {
       console.log("hola")
     },
-     setMenuConv(state, data) {
-    state.MenuConv = data
-  },
-
-  loadOff() {
-    document.querySelector("#preloader").style.visibility = "hidden";
-  },
-  
-  setMenuCur(state, data) {
-    state.MenuCur = data
-  }
-
+    
+    setMenuConv(state, data) {
+      state.MenuConv = data
+    },
+    
+    setMenuCur(state, data) {
+      state.MenuCur = data
+    }
   },
   
-  actions: {},
+  actions: {
+    async refreshConfig() {
+      console.log('🔄 Refreshing store config...')
+    }
+  },
+  
   modules: {}
 })

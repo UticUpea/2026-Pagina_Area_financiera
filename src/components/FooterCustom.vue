@@ -7,18 +7,19 @@
             <div class="col-lg-4 col-md-5">
               <div class="widget widget_contact pr-lg-3">
                 <div class="widget-title">
+                  
                   <img :src="imageUrl + Institucion.institucion_logo" alt="img" width="125" />
                 </div>
                 <ul class="social-media-2">
                   <li><strong>REDES SOCIALES:</strong></li>
                   <br>
                   <li>
-                    <a :href="formatUrl(Institucion.institucion_facebook)" target="_blank">
+                    <a :href="formatUrl(Institucion.institucion_facebook)" target="_blank" rel="noopener noreferrer">
                       <i class="fa fa-facebook" aria-hidden="true"></i>
                     </a>
                   </li>
                   <li>
-                    <a :href="formatUrl(Institucion.institucion_youtube)" target="_blank">
+                    <a :href="formatUrl(Institucion.institucion_youtube)" target="_blank" rel="noopener noreferrer">
                       <i class="fa fa-youtube" aria-hidden="true"></i>
                     </a>
                   </li>
@@ -37,13 +38,15 @@
                 <a 
                   :href="formatUrl(link.url_link)" 
                   target="_blank" 
+                  rel="noopener noreferrer"
                   v-for="(link, index) of Links" 
                   :key="link.id_link || index"
                   :title="link.tipo"
                 >
                   {{ link.nombre }}
                 </a>
-                <a href="https://utic.upea.bo/" target="_blank">UTIC UPEA</a>
+                <!-- ✅ URL corregida: sin espacios al final -->
+                <a href="https://utic.upea.bo/" target="_blank" rel="noopener noreferrer">UTIC UPEA</a>
               </div>
             </div>
             <div class="col-lg-5 col-md-4 col-sm-12 pl-lg-5 pr-5 pr-lg-0">
@@ -69,20 +72,20 @@
         </div>
       </div>
 
-<div class="">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12 text-center align-self-center mt-3">
-        <a href="https://utic.upea.bo/" target="_blank">
-          <img src="@/assets/utic.png" width="100" alt="sie" />
-        </a>
-        <p class="mb-0">
-          © Copyright {{ currentYear }} UTIC_UPEA&nbsp; | Support by FrehisyM 
-        </p>
+      <div class="">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-12 text-center align-self-center mt-3">
+              <a href="https://utic.upea.bo/" target="_blank" rel="noopener noreferrer">
+                <img src="@/assets/utic.png" width="150" alt="UTIC UPEA" />
+              </a>
+              <p class="mb-0">
+                © Copyright {{ currentYear }} UTIC_UPEA&nbsp; | Support by FrehisyM 
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
     </footer>
 
     <div class="whatsapp">
@@ -90,7 +93,8 @@
         class="btn_whatsapp" 
         :href="getWhatsAppLink(Institucion.institucion_celular1)"
         target="_blank" 
-        title="Contactanos por Whatsapp"
+        title="Contáctanos por WhatsApp"
+        rel="noopener noreferrer"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -108,15 +112,16 @@
   background-image: url("@/assets/images/Conta_1.jpg");
   background-repeat: no-repeat;
   background-size: 100%;
-  position: relative;
 }
 
 /* COPYRIGHT */
-.footer-area p {
+.footer-area p.copyright-text,
+.footer-area .col-12.text-center p.mb-0 {
   margin: 0;
-  font-size: 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.5;
+  font-size: 1.5rem !important;      
+  color: rgba(255, 255, 255, 0.9);   
+  line-height: 1.6;
+  font-weight: 500;                  
 }
 
 .footer-area a img {
@@ -172,6 +177,7 @@
     width: 18px;
   }
 }
+
 .widget_contact.pr-lg-3 {
   text-align: center !important;
 }
@@ -184,48 +190,50 @@
 .widget_contact.pr-lg-3 ul li {
   justify-content: flex-start;
 }
-
 </style>
 
 <script>
 import { mapState } from "vuex";
+import { config } from '@/config/env'
 
 export default {
   name: "FooterCustom",
   
   computed: {
     ...mapState(["Institucion", "MenuConv", "MenuCur", "url_api", "Links"]),
-    
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim()
+      return config.uploads.baseUrl || ''
     },
 
-        currentYear() {
+    currentYear() {
       return new Date().getFullYear();
     }
-
   },
-  
   
   methods: {
     formatUrl(value) {
       if (!value) return '#'
       const trimmed = String(value).trim()
-      return trimmed.startsWith('http') ? trimmed : `https://${trimmed}`
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        return trimmed
+      }
+      return `https://${trimmed}`
     },
     
     formatText(value) {
       if (!value) return ''
       return String(value).trim()
     },
+    
     formatPhone(value) {
       if (!value) return ''
       return String(value).replace(/[^0-9]/g, '')
     },
+    
     getWhatsAppLink(phone) {
       if (!phone) return '#'
       const cleanPhone = String(phone).replace(/[^0-9]/g, '')
-      return `https://api.whatsapp.com/send?phone=591${cleanPhone}`
+      return `https://wa.me/591${cleanPhone}`
     },
     
     clickBack() {

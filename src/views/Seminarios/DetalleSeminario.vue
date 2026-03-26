@@ -100,6 +100,7 @@
                 <a 
                   :href="imageUrl + seminario.det_img_portada" 
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
 
                   <img
@@ -156,7 +157,7 @@
                     </div>
                     <div v-if="seminario.det_grupo_whatssap" class="mt-2">
                       <b><i class="fa fa-whatsapp"></i> Grupo WhatsApp: </b>
-                      <a :href="seminario.det_grupo_whatssap" target="_blank">
+                      <a :href="seminario.det_grupo_whatssap" target="_blank" rel="noopener noreferrer">
                         Unirse al grupo
                       </a>
                     </div>
@@ -192,6 +193,7 @@
                                 v-if="fac.facebook_facilitador && fac.facebook_facilitador !== '_'"
                                 :href="fac.facebook_facilitador?.trim()" 
                                 target="_blank"
+                                rel="noopener noreferrer"
                               >
                                 <i class="fa fa-facebook" aria-hidden="true"></i>
                               </a>
@@ -199,8 +201,9 @@
                             <li>
                               <a 
                                 v-if="fac.celular_facilitador"
-                                :href="'https://wa.me/' + fac.celular_facilitador?.toString().replace(/[^0-9]/g, '')" 
+                                :href="'https://wa.me/591' + fac.celular_facilitador?.toString().replace(/[^0-9]/g, '')" 
                                 target="_blank"
+                                rel="noopener noreferrer"
                               >
                                 <i class="fa fa-whatsapp" aria-hidden="true"></i>
                               </a>
@@ -352,6 +355,7 @@
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "DetalleSeminario",
@@ -362,7 +366,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       seminario: {},
       loading: false,
       errorGet: false,
@@ -373,7 +377,7 @@ export default {
     ...mapState(["url_api", "Institucion"]),
 
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -384,8 +388,9 @@ export default {
       
       try {
         const idSem = this.$route.params.idCur
+        const institucionId = this.idInstitucion || config.app.idInstitucion
 
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
         
         const lista = data.cursos || []

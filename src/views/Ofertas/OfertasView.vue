@@ -258,7 +258,8 @@
 <script>
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import { mapState } from "vuex";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "OfertasView",
@@ -269,7 +270,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       ofertas: [],
       search: "",
       searchGet: false,
@@ -285,7 +286,7 @@ export default {
     ...mapState(["url_api", "Institucion"]),
 
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo/').trim()
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -293,7 +294,8 @@ export default {
     async getOfertasAll() {
       this.loading = true
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
 
         this.ofertas = (data.ofertasAcademicas || [])

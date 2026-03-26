@@ -68,6 +68,7 @@
                 <a
                   :href="imageUrl + evento.evento_imagen"
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <img
                     :src="imageUrl + evento.evento_imagen"
@@ -109,6 +110,7 @@
                           :href="imageUrl + eg.galeria_imagen"
                           class="single-gallery"
                           target="_blank"
+                          rel="noopener noreferrer"
                         >
                           <img
                             :src="imageUrl + eg.galeria_imagen"
@@ -256,7 +258,8 @@
 <script>
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "DetalleEvento",
@@ -267,7 +270,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       evento: {},
       loading: false,
       errorGet: false,
@@ -280,7 +283,7 @@ export default {
   computed: {
     ...mapState(["url_api", "Institucion"]),
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -291,7 +294,9 @@ export default {
       
       try {
         const idEv = this.$route.params.idEv
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
 
         const lista = data.upea_evento || []
@@ -318,6 +323,7 @@ export default {
         this.$store.commit("loading")
       }
     },
+    
     _actualizarPager() {
       const total = this.evento.galeria?.length || 0
       this.pager = Math.ceil(total / this.NUM_RESULTS)
@@ -325,6 +331,7 @@ export default {
         this.pag = this.pager
       }
     },
+    
     formatearFecha(fecha) {
       if (!fecha) return ''
 

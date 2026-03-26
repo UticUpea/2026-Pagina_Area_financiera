@@ -120,7 +120,7 @@
               <a href="#">ENLACES</a>
               <ul class="sub-menu" :style="[m_link ? 'display:block' : 'display:none']">
                 <li v-for="link of Links" :key="link.id_link">
-                  <a :href="formatUrl(link.url_link)" target="_blank" :title="link.tipo">
+                  <a :href="formatUrl(link.url_link)" target="_blank" rel="noopener noreferrer" :title="link.tipo">
                     {{ link.nombre }}
                   </a>
                 </li>
@@ -131,7 +131,8 @@
         <div class="nav-right-part nav-right-part-desktop style-white">
           <ul class="mb-0">
             <li class="ml-2">
-              <a class="btn btn-red" href="https://servicioadministrador.upea.bo/sign-in" target="_blank">
+              <!-- ✅ URL corregida: sin espacios al final -->
+              <a class="btn btn-red" :href="loginUrl" target="_blank" rel="noopener noreferrer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-login-2" width="24"
                   height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                   stroke-linecap="round" stroke-linejoin="round">
@@ -181,11 +182,16 @@
 
 <script>
 import { mapState } from "vuex";
+// ✅ Importar configuración centralizada
+import { config } from '@/config/env'
 
 export default {
+  name: "HeaderCustom",
+  
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      // ✅ Usar config centralizada con fallback seguro (solo para desarrollo)
+      idInstitucion: config.app.idInstitucion || '22',
       sopen: false,
       m_inicio: false,
       m_informacion: false,
@@ -200,7 +206,12 @@ export default {
     ...mapState(["url_api", "MenuConv", "MenuCur", "Institucion", "getter", "Links"]),
 
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim()
+      return config.uploads.baseUrl || ''
+    },
+
+    loginUrl() {
+      const baseUrl ='https://servicioadministrador.upea.bo'
+      return `${baseUrl}/sign-in`
     }
   },
 
@@ -208,7 +219,10 @@ export default {
     formatUrl(value) {
       if (!value) return '#'
       const trimmed = String(value).trim()
-      return trimmed.startsWith('http') ? trimmed : `https://${trimmed}`
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        return trimmed
+      }
+      return `https://${trimmed}`
     },
 
     click_m() {
@@ -246,7 +260,9 @@ export default {
 
     async getLinks() {
       try {
-        const res = await this.$api.get(`/institucion/${this.idInstitucion}/recursos`)
+        // ✅ Usar idInstitucion desde config si está disponible
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await this.$api.get(`/institucion/${institucionId}/recursos`)
         const data = res.data
         const filterLinks = (data.linksExternoInterno || [])
           .filter(link => link.estado === "1" || link.estado === 1)

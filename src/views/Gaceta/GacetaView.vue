@@ -57,6 +57,7 @@
                       <a
                         :href="getPdfUrl(gaceta.gaceta_documento)"
                         target="_blank"
+                        rel="noopener noreferrer"
                         class="btn-descargar"
                       >
                         <i class="fa fa-download"></i> Descargar PDF
@@ -113,6 +114,7 @@
                       <a
                         :href="getPdfUrl(gaceta.gaceta_documento)"
                         target="_blank"
+                        rel="noopener noreferrer"
                         class="btn-descargar"
                       >
                         <i class="fa fa-download"></i> Descargar PDF
@@ -155,8 +157,7 @@
                   </button>
                 </div>
               </div>
-              
-              <!-- Filtro por tipo -->
+
               <div class="widget widget_category">
                 <h4 class="widget-title">Filtrar por tipo</h4>
                 <ul class="cat-list">
@@ -417,7 +418,8 @@
 <script>
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import { mapState } from "vuex";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "GacetaView",
@@ -428,7 +430,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       gacetas: [],
       tiposUnicos: [],
       filtroTipo: null,
@@ -444,9 +446,9 @@ export default {
   
   computed: {
     ...mapState(["url_api", "Institucion"]),
-    
+
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim()
+      return config.uploads.baseUrl || ''
     }
   },
 
@@ -460,11 +462,10 @@ export default {
     async getGacetas() {
       this.loading = true
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
         const lista = data.upea_gaceta_universitaria || []
-        
-       // console.log('📦 Gacetas cargadas:', lista.length)
         
         this.gacetas = lista
           .filter(g => g.gaceta_documento)  
@@ -485,6 +486,7 @@ export default {
         this.$store.commit("loading")
       }
     },
+    
     aplicarFiltros() {
       let filtradas = this.gacetas
       if (this.filtroTipo) {
@@ -502,6 +504,7 @@ export default {
       this.pag = 1
       this._actualizarPager()
     },
+    
     filtrarPorTipo(tipo) {
       this.filtroTipo = tipo
       this.searchGet = false
@@ -510,11 +513,13 @@ export default {
     contarPorTipo(tipo) {
       return this.gacetas.filter(g => g.gaceta_tipo === tipo).length
     },
+
     getPdfUrl(nombreArchivo) {
       if (!nombreArchivo) return '#'
-      if (nombreArchivo.startsWith('http')) return nombreArchivo
-      const base = this.imageUrl.endsWith('/') ? this.imageUrl : `${this.imageUrl}/`
-      return `${base}${nombreArchivo.trim()}`
+      if (nombreArchivo.startsWith('http://') || nombreArchivo.startsWith('https://')) {
+        return nombreArchivo.trim()
+      }
+      return config.getResourceUrl(nombreArchivo.trim())
     },
 
     _actualizarPager() {

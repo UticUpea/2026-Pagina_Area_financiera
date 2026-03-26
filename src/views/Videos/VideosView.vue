@@ -68,6 +68,8 @@
                         style="border-radius: 5px"
                         allowfullscreen
                         loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
                       />
                       <div class="cat-area">
                         <span class="cat bg-base">VIDEOS</span>
@@ -101,8 +103,7 @@
             </div>
           </div>
           <div v-else class="col-12 row justify-content-center">
-            
-            <!-- Estado vacío -->
+
             <div class="col-12 text-center" v-if="videos.length === 0">
               <h2>Sin videos disponibles</h2>
               <p class="text-muted">Pronto se agregarán nuevos videos.</p>
@@ -124,6 +125,8 @@
                       style="border-radius: 5px"
                       allowfullscreen
                       loading="lazy"
+                      referrerpolicy="strict-origin-when-cross-origin"
+                      sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
                     />
                     <div class="cat-area">
                       <span class="cat bg-base">VIDEOS</span>
@@ -155,8 +158,7 @@
                 </div>
               </div>
             </template>
-            
-            <!-- Paginación -->
+
             <nav class="col-12 td-page-navigation text-center mb-5 mb-lg-0" v-if="pager > 1">
               <ul class="pagination">
                 <li class="pagination-arrow disable">
@@ -189,8 +191,7 @@
               </ul>
             </nav>
           </div>        
-          
-          <!-- Sidebar -->
+
           <div class="col-12">
             <hr />
             <SidebarCustom></SidebarCustom>
@@ -382,7 +383,8 @@
 <script>
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import { mapState } from "vuex";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "VideosView",
@@ -393,7 +395,7 @@ export default {
   
   data() {
     return {
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       videos: [],
       search: "",
       searchGet: false,
@@ -409,15 +411,20 @@ export default {
     ...mapState(["url_api", "Institucion"]),
 
     resourceUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo/uploads/').trim()
+
+      return config.uploads.baseUrl || ''
     }
   },
 
   methods: {
+    /**
+     * @returns {Promise<void>} 
+     */
     async getVideosAll() {
       this.loading = true
       try {
-        const res = await api.get(`/institucion/${this.idInstitucion}/contenido`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        const res = await api.get(`/institucion/${institucionId}/contenido`)
         const data = res.data
         const lista = data.upea_videos || []
 

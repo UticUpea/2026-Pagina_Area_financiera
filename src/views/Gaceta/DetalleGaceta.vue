@@ -51,12 +51,13 @@
             <div class="single-blog-inner mb-0">
               <div class="thumb">
                 <a 
-                  :href="imageUrl + gaceta.gaceta_documento?.trim()" 
+                  :href="getPdfUrl(gaceta.gaceta_documento)" 
                   target="_blank"
+                  rel="noopener noreferrer"
                   class="pdf-link"
                 >
                   <vue-pdf-embed
-                    :source="imageUrl + gaceta.gaceta_documento?.trim()"
+                    :source="getPdfUrl(gaceta.gaceta_documento)"
                     :disableTextLayer="true"
                     :height="700"
                   />
@@ -79,7 +80,6 @@
               </div>
             </div>
             <div class="blog-content-inner mt-4">
-              <!-- ✅ Descripción con HTML -->
               <p v-if="gaceta.gaceta_descripcion" v-html="gaceta.gaceta_descripcion"></p>
             </div>
           </div>
@@ -174,7 +174,8 @@
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import VuePdfEmbed from "vue-pdf-embed";
-import api from '@/plugins/axios' 
+import api from '@/plugins/axios'
+import { config } from '@/config/env'
 
 export default {
   name: "DetalleGaceta",
@@ -186,8 +187,7 @@ export default {
   
   data() {
     return {
-
-      idInstitucion: process.env.VUE_APP_ID_INSTITUCION || '22',
+      idInstitucion: config.app.idInstitucion || '22',
       gaceta: {},
       loading: false,
       errorGet: false,
@@ -198,18 +198,28 @@ export default {
     ...mapState(["url_api", "Institucion"]),
 
     imageUrl() {
-      return process.env.VUE_APP_UPLOADS_URL?.trim() || 'https://apiadministrador.upea.bo'
+      return config.uploads.baseUrl || ''
     }
   },
 
   methods: {
+    getPdfUrl(nombreArchivo) {
+      if (!nombreArchivo) return '#'
+      if (nombreArchivo.startsWith('http://') || nombreArchivo.startsWith('https://')) {
+        return nombreArchivo.trim()
+      }
+      return config.getResourceUrl(nombreArchivo.trim())
+    },
+
     async getGaceta() {
       this.loading = true
       this.errorGet = false
       
       try {
         const idGac = this.$route.params.idGac
-        const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`)
+        const institucionId = this.idInstitucion || config.app.idInstitucion
+        
+        const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
         const data = res.data
 
         const lista = data.upea_gaceta_universitaria || []
