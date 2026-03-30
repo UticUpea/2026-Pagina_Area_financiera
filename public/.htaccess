@@ -1,6 +1,6 @@
 # =============================================================================
 # .htaccess para Vue.js SPA - UPEA
-# Seguridad y routing para Apache (sin proxy)
+# Seguridad y routing para Apache
 # =============================================================================
 
 # Bloquear acceso a archivos sensibles
