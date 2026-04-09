@@ -36,7 +36,6 @@ module.exports = defineConfig({
             "upgrade-insecure-requests;"
           ].join(' ')
         : [
-            // ✅ DESARROLLO: CSP relajado para funcionalidad local
             "default-src 'self' * 'unsafe-inline' 'unsafe-eval' data: blob:;",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: *;",
             "style-src 'self' 'unsafe-inline' *;",
