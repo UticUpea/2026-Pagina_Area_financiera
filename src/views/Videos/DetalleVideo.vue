@@ -50,14 +50,20 @@
             <div class="single-blog-inner mb-0">
               <div class="thumb">
                 <iframe
-                  :src="video.video_enlace?.trim()"
+                  v-if="videoUrl"
+                  :src="videoUrl"
                   style="width: 100%; aspect-ratio: 16/9; border-radius: 10px"
                   frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowfullscreen="allowfullscreen"
                   loading="lazy"
                   referrerpolicy="strict-origin-when-cross-origin"
-                  sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
+                  :title="video.video_titulo"
                 />
+                <div v-else class="text-center p-4">
+                  <i class="fa fa-video-slash" style="font-size: 3rem; color: #999;"></i>
+                  <p class="mt-3">URL de video no disponible</p>
+                </div>
               </div>
               <div class="details">
                 <div class="blog-meta border-0 mt-0 pt-0">
@@ -78,8 +84,7 @@
           </div>
           
         </div>
-        
-        <!-- Sidebar -->
+
         <div class="row justify-content-center mt-5">
           <div class="col-lg-4 col-12">
             <div class="td-sidebar">
@@ -90,7 +95,6 @@
         
       </div>
     </div>
-    
   </div>
 </template>
 
@@ -114,7 +118,7 @@
 }
 
 .text-center h1 {
-  color: #dc3545;
+  color: var(--main-color, #dc3545);
   margin-bottom: 1rem;
 }
 
@@ -125,7 +129,7 @@
 
 .blog-content-inner {
   line-height: 1.8;
-  font-size: 1.05rem;
+  font-size: 1.7rem;
   color: #333;
 }
 
@@ -133,6 +137,31 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.blog-meta .date i {
+  color: var(--main-color, #007bff);
+}
+
+.btn-base {
+  background: var(--main-color, #007bff);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-base:hover {
+  background: var(--main-color-2, #0056b3);
+}
+
+@media (max-width: 768px) {
+  .single-blog-inner .thumb iframe {
+    aspect-ratio: 16/9;
+    height: auto;
+  }
 }
 </style>
 
@@ -161,9 +190,9 @@ export default {
   computed: {
     ...mapState(["url_api", "Institucion"]),
 
-
-    resourceUrl() {
-      return config.uploads.baseUrl || ''
+    videoUrl() {
+      if (!this.video.video_enlace) return '';
+      return this.getSafeVideoUrl(this.video.video_enlace);
     }
   },
 
@@ -205,6 +234,67 @@ export default {
       }
     },
 
+    getSafeVideoUrl(url) {
+      if (!url) return '';
+      
+      const cleaned = String(url).trim();
+      
+      if (!cleaned) return '';
+      
+      try {
+  
+        if (cleaned.includes('youtube.com/watch?v=') || cleaned.includes('youtu.be/')) {
+          const videoId = this.extractYouTubeId(cleaned);
+          if (videoId) {
+
+            return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&enablejsapi=1`;
+          }
+        }
+
+        if (cleaned.includes('youtube.com/embed/') || cleaned.includes('youtube-nocookie.com/embed/')) {
+          return cleaned.replace('http://', 'https://');
+        }
+
+        if (cleaned.includes('vimeo.com')) {
+          const videoId = cleaned.match(/vimeo\.com\/(\d+)/)?.[1];
+          if (videoId) {
+            return `https://player.vimeo.com/video/${videoId}?title=0&byline=0&portrait=0`;
+          }
+        }
+        if (cleaned.startsWith('https://')) {
+          return cleaned;
+        }
+   
+        if (cleaned.startsWith('http://')) {
+          return cleaned.replace('http://', 'https://');
+        }
+    
+        const base = config.uploads.baseUrl?.replace(/\/+$/, '');
+        const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+        return `${base}${resource}`.replace(/\/+/g, '/');
+        
+      } catch (error) {
+        console.error('Error procesando URL de video:', error);
+        return '';
+      }
+    },
+
+    extractYouTubeId(url) {
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)([^&\s?]+)/,
+        /youtube\.com\/watch\?.*?v=([^&\s]+)/
+      ];
+      
+      for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1]) {
+          return match[1];
+        }
+      }
+      
+      return null;
+    },
+
     _limpiarObjeto(obj) {
       if (!obj || typeof obj !== 'object') return obj
       const cleaned = { ...obj }
@@ -218,15 +308,46 @@ export default {
       return cleaned
     },
 
+    applyDynamicColors() {
+      const colors = this.Institucion?.colorinstitucion;
+      if (colors && colors.length > 0) {
+        const colorSet = colors[0];
+        if (colorSet.color_primario) {
+          document.documentElement.style.setProperty('--main-color', colorSet.color_primario);
+        }
+        if (colorSet.color_secundario) {
+          document.documentElement.style.setProperty('--main-color-2', colorSet.color_secundario);
+        }
+        if (colorSet.color_terciario) {
+          document.documentElement.style.setProperty('--main-color-3', colorSet.color_terciario);
+        }
+      }
+    },
+
     clickBack() {
       this.$store.commit("clickLink")
       this.$router.go(-1)
     }
   },
 
+  watch: {
+    Institucion: {
+      handler() {
+        this.applyDynamicColors();
+      },
+      deep: true,
+      immediate: true
+    }
+  },
+
   created() {
     this.$store.commit("loadOn")
+    this.applyDynamicColors();
     this.getVideoOne()
+  },
+
+  mounted() {
+    this.applyDynamicColors();
   },
 
   beforeUnmount() {

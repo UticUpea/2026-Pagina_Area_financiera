@@ -19,199 +19,162 @@
         </div>
       </div>
     </div>
+
     <div class="blog-area pd-top-120 pd-bottom-120">
       <div class="container">
+
+        <div class="row justify-content-center mb-5">
+          <div class="col-lg-8 col-md-10">
+            <div class="search-wrapper">
+              <div class="search-input-group">
+                <i class="fa fa-search search-icon"></i>
+                <input
+                  type="text"
+                  placeholder="Buscar publicaciones por título, autor o descripción..."
+                  v-model="searchQuery"
+                  @input="onSearchInput"
+                  @keyup.enter="performSearch"
+                  class="search-input"
+                />
+                <button 
+                  v-if="searchQuery" 
+                  @click="clearSearch" 
+                  class="search-clear"
+                  title="Limpiar búsqueda"
+                >
+                  <i class="fa fa-times"></i>
+                </button>
+                <button @click="performSearch" class="search-btn" type="button">
+                  Buscar
+                </button>
+              </div>
+              <div v-if="isSearching" class="search-info">
+                <span>{{ filteredPublications.length }} resultado(s) encontrado(s)</span>
+                <button @click="clearSearch" class="btn-clear-search">
+                  Mostrar todas
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="row">
-          
           <div class="col-lg-8 col-12">
-            <div v-if="searchGet">
-              
-              <div v-if="searchValues.length === 0" class="text-center">
-                <h3> No se encontraron resultados para "{{ search }}"</h3>
-                <button class="btn btn-base mt-3" @click="limpiarBusqueda">
+
+            <div v-if="isSearching && filteredPublications.length === 0" class="pd-bottom-90">
+              <div class="col-12 text-center py-5">
+                <i class="fa fa-search text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+                <h3 class="mt-4">No se encontraron publicaciones</h3>
+                <p class="text-muted">
+                  No hay publicaciones que coincidan con "{{ searchQuery }}"
+                </p>
+                <button @click="clearSearch" class="btn btn-base mt-3">
                   Mostrar todas las publicaciones
                 </button>
               </div>
-              
-              <div v-else class="row justify-content-center">
-                <div class="col-12">
-                  <p>{{ searchValues.length }} resultado(s) encontrado(s)</p>
-                  <hr />
-                </div>
-                <div
-                  class="single-blog-inner col-12 col-lg-6"
-                  v-for="(pub, index) of searchValues"
-                  :key="pub.publicaciones_id || index"
-                >
-                  <div class="thumb">
-                    <router-link
-                      :to="'/detallePublicacion/' + pub.publicaciones_id"
-                      @click="$store.commit('clickLink')"
-                    >
-                      <img
-                        :src="imageUrl + pub.publicaciones_imagen"
-                        :alt="pub.publicaciones_titulo"
-                        loading="lazy"
-                      />
-                    </router-link>
-                  </div>
-                  <div class="details">
-                    <div class="blog-meta">
-                      <ul>
-                        <li class="comnt bg-base">PUBLICACIONES</li>
-                        <li class="author">
-                          Por <span>{{ pub.publicaciones_autor }}</span>
-                        </li>
-                        <li class="date">
-                          <i class="fa fa-calendar"></i>
-                          {{ formatearFecha(pub.publicaciones_fecha) }}
-                        </li>
-                      </ul>
-                    </div>
-                    <h4>
-                      <router-link
-                        :to="'/detallePublicacion/' + pub.publicaciones_id"
-                        @click="$store.commit('clickLink')"
-                      >
-                        {{ pub.publicaciones_titulo }}
-                      </router-link>
-
-                       <router-link
-                      :to="'/detallePublicacion/' + pub.publicaciones_id"
-                      @click="$store.commit('clickLink')"
-                      class="btn-leer-mas"
-                    >
-                      Leer más
-                      <i class="fa fa-arrow-right"></i>
-                    </router-link>
-                    </h4>
-                   
-                  </div>
-                </div>
-              </div>
             </div>
-            <div v-else class="row justify-content-center">
-              <div v-if="publicaciones.length === 0" class="col-12 text-center">
-                <h2>Sin publicaciones disponibles</h2>
+
+            <div v-else class="row">
+
+              <div v-if="!isSearching && publicaciones.length === 0" class="col-12 text-center py-5">
+                <i class="fa fa-newspaper-o text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+                <h2 class="mt-4">Sin publicaciones disponibles</h2>
                 <p class="text-muted">Pronto se agregarán nuevas publicaciones.</p>
               </div>
-              
 
               <template v-else>
                 <div
-                  class="single-blog-inner col-12 col-lg-6"
-                  v-for="(pub, index) of publicaciones"
-                  :key="pub.publicaciones_id || index"
-                  v-show="
-                    (pag - 1) * NUM_RESULTS <= index &&
-                    pag * NUM_RESULTS > index
-                  "
+                  v-for="pub in displayPublications"
+                  :key="pub.publicaciones_id"
+                  class="col-12 col-lg-6 mb-4"
                 >
-                  <div class="thumb">
-                    <router-link
-                      :to="'/detallePublicacion/' + pub.publicaciones_id"
-                      @click="$store.commit('clickLink')"
-                    >
-                      <img
-                        :src="imageUrl + pub.publicaciones_imagen"
-                        :alt="pub.publicaciones_titulo"
-                        loading="lazy"
-                      />
-                    </router-link>
-                  </div>
-                  <div class="details">
-                    <div class="blog-meta">
-                      <ul>
-                        <li class="comnt bg-base">PUBLICACIONES</li>
-                        <li class="author">
-                          Por <span>{{ pub.publicaciones_autor }}</span>
-                        </li>
-                        <li class="date">
-                          <i class="fa fa-calendar"></i>
-                          {{ formatearFecha(pub.publicaciones_fecha) }}
-                        </li>
-                      </ul>
-                    </div>
-                    <h4>
+                  <div class="single-blog-inner">
+                    <div class="thumb">
                       <router-link
                         :to="'/detallePublicacion/' + pub.publicaciones_id"
                         @click="$store.commit('clickLink')"
                       >
-                        {{ pub.publicaciones_titulo }}
+                        <img
+                          :src="buildSafeImageUrl(pub.publicaciones_imagen)"
+                          :alt="pub.publicaciones_titulo"
+                          loading="lazy"
+                        />
                       </router-link>
-                    </h4>
-                    <router-link
-                      :to="'/detallePublicacion/' + pub.publicaciones_id"
-                      @click="$store.commit('clickLink')"
-                      class="btn-leer-mas"
-                    >
-                      Leer más
-                      <i class="fa fa-arrow-right"></i>
-                    </router-link>
+                    </div>
+                    <div class="details">
+                      <div class="blog-meta">
+                        <ul>
+                          <li class="comnt bg-base">PUBLICACIONES</li>
+                          <li class="author">
+                            Por <span>{{ pub.publicaciones_autor }}</span>
+                          </li>
+                          <li class="date">
+                            <i class="fa fa-calendar"></i>
+                            {{ formatearFecha(pub.publicaciones_fecha) }}
+                          </li>
+                        </ul>
+                      </div>
+                      <h4>
+                        <router-link
+                          :to="'/detallePublicacion/' + pub.publicaciones_id"
+                          @click="$store.commit('clickLink')"
+                        >
+                          {{ pub.publicaciones_titulo }}
+                        </router-link>
+                      </h4>
+                      <p v-if="pub.publicaciones_descripcion" class="publication-description">
+                        {{ pub.publicaciones_descripcion }}
+                      </p>
+                      <router-link
+                        :to="'/detallePublicacion/' + pub.publicaciones_id"
+                        @click="$store.commit('clickLink')"
+                        class="btn-leer-mas"
+                      >
+                        Leer más
+                        <i class="fa fa-arrow-right"></i>
+                      </router-link>
+                    </div>
                   </div>
                 </div>
 
-                <nav class="col-12 td-page-navigation text-center mb-5 mb-lg-0" v-if="pager > 1">
-                  <ul class="pagination">
-                    <li class="pagination-arrow disable">
-                      <a
-                        href="#"
-                        aria-label="Previous"
-                        @click.prevent="pag > 1 ? pag-- : null"
-                      >
-                        <i class="fa fa-angle-double-left"></i>
+                <nav v-if="totalPages > 1 && !isSearching" class="col-12 td-page-navigation text-center mb-5 mb-lg-0">
+                  <ul class="pagination justify-content-center">
+                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                      <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">
+                        <i class="fa fa-angle-left"></i> Anterior
                       </a>
                     </li>
-                    <li v-for="(i, index) of pager" :key="index">
-                      <a
-                        href="#"
-                        :class="[i === pag ? 'active' : '']"
-                        @click.prevent="pag = i"
-                      >
-                        {{ i }}
+                    
+                    <li 
+                      v-for="page in visiblePages" 
+                      :key="page"
+                      class="page-item" 
+                      :class="{ active: page === currentPage }"
+                    >
+                      <a class="page-link" href="#" @click.prevent="changePage(page)">
+                        {{ page }}
                       </a>
                     </li>
-                    <li class="pagination-arrow">
-                      <a
-                        href="#"
-                        aria-label="Next"
-                        @click.prevent="pag < pager ? pag++ : null"
-                      >
-                        <i class="fa fa-angle-double-right"></i>
+                    
+                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                      <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">
+                        Siguiente <i class="fa fa-angle-right"></i>
                       </a>
                     </li>
                   </ul>
                 </nav>
               </template>
             </div>
-            
           </div>
+
           <div class="col-lg-4 col-12">
             <div class="td-sidebar">
-              <div class="widget widget_search">
-                <div class="search-form">
-                  <div class="form-group">
-                    <input
-                      type="text"
-                      placeholder="Buscar publicación"
-                      v-model="search"
-                      @keyup.enter="buscar"
-                    />
-                  </div>
-                  <button class="submit-btn" @click="buscar" type="button">
-                    <i class="fa fa-search"></i>
-                  </button>
-                </div>
-              </div>
-              
               <SidebarCustom></SidebarCustom>
             </div>
           </div>
-          
         </div>
       </div>
     </div>
-    
   </div>
 </template>
 
@@ -220,119 +183,141 @@
   background-image: url("@/assets/Fondo2.jpg");
 }
 
-.search-form {
+.search-wrapper {
+  margin-bottom: 2rem;
+}
+
+.search-input-group {
+  position: relative;
   display: flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
-.search-form input {
+.search-icon {
+  position: absolute;
+  left: 15px;
+  color: #999;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+.search-input {
   flex: 1;
-  padding: 0.75rem 1rem;
+  padding: 1rem 1rem 1rem 3rem;
   border: 2px solid #e0e0e0;
-  border-radius: 4px;
+  border-radius: 50px;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
-.search-form input:focus {
+.search-input:focus {
   outline: none;
-  border-color: var(--main-color-1, #007bff);
+  border-color: var(--main-color, #007bff);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
-.submit-btn {
-  padding: 0.75rem 1.5rem;
-  background: var(--main-color-1, #007bff);
+.search-clear {
+  position: absolute;
+  right: 85px;
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+}
+
+.search-clear:hover {
+  color: #dc3545;
+}
+
+.search-btn {
+  padding: 0.75rem 2rem;
+  background: var(--main-color, #007bff);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 50px;
   cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.submit-btn:hover {
-  background: var(--main-color-2, #0056b3);
-}
-
-.single-blog-inner img {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 4px;
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-}
-
-.single-blog-inner img:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.text-center h2,
-.text-center h3 {
-  color: #666;
-  padding: 2rem;
-}
-
-.text-muted {
-  color: #999;
-}
-
-.blog-meta .date {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-leer-mas {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.25rem;
-  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-  color: #000;
-  text-decoration: none;
-  border-radius: 25px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1rem;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
-  border: 2px solid transparent;
-  margin-top: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.btn-leer-mas:hover {
-  background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+.search-btn:hover {
+  background: var(--main-color-2, #0056b3);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
-  color: #000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.btn-leer-mas i {
+.search-btn:active {
+  transform: translateY(0);
+}
+
+.search-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
   font-size: 0.9rem;
-  transition: transform 0.3s ease;
 }
 
-.btn-leer-mas:hover i {
-  transform: translateX(4px);
+.btn-clear-search {
+  background: none;
+  border: none;
+  color: var(--main-color, #007bff);
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.btn-clear-search:hover {
+  color: var(--main-color-2, #0056b3);
+  text-decoration: underline;
 }
 
 .single-blog-inner {
   display: flex;
   flex-direction: column;
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   background: white;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  height: 100%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .single-blog-inner:hover {
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transform: translateY(-5px);
+}
+
+.single-blog-inner .thumb {
+  position: relative;
+  overflow: hidden;
+}
+
+.single-blog-inner img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.single-blog-inner:hover img {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .single-blog-inner .details {
-  padding: 1.25rem;
+  padding: 1.5rem;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -340,26 +325,42 @@
 
 .single-blog-inner h4 {
   margin: 0.75rem 0;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 600;
   line-height: 1.4;
 }
 
 .single-blog-inner h4 a {
-  color: inherit;
+  color: #333;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .single-blog-inner h4 a:hover {
-  color: var(--main-color-1, #007bff);
+  color: var(--main-color, #007bff);
+}
+
+.publication-description {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.5;
+  margin: 0.75rem 0 1rem 0;
+ 
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+ 
+  max-height: 3em;
 }
 
 .blog-meta ul {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin: 0;
+  margin: 0 0 1rem 0;
   padding: 0;
   list-style: none;
 }
@@ -381,34 +382,131 @@
   color: #333;
 }
 
-.single-blog-inner h4 {
+.blog-meta .date {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
-.btn-leer-mas-small {
-  padding: 0.3rem 0.75rem;
-  font-size: 0.8rem;
+.blog-meta .date i {
+  color: var(--main-color, #007bff);
+}
+
+.btn-leer-mas {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
   background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-  border-radius: 15px;
-  white-space: nowrap;
+  color: #000;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+  border: 2px solid transparent;
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+.btn-leer-mas:hover {
+  background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+  color: #000;
+}
+
+.btn-leer-mas i {
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+}
+
+.btn-leer-mas:hover i {
+  transform: translateX(4px);
+}
+
+.pagination {
+  margin: 0;
+}
+
+.page-item {
+  margin: 0 0.25rem;
+}
+
+.page-link {
+  padding: 0.5rem 1rem;
+  color: #333;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.page-link:hover {
+  background: var(--main-color, #007bff);
+  color: white;
+  border-color: var(--main-color, #007bff);
+}
+
+.page-item.active .page-link {
+  background: var(--main-color, #007bff);
+  color: white;
+  border-color: var(--main-color, #007bff);
+}
+
+.page-item.disabled .page-link {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
-  .single-blog-inner {
-    margin-bottom: 1.5rem;
+  .search-input-group {
+    flex-direction: column;
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+  
+  .search-btn {
+    width: 100%;
+  }
+  
+  .search-clear {
+    right: 10px;
+  }
+  
+  .publication-description {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+  
+  .single-blog-inner img {
+    height: 220px;
+  }
+}
+
+@media (max-width: 576px) {
+  .single-blog-inner img {
+    height: 200px;
   }
   
   .btn-leer-mas {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
   }
-  
-  .single-blog-inner h4 {
-    font-size: 1.15rem;
-  }
+}
+
+.text-center h2,
+.text-center h3 {
+  color: #666;
+  padding: 2rem;
+}
+
+.text-muted {
+  color: #999;
 }
 </style>
 
@@ -429,124 +527,242 @@ export default {
     return {
       idInstitucion: config.app.idInstitucion || '22',
       publicaciones: [],
-      search: "",
-      searchGet: false,
-      searchValues: [],
+      searchQuery: "",
+      isSearching: false,
+      currentPage: 1,
       NUM_RESULTS: 4,
-      pag: 1,
-      pager: 0,
-      loading: false
+      loading: false,
+      searchTimeout: null
     };
   },
   
   computed: {
     ...mapState(["url_api", "Institucion"]),
 
-    imageUrl() {
-      return config.uploads.baseUrl || ''
+    filteredPublications() {
+      if (!this.searchQuery.trim()) {
+        return this.publicaciones;
+      }
+      
+      const query = this.searchQuery.toLowerCase().trim();
+      
+      return this.publicaciones.filter(pub => {
+        const titulo = (pub.publicaciones_titulo || '').toLowerCase();
+        const autor = (pub.publicaciones_autor || '').toLowerCase();
+        const descripcion = (pub.publicaciones_descripcion || '').toLowerCase();
+        
+        return titulo.includes(query) || 
+               autor.includes(query) || 
+               descripcion.includes(query);
+      });
+    },
+
+    displayPublications() {
+      const start = (this.currentPage - 1) * this.NUM_RESULTS;
+      const end = start + this.NUM_RESULTS;
+      return this.filteredPublications.slice(start, end);
+    },
+
+    totalPages() {
+      return Math.ceil(this.filteredPublications.length / this.NUM_RESULTS);
+    },
+
+    visiblePages() {
+      const pages = [];
+      const maxVisible = 5;
+      let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+      let end = Math.min(this.totalPages, start + maxVisible - 1);
+      
+      if (end - start < maxVisible - 1) {
+        start = Math.max(1, end - maxVisible + 1);
+      }
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+      
+      return pages;
     }
   },
 
   methods: {
-    async getPublicaciones() {
-      this.loading = true
-      try {
-        const institucionId = this.idInstitucion || config.app.idInstitucion
-        const res = await api.get(`/institucion/${institucionId}/recursos`)
-        const data = res.data
 
-        this.publicaciones = (data.upea_publicaciones || []).map(this._limpiarObjeto)
-        this._actualizarPager()
+    async getPublicaciones() {
+      this.loading = true;
+      try {
+        const institucionId = this.idInstitucion || config.app.idInstitucion;
+        const res = await api.get(`/institucion/${institucionId}/recursos`);
+        const data = res.data;
+
+        this.publicaciones = (data.upea_publicaciones || []).map(this._limpiarObjeto);
+        this._actualizarPager();
         
       } catch (error) {
-        console.error('Error cargando publicaciones:', error)
-        this.publicaciones = []
+        console.error('Error cargando publicaciones:', error);
+        this.publicaciones = [];
       } finally {
-        this.loading = false
-        this.$store.commit("loading")
+        this.loading = false;
+        this.$store.commit("loading");
+      }
+    },
+
+    buildSafeImageUrl(path) {
+      if (!path) return '';
+      
+      const cleaned = String(path).trim();
+      
+
+      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
+        return cleaned.replace('http://', 'https://');
+      }
+
+      const base = config.uploads.baseUrl?.replace(/\/+$/, '');
+      const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+      
+      return `${base}${resource}`.replace(/\/+/g, '/');
+    },
+
+    onSearchInput() {
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout);
+      }
+      
+      this.searchTimeout = setTimeout(() => {
+        this.performSearch();
+      }, 300);
+    },
+
+    performSearch() {
+      this.isSearching = this.searchQuery.trim().length > 0;
+      this.currentPage = 1;
+
+      if (this.isSearching) {
+        this.$nextTick(() => {
+          const resultsSection = document.querySelector('.blog-area');
+          if (resultsSection) {
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      }
+    },
+
+    clearSearch() {
+      this.searchQuery = "";
+      this.isSearching = false;
+      this.currentPage = 1;
+      
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout);
+      }
+    },
+
+    changePage(page) {
+      if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+        this.currentPage = page;
+  
+        this.$nextTick(() => {
+          const publicationsSection = document.querySelector('.blog-area');
+          if (publicationsSection) {
+            publicationsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      }
+    },
+
+
+    applyDynamicColors() {
+      const colors = this.Institucion?.colorinstitucion;
+      if (colors && colors.length > 0) {
+        const colorSet = colors[0];
+        if (colorSet.color_primario) {
+          document.documentElement.style.setProperty('--main-color', colorSet.color_primario);
+        }
+        if (colorSet.color_secundario) {
+          document.documentElement.style.setProperty('--main-color-2', colorSet.color_secundario);
+        }
+        if (colorSet.color_terciario) {
+          document.documentElement.style.setProperty('--main-color-3', colorSet.color_terciario);
+        }
       }
     },
 
     _actualizarPager() {
-      const total = this.publicaciones?.length || 0
-      this.pager = Math.ceil(total / this.NUM_RESULTS)
+      const total = this.publicaciones?.length || 0;
+      this.pager = Math.ceil(total / this.NUM_RESULTS);
       if (this.pag > this.pager && this.pager > 0) {
-        this.pag = this.pager
+        this.pag = this.pager;
       }
-    },
-
-    buscar() {
-      const query = this.search.trim().toUpperCase()
-      
-      if (query) {
-        this.searchGet = true
-        this.searchValues = this.publicaciones.filter(pub => 
-          pub.publicaciones_titulo?.toUpperCase().includes(query) ||
-          pub.publicaciones_autor?.toUpperCase().includes(query) ||
-          pub.publicaciones_descripcion?.toUpperCase().includes(query)
-        )
-
-        this.pag = 1
-      } else {
-        this.limpiarBusqueda()
-      }
-    },
-
-    limpiarBusqueda() {
-      this.search = ""
-      this.searchGet = false
-      this.searchValues = []
-      this.pag = 1
     },
 
     formatearFecha(fecha) {
-      if (!fecha) return ''
-      if (typeof fecha === 'string' && fecha.includes('de')) return fecha
+      if (!fecha) return '';
+      if (typeof fecha === 'string' && fecha.includes('de')) return fecha;
       
       const meses = [
         "enero", "febrero", "marzo", "abril", "mayo", "junio",
         "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
-      ]
+      ];
       
-      let fechaObj
+      let fechaObj;
       if (fecha.includes('T')) {
-        fechaObj = new Date(fecha)
+        fechaObj = new Date(fecha);
       } else {
-        const partes = fecha.substr(0, 10).split("-")
-        fechaObj = new Date(partes[0], parseInt(partes[1]) - 1, partes[2])
+        const partes = fecha.substr(0, 10).split("-");
+        fechaObj = new Date(partes[0], parseInt(partes[1]) - 1, partes[2]);
       }
       
-      if (isNaN(fechaObj.getTime())) return fecha
+      if (isNaN(fechaObj.getTime())) return fecha;
       
-      return `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`
+      return `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`;
     },
 
+
     _limpiarObjeto(obj) {
-      if (!obj || typeof obj !== 'object') return obj
-      const cleaned = { ...obj }
+      if (!obj || typeof obj !== 'object') return obj;
+      const cleaned = { ...obj };
       Object.keys(cleaned).forEach(key => {
         if (typeof cleaned[key] === 'string') {
-          cleaned[key] = cleaned[key].trim()
+          cleaned[key] = cleaned[key].trim();
         } else if (cleaned[key] && typeof cleaned[key] === 'object' && !Array.isArray(cleaned[key])) {
-          cleaned[key] = this._limpiarObjeto(cleaned[key])
+          cleaned[key] = this._limpiarObjeto(cleaned[key]);
         }
-      })
-      return cleaned
+      });
+      return cleaned;
     },
 
     clickBack() {
-      this.$store.commit("clickLink")
-      this.$router.go(-1)
+      this.$store.commit("clickLink");
+      this.$router.go(-1);
+    }
+  },
+
+  watch: {
+    Institucion: {
+      handler() {
+        this.applyDynamicColors();
+      },
+      deep: true,
+      immediate: true
     }
   },
 
   created() {
-    this.$store.commit("loadOn")
-    this.getPublicaciones()
+    this.$store.commit("loadOn");
+    this.getPublicaciones();
+    this.applyDynamicColors();
+  },
+
+  mounted() {
+    this.applyDynamicColors();
   },
 
   beforeUnmount() {
-    this.limpiarBusqueda()
+    this.clearSearch();
+    this.publicaciones = [];
+    
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
   }
 };
 </script>

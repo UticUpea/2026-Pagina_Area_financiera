@@ -5,33 +5,35 @@
         <div class="row">
           <div class="col-6 text-md-left">
             <ul>
-              <li class="d-none d-md-inline-block" v-if="Institucion.institucion_correo1?.trim()">
+              <li class="d-none d-md-inline-block" v-if="isValidEmail(Institucion.institucion_correo1)">
                 <p>
                   <i class="fa fa-envelope-o"></i>
-                  {{ Institucion.institucion_correo1?.trim() }}
+                  <a :href="buildMailTo(Institucion.institucion_correo1)" rel="noopener noreferrer">
+                    {{ sanitizeText(Institucion.institucion_correo1) }}
+                  </a>
                 </p>
               </li>
             </ul>
           </div>
           <div class="col-6">
             <ul class="text-right">
-              <li class="d-lg-inline-block d-none" v-if="Institucion.institucion_celular1">
+              <li class="d-lg-inline-block d-none" v-if="isValidPhone(Institucion.institucion_celular1)">
                 <p>
                   <i class="fa fa-phone"></i>
-                  +591 {{ Institucion.institucion_celular1 }}
+                  +591 {{ formatPhone(Institucion.institucion_celular1) }}
                 </p>
               </li>
-              <li class="d-lg-inline-block d-none" v-if="Institucion.institucion_telefono1">
+              <li class="d-lg-inline-block d-none" v-if="isValidPhone(Institucion.institucion_telefono1)">
                 <p>
                   <i class="fa fa-phone"></i>
-                  +591 {{ Institucion.institucion_telefono1 }}
+                  +591 {{ formatPhone(Institucion.institucion_telefono1) }}
                 </p>
               </li>
             </ul>
           </div>
         </div>
       </div>
-    </div>
+    </div> 
     <nav class="navbar navbar-area-1 navbar-area navbar-expand-lg">
       <div class="container nav-container">
         <div class="responsive-mobile-menu">
@@ -41,15 +43,19 @@
             <span class="icon-right"></span>
           </button>
         </div>
+        
         <div>
           <div v-if="idInstitucion === '24'">
             <router-link to="/">
               <div class="logo_carrera">
-                <img src="@/assets/logoComercio.png" 
-                alt="Comercio Internacional" 
-                width="274" 
-                height="113" 
-                class="logo-animado"/>
+                <img 
+                  src="@/assets/logoComercio.png" 
+                  alt="Comercio Internacional" 
+                  width="274" 
+                  height="113" 
+                  class="logo-animado"
+                  loading="lazy"
+                />
               </div>
             </router-link>
           </div>
@@ -57,18 +63,21 @@
             <router-link to="/">
               <div class="logo_carrera">
                 <img 
-                  :src="imageUrl + Institucion?.institucion_logo" 
-                  :alt="Institucion?.institucion_nombre || 'Logo'"
+                  :src="buildSafeImageUrl(Institucion?.institucion_logo)" 
+                  :alt="sanitizeText(Institucion?.institucion_nombre) || 'Logo institucional'"
                   width="100"
                   height="auto"
                   @error="e => e.target.src = require('@/assets/upea.png')"
                   class="logo-animado"
-                  />
+                  loading="lazy"
+                />
               </div>
             </router-link>
           </div>
         </div>
+        
         &nbsp;
+        
         <div class="collapse navbar-collapse" :class="[sopen ? 'sopen' : '']" id="edumint_main_menu">
           <ul class="navbar-nav menu-open">
             
@@ -76,35 +85,53 @@
             <li @mouseover="showSubMenu('m_inicio')">
               <router-link to="/">INICIO</router-link>
             </li>
+            
             <li class="menu-item-has-children" @mouseover="showSubMenu('m_informacion')">
               <router-link to="/about">INFORMACIÓN</router-link>
               <ul class="sub-menu" :style="[m_informacion ? 'display:block' : 'display:none']">
-                <li><a href="#abaut" @click="click_ma()">SOBRE NOSOTROS</a></li>
-                <li><a href="#mision" @click="click_ma()">MISIÓN Y VISIÓN</a></li>
-                <li><a href="#autoridades" @click="click_ma()">AUTORIDADES</a></li>
-                <li><a href="#contacto" @click="click_ma()">CONTACTO</a></li>
+                <li>
+                  <router-link to="/about#nosotros" @click="handleInfoNav">
+                    SOBRE NOSOTROS
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/about#mision" @click="handleInfoNav">
+                    MISIÓN Y VISIÓN
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/about#autoridades" @click="handleInfoNav">
+                    AUTORIDADES
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/about#contacto" @click="handleInfoNav">
+                    CONTACTO
+                  </router-link>
+                </li>
               </ul>
             </li>
+
             <li class="menu-item-has-children" @mouseover="showSubMenu('m_conv')">
-              <a href="#">COMUNICADOS</a>
+              <a href="#" aria-haspopup="true" aria-expanded="false">COMUNICADOS</a>
               <ul class="sub-menu" :style="[m_conv ? 'display:block' : 'display:none']">
                 <li v-for="mc of MenuConv" :key="mc.idtipo_conv_comun">
                   <router-link :to="'/convocatorias/' + mc.idtipo_conv_comun" @click="click_m()">
-                    {{ mc.tipo_conv_comun_titulo }}
+                    {{ sanitizeText(mc.tipo_conv_comun_titulo) }}
                   </router-link>
                 </li>
               </ul>
             </li>
+
             <li class="menu-item-has-children" @mouseover="showSubMenu('m_mas')">
-              <a href="#">MÁS</a>
+              <a href="#" aria-haspopup="true" aria-expanded="false">MÁS</a>
               <ul class="sub-menu" :style="[m_mas ? 'display:block' : 'display:none']">
                 <li v-for="mc of MenuCur" :key="'curso-' + mc.idtipo_curso_otros">
                   <router-link :to="'/cursos/' + mc.idtipo_curso_otros" @click="click_m()">
-                    {{ mc.tipo_conv_curso_nombre }}
+                    {{ sanitizeText(mc.tipo_conv_curso_nombre) }}
                   </router-link>
                 </li>
-                
-                <!-- Enlaces fijos -->
+
                 <li><router-link to="/servicios" @click="click_m()">SERVICIOS</router-link></li>
                 <li><router-link to="/ofertas" @click="click_m()">OFERTAS ACADÉMICAS</router-link></li>
                 <li><router-link to="/publicaciones" @click="click_m()">PUBLICACIONES</router-link></li>
@@ -116,23 +143,36 @@
                 </li>
               </ul>
             </li>
+            
+            <!-- Enlaces -->
             <li class="menu-item-has-children" @mouseover="showSubMenu('m_link')">
-              <a href="#">ENLACES</a>
+              <a href="#" aria-haspopup="true" aria-expanded="false">ENLACES</a>
               <ul class="sub-menu" :style="[m_link ? 'display:block' : 'display:none']">
                 <li v-for="link of Links" :key="link.id_link">
-                  <a :href="formatUrl(link.url_link)" target="_blank" rel="noopener noreferrer" :title="link.tipo">
-                    {{ link.nombre }}
+                  <a 
+                    :href="buildSafeUrl(link.url_link)" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    :title="sanitizeText(link.tipo)"
+                  >
+                    {{ sanitizeText(link.nombre) }}
                   </a>
                 </li>
               </ul>
             </li>
           </ul>
         </div>
+        
         <div class="nav-right-part nav-right-part-desktop style-white">
           <ul class="mb-0">
             <li class="ml-2">
-              <!-- ✅ URL corregida: sin espacios al final -->
-              <a class="btn btn-red" :href="loginUrl" target="_blank" rel="noopener noreferrer">
+              <a 
+                class="btn btn-red" 
+                :href="loginUrl" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                aria-label="Iniciar sesión en el sistema administrativo"
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-login-2" width="24"
                   height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                   stroke-linecap="round" stroke-linejoin="round">
@@ -151,7 +191,6 @@
 </template>
 
 <style scoped>
-
 .logo-animado {
   animation: flip-horizontal 5s ease-in-out infinite;
   transform-style: preserve-3d;
@@ -165,24 +204,45 @@
     transform: perspective(400px) rotateY(360deg);
   }
 }
+
 .logo-animado:hover {
   animation-play-state: paused;
 }
-
 
 .logo_carrera {
   display: flex;
   align-items: center;
 }
+
 .logo_carrera h3 {
   color: white;
   padding: 5px;
+}
+
+.navbar-nav a:focus {
+  outline: 2px solid var(--main-color, #007bff);
+  outline-offset: 2px;
+}
+
+.navbar-top {
+  background: rgba(0, 0, 0, 0.956);
+}
+
+.navbar-top p,
+.navbar-top a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.navbar-top a:hover {
+  color: white;
+  text-decoration: underline;
 }
 </style>
 
 <script>
 import { mapState } from "vuex";
-// ✅ Importar configuración centralizada
 import { config } from '@/config/env'
 
 export default {
@@ -190,7 +250,6 @@ export default {
   
   data() {
     return {
-      // ✅ Usar config centralizada con fallback seguro (solo para desarrollo)
       idInstitucion: config.app.idInstitucion || '22',
       sopen: false,
       m_inicio: false,
@@ -205,24 +264,103 @@ export default {
   computed: {
     ...mapState(["url_api", "MenuConv", "MenuCur", "Institucion", "getter", "Links"]),
 
-    imageUrl() {
-      return config.uploads.baseUrl || ''
-    },
-
     loginUrl() {
-      const baseUrl ='https://servicioadministrador.upea.bo'
-      return `${baseUrl}/sign-in`
+      return 'https://servicioadministrador.upea.bo';
     }
   },
 
   methods: {
-    formatUrl(value) {
-      if (!value) return '#'
-      const trimmed = String(value).trim()
-      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-        return trimmed
+    buildSafeImageUrl(path) {
+      if (!path) return require('@/assets/upea.png');
+      const cleaned = String(path).trim();
+      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
+        return cleaned.replace('http://', 'https://');
       }
-      return `https://${trimmed}`
+      const base = config.uploads?.baseUrl?.replace(/\/+$/, '');
+      if (!base) return require('@/assets/upea.png');
+      const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+      return `${base}${resource}`.replace(/\/+/g, '/');
+    },
+
+    buildSafeUrl(url) {
+      if (!url) return '#';
+      const cleaned = String(url).trim().toLowerCase();
+      if (cleaned.startsWith('javascript:') || 
+          cleaned.startsWith('') || 
+          cleaned.startsWith('vbscript:') ||
+          cleaned.startsWith('')) {
+        console.warn('URL bloqueada por seguridad:', url);
+        return '#';
+      }
+      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
+        return cleaned.replace('http://', 'https://');
+      }
+      return `https://${String(url).trim()}`;
+    },
+
+    buildMailTo(email) {
+      if (!email) return '#';
+      const cleaned = String(email).trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(cleaned)) return '#';
+      return `mailto:${cleaned}`;
+    },
+
+    sanitizeText(text) {
+      if (!text) return '';
+      return String(text)
+        .trim()
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<[^>]*>/g, '')
+        .replace(/javascript:/gi, '')
+        .replace(/on\w+=/gi, '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    },
+
+    isValidEmail(email) {
+      if (!email) return false;
+      const cleaned = String(email).trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(cleaned) && cleaned.length > 5;
+    },
+
+    isValidPhone(phone) {
+      if (!phone) return false;
+      const cleaned = String(phone).replace(/[^0-9]/g, '');
+      return cleaned.length >= 7 && cleaned.length <= 15;
+    },
+
+    formatPhone(phone) {
+      if (!phone) return '';
+      return String(phone).replace(/[^0-9]/g, '');
+    },
+
+    applyDynamicColors() {
+      const colors = this.Institucion?.colorinstitucion;
+      if (colors && colors.length > 0) {
+        const colorSet = colors[0];
+        if (colorSet.color_primario) {
+          document.documentElement.style.setProperty('--main-color', colorSet.color_primario);
+        }
+        if (colorSet.color_secundario) {
+          document.documentElement.style.setProperty('--main-color-2', colorSet.color_secundario);
+        }
+        if (colorSet.color_terciario) {
+          document.documentElement.style.setProperty('--main-color-3', colorSet.color_terciario);
+        }
+      }
+    },
+
+    handleInfoNav() {
+
+      if (this.sopen) {
+        this.sopen = false;
+      }
+
     },
 
     click_m() {
@@ -232,8 +370,8 @@ export default {
 
     click_ma() {
       this.$store.commit("clickLink");
-      this.$router.push("/about");
       this.openMenu();
+
     },
 
     showSubMenu(id) {
@@ -260,36 +398,43 @@ export default {
 
     async getLinks() {
       try {
-        // ✅ Usar idInstitucion desde config si está disponible
-        const institucionId = this.idInstitucion || config.app.idInstitucion
-        const res = await this.$api.get(`/institucion/${institucionId}/recursos`)
-        const data = res.data
+        const institucionId = this.idInstitucion || config.app.idInstitucion;
+        const res = await this.$api.get(`/institucion/${institucionId}/recursos`);
+        const data = res.data;
+        
         const filterLinks = (data.linksExternoInterno || [])
           .filter(link => link.estado === "1" || link.estado === 1)
-          .map(this._limpiarObjeto)
-        this.$store.commit('setLinks', filterLinks)
+          .map(this._limpiarObjeto);
+        
+        this.$store.commit('setLinks', filterLinks);
       } catch (error) {
-        console.error('Error cargando Links:', error)
+        console.error('Error cargando Links:', error);
       }
     },
 
     _limpiarObjeto(obj) {
-      if (!obj || typeof obj !== 'object') return obj
-      const cleaned = { ...obj }
+      if (!obj || typeof obj !== 'object') return obj;
+      const cleaned = { ...obj };
       Object.keys(cleaned).forEach(key => {
         if (typeof cleaned[key] === 'string') {
-          cleaned[key] = cleaned[key].trim()
+          cleaned[key] = cleaned[key].trim();
         } else if (cleaned[key] && typeof cleaned[key] === 'object' && !Array.isArray(cleaned[key])) {
-          cleaned[key] = this._limpiarObjeto(cleaned[key])
+          cleaned[key] = this._limpiarObjeto(cleaned[key]);
         }
-      })
-      return cleaned
+      });
+      return cleaned;
     }
   },
 
   watch: {
     MenuCur: {
+      handler() {},
+      deep: true,
+      immediate: true
+    },
+    Institucion: {
       handler() {
+        this.applyDynamicColors();
       },
       deep: true,
       immediate: true
@@ -297,10 +442,12 @@ export default {
   },
 
   created() {
+    this.applyDynamicColors();
     this.getLinks();
   },
 
   mounted() {
+    this.applyDynamicColors();
     if (this.getter) {
       this.getLinks();
       this.$store.commit('setGetter', false);

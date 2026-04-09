@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="widget widget_catagory">
-      <h4 class="widget-title" :style="{ borderBottomColor: colorPrimario }">
+      <h4 class="widget-title" :style="{ borderBottomColor: safeColor }">
         Categorías
       </h4>
       <ul class="catagory-items">
@@ -10,39 +10,39 @@
             :to="'/convocatorias/' + conv.idtipo_conv_comun"
             @click="$store.commit('clickLink')"
           >
-            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i>
-            {{ conv.tipo_conv_comun_titulo?.charAt(0).toUpperCase() }}{{ conv.tipo_conv_comun_titulo?.slice(1).toLowerCase() }}
+            <i class="fa fa-angle-right" :style="{ color: safeColor }"></i>
+            {{ formatCategoryName(conv.tipo_conv_comun_titulo) }}
           </router-link>
         </li>
         
         <li>
           <router-link to="/servicios" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Servicios
+            <i class="fa fa-angle-right" :style="{ color: safeColor }"></i> Servicios
           </router-link>
         </li>
         <li>
           <router-link to="/ofertas" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Ofertas académicas
+            <i class="fa fa-angle-right" :style="{ color: safeColor }"></i> Ofertas académicas
           </router-link>
         </li>
         <li>
           <router-link to="/publicaciones" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Publicaciones
+            <i class="fa fa-angle-right" :style="{ color: safeColor }"></i> Publicaciones
           </router-link>
         </li>
         <li>
           <router-link to="/gaceta" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Gaceta
+            <i class="fa fa-angle-right" :style="{ color: safeColor }"></i> Gaceta
           </router-link>
         </li>
         <li>
           <router-link to="/eventos" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Eventos
+            <i class="fa fa-angle-right" :style="{ color: safeColor }"></i> Eventos
           </router-link>
         </li>
         <li>
           <router-link to="/videos" @click="$store.commit('clickLink')">
-            <i class="fa fa-angle-right" :style="{ color: colorPrimario }"></i> Videos
+            <i class="fa fa-angle-right" :style="{ color: safeColor }"></i> Videos
           </router-link>
         </li>
       </ul>
@@ -60,24 +60,99 @@ export default {
   computed: {
     ...mapState(["MenuConv", "MenuCur", "Links", "Institucion"]),
 
-    colorPrimario() {
-      return this.Institucion?.colorinstitucion?.[0]?.color_primario || '#DC0E10'
+    safeColor() {
+      return this.validateColor(
+        this.Institucion?.colorinstitucion?.[0]?.color_primario,
+        '#DC0E10'
+      );
     },
     
-    colorSecundario() {
-      return this.Institucion?.colorinstitucion?.[0]?.color_secundario || '#E9C202'
+    safeSecondaryColor() {
+      return this.validateColor(
+        this.Institucion?.colorinstitucion?.[0]?.color_secundario,
+        '#E9C202'
+      );
     },
     
-    colorTerciario() {
-      return this.Institucion?.colorinstitucion?.[0]?.color_terciario || '#060705'
+    safeTertiaryColor() {
+      return this.validateColor(
+        this.Institucion?.colorinstitucion?.[0]?.color_terciario,
+        '#060705'
+      );
     },
 
     gradientHover() {
-      return `linear-gradient(135deg, ${this.colorPrimario} 0%, ${this.colorSecundario} 100%)`
+      return `linear-gradient(135deg, ${this.safeColor} 0%, ${this.safeSecondaryColor} 100%)`;
     }
   },
   
   methods: {
+    /**
+     * Valida que un color sea seguro para CSS
+     * @param {string} color - Color a validar
+     * @param {string} fallback - Color por defecto si es inválido
+     * @returns {string} - Color seguro o fallback
+     */
+    validateColor(color, fallback = '#000000') {
+      if (!color || typeof color !== 'string') {
+        return fallback;
+      }
+      
+      const cleaned = color.trim().toLowerCase();
+      
+      // Permitir solo formatos seguros de color CSS
+      const validPatterns = [
+        /^#[0-9a-f]{6}$/,           // Hex #RRGGBB
+        /^#[0-9a-f]{3}$/,           // Hex #RGB
+        /^rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*[\d.]+\s*)?\)$/,  // rgb/rgba
+        /^hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(,\s*[\d.]+\s*)?\)$/, // hsl/hsla
+        /^[a-z]+$/                  // Named colors (red, blue, etc.)
+      ];
+      
+      if (validPatterns.some(pattern => pattern.test(cleaned))) {
+        return cleaned;
+      }
+      
+      console.warn('Color inválido bloqueado:', color);
+      return fallback;
+    },
+
+    /**
+     * Formatea y sanitiza nombre de categoría
+     * @param {string} text - Texto a formatear
+     * @returns {string} - Texto seguro formateado
+     */
+    formatCategoryName(text) {
+      if (!text || typeof text !== 'string') {
+        return '';
+      }
+
+      const sanitized = this.sanitizeText(text.trim());
+
+      if (sanitized.length === 0) return '';
+      return sanitized.charAt(0).toUpperCase() + sanitized.slice(1).toLowerCase();
+    },
+
+    /**
+     * Sanitiza texto para prevenir XSS
+     * @param {string} text - Texto a sanitizar
+     * @returns {string} - Texto seguro
+     */
+    sanitizeText(text) {
+      if (!text) return '';
+      
+      return String(text)
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<[^>]*>/g, '')
+        .replace(/javascript:/gi, '')
+        .replace(/on\w+=/gi, '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    },
+
     clickBack() {
       this.$store.commit("clickLink");
       this.$router.go(-1);
@@ -123,7 +198,7 @@ export default {
   transform: translateX(-50%);
   width: 60px;
   height: 3px;
-  background: v-bind(colorPrimario);
+  background: var(--sidebar-color-primary, #DC0E10);
   border-radius: 2px;
   transition: background 0.3s ease;
 }
@@ -160,7 +235,7 @@ export default {
 }
 
 .catagory-items li a:hover {
-  background: v-bind(gradientHover);
+  background: var(--sidebar-gradient-hover, linear-gradient(135deg, #DC0E10 0%, #E9C202 100%));
   color: #fff;
   transform: translateX(8px);
   border-color: transparent;
@@ -170,6 +245,7 @@ export default {
 .catagory-items li a i {
   font-size: 1.4rem;
   transition: transform 0.3s ease;
+  color: var(--sidebar-color-primary, #DC0E10);
 }
 
 .catagory-items li a:hover i {
@@ -225,7 +301,7 @@ hr {
 }
 
 .catagory-items li a:focus-visible {
-  outline: 2px solid v-bind(colorPrimario);
+  outline: 2px solid var(--sidebar-color-primary, #DC0E10);
   outline-offset: 2px;
 }
 
@@ -237,11 +313,11 @@ hr {
 }
 
 .widget_catagory .widget-title {
-  font-size: 1.3rem;  
+  font-size: 1.3rem;
 }
 
 .widget_catagory .catagory-items li a {
-  font-size: 1.3rem; 
+  font-size: 1.3rem;
   padding: 1rem 1.4rem;
 }
 
