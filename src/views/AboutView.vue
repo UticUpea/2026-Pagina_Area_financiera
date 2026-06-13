@@ -350,7 +350,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.186) 0%, rgba(0, 0, 0, 0.4) 100%);
   z-index: 1;
 }
 
@@ -365,7 +365,7 @@
 }
 
 .page-title {
-  font-size: 5rem;
+  font-size: 7rem;
   font-weight: 700;
   color: white !important;
   margin-bottom: 0.5rem;
@@ -374,7 +374,7 @@
 }
 
 .page-subtitle {
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: rgba(255, 255, 255, 0.9);
   font-weight: 300;
   animation: fadeInUp 0.6s ease 0.2s both;
@@ -507,7 +507,7 @@
 .content-text-about :deep(ul),
 .content-text-about :deep(ol),
 .content-text-about :deep(li) {
-  font-size: 1.5rem !important;  /* ← CAMBIA ESTE VALOR PARA AJUSTAR TAMAÑO */
+  font-size: 1.5rem !important;  
   line-height: 1.8 !important;
 }
 
@@ -920,7 +920,7 @@ button:focus-visible,
 
 @media (max-width: 991px) {
   .page-title {
-    font-size: 2.2rem;
+    font-size: 5rem;
   }
   
   .section-title-main {
@@ -944,11 +944,11 @@ button:focus-visible,
   }
   
   .page-title {
-    font-size: 1.8rem;
+    font-size: 5rem;
   }
   
   .page-subtitle {
-    font-size: 1rem;
+    font-size: 2rem;
   }
   
   .section-title-main {

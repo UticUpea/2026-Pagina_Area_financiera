@@ -234,7 +234,7 @@
   border-radius: 50px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }

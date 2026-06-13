@@ -207,7 +207,7 @@
   padding: 1rem 1rem 1rem 3rem;
   border: 2px solid #e0e0e0;
   border-radius: 50px;
-  font-size: 1rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
 }
 
@@ -241,7 +241,7 @@
   border-radius: 50px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -325,7 +325,7 @@
 
 .single-blog-inner h4 {
   margin: 0.75rem 0;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: 600;
   line-height: 1.4;
 }
@@ -341,7 +341,7 @@
 }
 
 .publication-description {
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   color: #666;
   line-height: 1.5;
   margin: 0.75rem 0 1rem 0;
@@ -402,7 +402,7 @@
   text-decoration: none;
   border-radius: 25px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
   border: 2px solid transparent;

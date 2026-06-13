@@ -200,7 +200,7 @@
   padding: 1rem 1rem 1rem 3rem;
   border: 2px solid #e0e0e0;
   border-radius: 50px;
-  font-size: 1rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
 }
 
@@ -234,7 +234,7 @@
   border-radius: 50px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -351,7 +351,7 @@
 }
 
 .video-description {
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   color: #666;
   line-height: 1.5;
   margin: 0 0 1rem 0;
@@ -368,7 +368,7 @@
 }
 
 .video-type {
-  font-size: 0.85rem;
+  font-size: 1.3rem;
   color: #666;
 }
 
@@ -392,7 +392,7 @@
   text-decoration: none;
   border-radius: 20px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
 }
@@ -481,7 +481,7 @@
   }
   
   .btn-leer-mas {
-    font-size: 0.85rem;
+    font-size: 1.3rem;
     padding: 0.4rem 0.8rem;
   }
 }

@@ -229,7 +229,7 @@
   padding: 1rem 1rem 1rem 3rem;
   border: 2px solid #e0e0e0;
   border-radius: 50px;
-  font-size: 1rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
 }
 
@@ -263,7 +263,7 @@
   border-radius: 50px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -363,7 +363,7 @@
 .single-course-inner .cat {
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  font-size: 0.9rem;
+  font-size: 1.5rem;
   font-weight: 600;
   background: #ffc107;
   color: #000;
@@ -379,7 +379,7 @@
 .single-course-inner .status {
   margin: 0 0 1rem 0;
   color: #666;
-  font-size: 0.95rem;
+  font-size: 1.5rem;
 }
 
 .single-course-inner .status i {
@@ -397,7 +397,7 @@
   margin: 0.75rem 0;
   font-weight: 600;
   line-height: 1.4;
-  font-size: 1.15rem;
+  font-size: 1.5rem;
 }
 
 .single-course-inner .details-inner h5 a {
@@ -414,11 +414,11 @@
   color: #666;
   margin: 0.75rem 0;
   line-height: 1.5;
-  font-size: 0.95rem;
+  font-size: 1.3rem;
   
   display: -webkit-box;
   -webkit-line-clamp: 3;
-  line-clamp: 2;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -447,7 +447,7 @@
 
 .single-course-inner .author.media p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 1.5rem;
   color: #555;
 }
 
@@ -461,7 +461,7 @@
   display: flex;
   gap: 4px;
   color: #ff9800;
-  font-size: 1rem;
+  font-size: 1.5rem;
 }
 
 .btn-leer-mas {
@@ -474,7 +474,7 @@
   text-decoration: none;
   border-radius: 25px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
   border: 2px solid transparent;
@@ -488,7 +488,7 @@
 }
 
 .btn-leer-mas i {
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   transition: transform 0.3s ease;
 }
 

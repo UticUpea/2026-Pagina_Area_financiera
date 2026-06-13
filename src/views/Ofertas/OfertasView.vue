@@ -195,7 +195,7 @@
   padding: 1rem 1rem 1rem 3rem;
   border: 2px solid #e0e0e0;
   border-radius: 50px;
-  font-size: 1rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
 }
 
@@ -229,7 +229,7 @@
   border-radius: 50px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -311,8 +311,8 @@
 }
 
 .single-event-inner .date {
-  font-size: 0.9rem;
-  color: #666;
+  font-size: 1rem;
+  color: #ffffff;
   margin-bottom: 0.5rem;
 }
 
@@ -323,7 +323,7 @@
 
 .single-event-inner h5 {
   margin: 0.75rem 0;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
@@ -338,7 +338,7 @@
 }
 
 .offer-description {
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   color: #666;
   line-height: 1.5;
   margin: 0.75rem 0 0 0;

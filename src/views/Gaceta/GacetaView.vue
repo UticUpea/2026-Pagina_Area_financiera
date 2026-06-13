@@ -225,7 +225,7 @@
   padding: 1rem 1rem 1rem 3rem;
   border: 2px solid #e0e0e0;
   border-radius: 50px;
-  font-size: 1rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
 }
 
@@ -259,7 +259,7 @@
   border-radius: 50px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -548,7 +548,7 @@
 }
 
 .gaceta-title-link {
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: #0d0d0d;
   text-decoration: none;
   transition: color 0.3s ease;
