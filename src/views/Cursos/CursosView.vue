@@ -614,6 +614,7 @@ import SidebarCustom from "@/components/SidebarCustom.vue";
 import { mapState } from "vuex";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default {
   name: "CursosView",
@@ -716,7 +717,7 @@ export default {
         await this.getTipoCur(tipoCursoId, institucionId)
         await this.getCursos(institucionId)
       } catch (error) { 
-        console.error('Error cargando datos:', error) 
+        logger.error('Error cargando datos:', error)
       } finally { 
         this.loading = false
         this.$store.commit("loading") 
@@ -755,7 +756,7 @@ export default {
           }
         }
       } catch (e) { 
-        console.error('Error en getTipoCur:', e)
+        logger.error('Error en getTipoCur:', e)
         this.tipo = "CURSOS"
         this.tipoCursoId = tipo_cur
       }
@@ -786,25 +787,42 @@ export default {
         
         this._actualizarPager()
       } catch (e) { 
-        console.error('Error en getCursos:', e)
+        logger.error('Error en getCursos:', e)
         this.cursos = [] 
       }
     },
     
-    buildSafeImageUrl(path) {
-      if (!path) return '';
-      
-      const cleaned = String(path).trim();
-      
-      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
-        return cleaned.replace('http://', 'https://');
-      }
-      
-      const base = config.uploads.baseUrl?.replace(/\/+$/, '');
-      const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-      
-      return `${base}${resource}`.replace(/\/+/g, '/');
-    },
+buildSafeImageUrl(path) {
+  if (!path) return require('@/assets/upea.png');
+  
+  const cleaned = String(path).trim();
+  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
+  
+  // ✅ CASO 1: Ya es URL completa de MinIO → solo asegurar HTTPS
+  if (cleaned.includes('archivosminio.upea.bo')) {
+    return cleaned.replace(/^http:\/\//, 'https://');
+  }
+  
+  // ✅ CASO 2: Es nombre de archivo o ruta relativa → construir con base de MinIO
+
+  const lower = cleaned.toLowerCase();
+  let folder = '/imagenes/'; 
+  
+  if (lower.endsWith('.pdf')) {
+    folder = '/documentos/';
+  } else if (lower.includes('institucion_logo')) {
+    folder = '/imagenes/instituciones/';
+  } else if (lower.includes('portada_imagen')) {
+    folder = '/imagenes/portadas/';
+  } else if (lower.includes('serv_imagen')) {
+    folder = '/imagenes/servicios/';
+  } else if (lower.includes('con_foto_portada')) {
+    folder = '/imagenes/convocatorias/';
+  }
+  
+  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+},
 
     onSearchInput() {
       if (this.searchTimeout) {

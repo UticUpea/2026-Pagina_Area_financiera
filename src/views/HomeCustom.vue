@@ -1558,6 +1558,7 @@ import { mapState } from "vuex";
 import Typed from 'typed.js';
 import { config } from '@/config/env'
 import api from '@/plugins/axios'
+import logger from '@/utils/logger' 
 
 export default {
   name: "HomeCustom",
@@ -1628,19 +1629,38 @@ export default {
   },
 
   methods: {
-    buildSafeImageUrl(path) {
-      if (!path) return '';
-      const cleaned = String(path).trim();
-      
-      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
-        return cleaned.replace('http://', 'https://');
-      }
-      
-      const base = this.imageUrl?.replace(/\/+$/, '');
-      const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-      
-      return `${base}${resource}`.replace(/\/+/g, '/');
-    },
+buildSafeImageUrl(path) {
+  if (!path) return require('@/assets/upea.png');
+  
+  const cleaned = String(path).trim();
+  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
+  
+  // ✅ CASO 1: Ya es URL completa de MinIO → solo asegurar HTTPS
+  if (cleaned.includes('archivosminio.upea.bo')) {
+    return cleaned.replace(/^http:\/\//, 'https://');
+  }
+  
+  // ✅ CASO 2: Es nombre de archivo o ruta relativa → construir con base de MinIO
+
+  const lower = cleaned.toLowerCase();
+  let folder = '/imagenes/'; 
+  
+  if (lower.endsWith('.pdf')) {
+    folder = '/documentos/';
+  } else if (lower.includes('institucion_logo')) {
+    folder = '/imagenes/instituciones/';
+  } else if (lower.includes('portada_imagen')) {
+    folder = '/imagenes/portadas/';
+  } else if (lower.includes('serv_imagen')) {
+    folder = '/imagenes/servicios/';
+  } else if (lower.includes('con_foto_portada')) {
+    folder = '/imagenes/convocatorias/';
+  }
+  
+  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+
+  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+},
     
     iniciarMaquinaDeEscribir() {
       const options = {
@@ -1681,7 +1701,7 @@ export default {
           document.documentElement.style.setProperty('--color-secundario', colores.color_secundario)
         }
       } catch (error) {
-        console.error('Error cargando institución:', error)
+        logger.error('Error cargando institución:', error)  
       } finally {
         this.loading.institucion = false
       }
@@ -1704,7 +1724,7 @@ export default {
         this._filtrarRecientes()
         this._actualizarPager()
       } catch (error) {
-        console.error('Error cargando contenidos:', error)
+        logger.error('Error cargando contenidos:', error)  
       } finally {
         this.loading.contenidos = false
       }
@@ -1729,7 +1749,7 @@ export default {
         this.autoridades = data.autoridad?.map(this._limpiarObjeto) || []
         this.videos = data.upea_videos?.map(this._limpiarObjeto) || []
       } catch (error) {
-        console.error('Error cargando contenido extra:', error)
+        logger.error('Error cargando contenido extra:', error)  
       } finally {
         this.loading.contenido = false
       }
@@ -1745,7 +1765,7 @@ export default {
         this.publicaciones = data.upea_publicaciones?.map(this._limpiarObjeto) || []
         this.enlaces = data.linksExternoInterno?.filter(l => l.estado === 1)?.map(this._limpiarObjeto) || []
       } catch (error) {
-        console.error('Error cargando recursos:', error)
+        logger.error('Error cargando recursos:', error)  
       } finally {
         this.loading.recursos = false
         this.$store.commit("loading")

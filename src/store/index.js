@@ -1,9 +1,9 @@
 import { createStore } from 'vuex'
 import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default createStore({
   state: {
-    // ✅ Fallback minimalista: fail-fast en producción
     url_api: config.api.root || '',
     
     getter: true,
@@ -60,7 +60,7 @@ export default createStore({
     },
     
     idEncrypt() {
-      console.log("hola")
+      logger.debug("hola")
     },
     
     setMenuConv(state, data) {
@@ -74,7 +74,7 @@ export default createStore({
   
   actions: {
     async refreshConfig() {
-      console.log('🔄 Refreshing store config...')
+      logger.debug('Refreshing store config...')
     }
   },
   

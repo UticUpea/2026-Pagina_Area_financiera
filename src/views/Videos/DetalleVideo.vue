@@ -170,6 +170,7 @@ import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default {
   name: "DetalleVideo",
@@ -213,20 +214,20 @@ export default {
 
         if (!this.video.video_id) {
           this.errorGet = true
-          console.warn('Video no encontrado con ID:', idVid)
+          logger.warn('Video no encontrado con ID:', idVid)
           return
         }
         
         this.video = this._limpiarObjeto(this.video)
         
       } catch (error) {
-        console.error('Error cargando video:', error)
+        logger.error('Error cargando video:', error)
         this.errorGet = true
 
         if (error.response?.status === 404) {
-          console.warn('Video no encontrado (404)')
+          logger.warn('Video no encontrado (404)')
         } else if (error.response?.status === 500) {
-          console.error('Error del servidor (500)')
+          logger.error('Error del servidor (500)')
         }
       } finally {
         this.loading = false
@@ -274,7 +275,7 @@ export default {
         return `${base}${resource}`.replace(/\/+/g, '/');
         
       } catch (error) {
-        console.error('Error procesando URL de video:', error);
+        logger.error('Error procesando URL de video:', error);
         return '';
       }
     },

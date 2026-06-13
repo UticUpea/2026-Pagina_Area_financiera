@@ -43,20 +43,27 @@
               <p class="mt-3">Cargando documento...</p>
             </div>
 
-            <div v-else-if="gaceta.gaceta_id">
+            <div v-else-if="gaceta.gaceta_id && pdfUrl && pdfUrl !== '#'">
               <div class="gaceta-detail-card">
                 <div class="row align-items-stretch">
 
                   <div class="col-md-6">
                     <div class="pdf-viewer-wrapper">
-                      <vue-pdf-embed
-                        :source="getSafePdfUrl(gaceta.gaceta_documento)"
-                        :disableTextLayer="true"
-                        class="pdf-viewer"
-                      />
+                      
+                      <!-- ✅ Iframe nativo con navegación página por página -->
+                      <iframe
+                        :src="pdfUrl"
+                        class="pdf-iframe"
+                        frameborder="0"
+                        allowfullscreen
+                        loading="lazy"
+                        title="Visor de PDF"
+                      ></iframe>
+
+                      <!-- Botones de acción -->
                       <div class="pdf-actions">
                         <a
-                          :href="getSafePdfUrl(gaceta.gaceta_documento)"
+                          :href="pdfUrl"
                           target="_blank"
                           rel="noopener noreferrer"
                           class="btn-pdf-open"
@@ -64,7 +71,7 @@
                           <i class="fa fa-external-link"></i> Abrir en nueva pestaña
                         </a>
                         <a
-                          :href="getSafePdfUrl(gaceta.gaceta_documento)"
+                          :href="pdfUrl"
                           download
                           class="btn-pdf-download"
                         >
@@ -117,6 +124,13 @@
                 </div>
               </div>
             </div>
+
+            <!-- Mensaje si no hay PDF válido -->
+            <div v-else-if="gaceta.gaceta_id && (!pdfUrl || pdfUrl === '#')" class="text-center py-5">
+              <i class="fa fa-file-pdf-o" style="font-size: 3rem; color: #999;"></i>
+              <p class="mt-3">El documento PDF no está disponible</p>
+            </div>
+
           </div>
 
           <div class="col-lg-4 col-12">
@@ -157,17 +171,13 @@
   flex-direction: column;
 }
 
-.pdf-viewer {
-  flex: 1;
+.pdf-iframe {
   width: 100%;
+  height: 600px;
   min-height: 500px;
-}
-
-.pdf-viewer :deep(canvas) {
-  max-width: 100%;
-  height: auto !important;
-  display: block;
-  margin: 0 auto;
+  border: none;
+  background: white;
+  scroll-behavior: smooth;
 }
 
 .pdf-actions {
@@ -322,7 +332,7 @@
     border-radius: 12px 12px 0 0;
   }
   
-  .pdf-viewer {
+  .pdf-iframe {
     min-height: 400px;
   }
   
@@ -340,7 +350,7 @@
     min-height: 400px;
   }
   
-  .pdf-viewer {
+  .pdf-iframe {
     min-height: 350px;
   }
   
@@ -373,7 +383,7 @@
     min-height: 350px;
   }
   
-  .pdf-viewer {
+  .pdf-iframe {
     min-height: 300px;
   }
   
@@ -415,16 +425,15 @@
 <script>
 import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
-import VuePdfEmbed from "vue-pdf-embed";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default {
   name: "DetalleGaceta",
   
   components: { 
-    SidebarCustom, 
-    VuePdfEmbed 
+    SidebarCustom
   },
   
   data() {
@@ -433,6 +442,7 @@ export default {
       gaceta: {},
       loading: false,
       errorGet: false,
+      pdfUrl: '',
     };
   },
   
@@ -441,20 +451,29 @@ export default {
   },
 
   methods: {
-    getSafePdfUrl(path) {
-      if (!path) return '#';
-      
-      const cleaned = String(path).trim();
-      
-      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
-        return cleaned.replace('http://', 'https://');
-      }
-      
-      const base = config.uploads.baseUrl?.replace(/\/+$/, '');
-      const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-      
-      return `${base}${resource}`.replace(/\/+/g, '/');
-    },
+    /**
+     * Construye URL segura para PDFs
+     * @param {string} path - Ruta o URL del PDF
+     * @returns {string} - URL completa con parámetros para el visor nativo
+     */
+getSafePdfUrl(path) {
+  if (!path) return '#';
+  
+  const cleaned = String(path).trim();
+  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
+  
+  // ✅ CASO 1: Ya es URL completa de MinIO
+  if (cleaned.includes('archivosminio.upea.bo')) {
+    const httpsUrl = cleaned.replace(/^http:\/\//, 'https://');
+    return httpsUrl + '#toolbar=1&navpanes=1&scrollbar=1';
+  }
+  
+  // ✅ CASO 2: Es nombre de archivo → construir URL con carpeta de documentos
+  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+  const fullUrl = `${MINIO_BASE}/documentos${resource}`.replace(/\/+/g, '/');
+  
+  return fullUrl + '#toolbar=1&navpanes=1&scrollbar=1';
+},
 
     async getGaceta() {
       this.loading = true
@@ -468,24 +487,28 @@ export default {
         const data = res.data
 
         const lista = data.upea_gaceta_universitaria || []
-        this.gaceta = lista.find(g => g.gaceta_id == idGac) || {}
+        this.gaceta = lista.find(g => String(g.gaceta_id) === String(idGac)) || {}
 
         if (!this.gaceta.gaceta_id) {
           this.errorGet = true
-          console.warn('Gaceta no encontrada con ID:', idGac)
+          logger.warn('Gaceta no encontrada con ID:', idGac)
           return
         }
 
         this.gaceta = this._limpiarObjeto(this.gaceta)
         
+        // Generar URL del PDF
+        this.pdfUrl = this.getSafePdfUrl(this.gaceta.gaceta_documento)
+        logger.debug('URL del PDF generada:', this.pdfUrl)
+        
       } catch (error) {
-        console.error('Error cargando gaceta:', error)
+        logger.error('Error cargando gaceta:', error)
         this.errorGet = true
 
         if (error.response?.status === 404) {
-          console.warn('Gaceta no encontrada (404)')
+          logger.warn('Gaceta no encontrada (404)')
         } else if (error.response?.status === 500) {
-          console.error('Error del servidor (500)')
+          logger.error('Error del servidor (500)')
         }
       } finally {
         this.loading = false
@@ -574,6 +597,7 @@ export default {
     this.gaceta = {}
     this.errorGet = false
     this.loading = false
+    this.pdfUrl = ''
   }
 };
 </script>

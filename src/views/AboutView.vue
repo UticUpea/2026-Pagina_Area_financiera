@@ -304,15 +304,14 @@
                 </h4>
                 <iframe 
                   v-if="isValidEmbedUrl(institucion.institucion_api_google_map)"
-                  :src="buildSafeEmbedUrl(institucion.institucion_api_google_map)"
-                  width="100%" 
-                  height="400" 
-                  style="border:0;" 
-                  allowfullscreen="" 
-                  loading="lazy"
-                  title="Ubicación en mapa"
-                  referrerpolicy="no-referrer-when-downgrade"
-                  sandbox="allow-scripts allow-same-origin allow-popups allow-forms">
+                 :src="institucion.institucion_api_google_map"
+  width="100%" 
+  height="400" 
+  style="border:0;" 
+  allowfullscreen="" 
+  loading="lazy"
+  referrerpolicy="no-referrer-when-downgrade"
+  sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation">
                 </iframe>
                 <div v-else class="map-placeholder">
                   <i class="fa fa-map-marker"></i>
@@ -1014,6 +1013,7 @@ button:focus-visible,
 import { mapState } from "vuex";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default {
   name: "AboutView",
@@ -1094,28 +1094,45 @@ export default {
       }
     },
 
-    buildSafeImageUrl(path) {
-      if (!path) return require('@/assets/upea.png');
-      const cleaned = String(path).trim();
-      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
-        return cleaned.replace('http://', 'https://');
-      }
-      const base = config.uploads?.baseUrl?.replace(/\/+$/, '');
-      if (!base) return require('@/assets/upea.png');
-      const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-      return `${base}${resource}`.replace(/\/+/g, '/');
-    },
+buildSafeImageUrl(path) {
+  if (!path) return require('@/assets/upea.png');
+  
+  const cleaned = String(path).trim();
+  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
+  
+  if (cleaned.includes('archivosminio.upea.bo')) {
+    return cleaned.replace(/^http:\/\//, 'https://');
+  }
+
+  const lower = cleaned.toLowerCase();
+  let folder = '/imagenes/'; // por defecto
+  
+  if (lower.endsWith('.pdf')) {
+    folder = '/documentos/';
+  } else if (lower.includes('institucion_logo')) {
+    folder = '/imagenes/instituciones/';
+  } else if (lower.includes('portada_imagen')) {
+    folder = '/imagenes/portadas/';
+  } else if (lower.includes('serv_imagen')) {
+    folder = '/imagenes/servicios/';
+  } else if (lower.includes('con_foto_portada')) {
+    folder = '/imagenes/convocatorias/';
+  }
+  
+  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+
+  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+},
 
     buildSafeUrl(url) {
       if (!url) return '#';
       const cleaned = String(url).trim().toLowerCase();
-      if (cleaned.startsWith('javascript:') || 
-          cleaned.startsWith('') || 
-          cleaned.startsWith('vbscript:') ||
-          cleaned.startsWith('')) {
-        console.warn('URL bloqueada por seguridad:', url);
-        return '#';
-      }
+     if (cleaned.startsWith('javascript:') || 
+      cleaned.startsWith('vbscript:') ||
+      cleaned.startsWith('data:')) {
+    logger.warn('URL bloqueada por seguridad:', url);
+    return '#';
+  }
       if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
         return cleaned.replace('http://', 'https://');
       }
@@ -1128,7 +1145,7 @@ export default {
       if (cleaned.includes('google.com/maps') || cleaned.includes('google.com/maps/embed')) {
         return cleaned.replace('http://', 'https://');
       }
-      console.warn('Embed URL no permitido:', url);
+      logger.warn('Embed URL no permitido:', url);
       return '';
     },
 
@@ -1230,7 +1247,7 @@ export default {
           this.checkTextLength();
         });
       } catch (error) {
-        console.error('Error cargando institución:', error);
+        logger.error('Error cargando institución:', error);
       } finally {
         this.loading.institucion = false;
       }
@@ -1245,7 +1262,7 @@ export default {
         this.autoridades = data.autoridad?.map(this._limpiarObjeto) || [];
         this._actualizarPager();
       } catch (error) {
-        console.error('Error cargando autoridades:', error);
+        logger.error('Error cargando autoridades:', error);
       } finally {
         this.loading.contenido = false;
         this.$store.commit("loading");
@@ -1278,33 +1295,31 @@ export default {
     }
   },
 
-watch: {
-  Institucion: {
-    handler() {
-      this.applyDynamicColors();
+  watch: {
+    Institucion: {
+      handler() {
+        this.applyDynamicColors();
+      },
+      deep: true,
+      immediate: true
     },
-    deep: true,
-    immediate: true
-  },
   
-
-  '$route'(to, from) {
-
-    if (to.path === from.path && to.hash && to.hash !== from.hash) {
-      this.$nextTick(() => {
-        setTimeout(() => {
-          const element = document.getElementById(to.hash.replace('#', ''));
-          if (element) {
-            window.scrollTo({
-              top: element.offsetTop - 100, 
-              behavior: 'smooth'
-            });
-          }
-        }, 10);
-      });
+    '$route'(to, from) {
+      if (to.path === from.path && to.hash && to.hash !== from.hash) {
+        this.$nextTick(() => {
+          setTimeout(() => {
+            const element = document.getElementById(to.hash.replace('#', ''));
+            if (element) {
+              window.scrollTo({
+                top: element.offsetTop - 100, 
+                behavior: 'smooth'
+              });
+            }
+          }, 10);
+        });
+      }
     }
-  }
-},
+  },
 
   created() {
     this.$store.commit("loadOn");
@@ -1316,7 +1331,6 @@ watch: {
   },
 
   mounted() {
-
     if (this.$route.hash) {
       this.$nextTick(() => {
         const sectionId = this.$route.hash.replace('#', '');

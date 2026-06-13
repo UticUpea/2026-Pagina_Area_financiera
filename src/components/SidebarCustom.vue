@@ -53,6 +53,7 @@
 
 <script>
 import { mapState } from "vuex";
+import logger from '@/utils/logger'
 
 export default {
   name: "SidebarCustom",
@@ -87,12 +88,6 @@ export default {
   },
   
   methods: {
-    /**
-     * Valida que un color sea seguro para CSS
-     * @param {string} color - Color a validar
-     * @param {string} fallback - Color por defecto si es inválido
-     * @returns {string} - Color seguro o fallback
-     */
     validateColor(color, fallback = '#000000') {
       if (!color || typeof color !== 'string') {
         return fallback;
@@ -100,28 +95,22 @@ export default {
       
       const cleaned = color.trim().toLowerCase();
       
-      // Permitir solo formatos seguros de color CSS
       const validPatterns = [
-        /^#[0-9a-f]{6}$/,           // Hex #RRGGBB
-        /^#[0-9a-f]{3}$/,           // Hex #RGB
-        /^rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*[\d.]+\s*)?\)$/,  // rgb/rgba
-        /^hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(,\s*[\d.]+\s*)?\)$/, // hsl/hsla
-        /^[a-z]+$/                  // Named colors (red, blue, etc.)
+        /^#[0-9a-f]{6}$/,
+        /^#[0-9a-f]{3}$/,
+        /^rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*[\d.]+\s*)?\)$/,
+        /^hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(,\s*[\d.]+\s*)?\)$/,
+        /^[a-z]+$/
       ];
       
       if (validPatterns.some(pattern => pattern.test(cleaned))) {
         return cleaned;
       }
       
-      console.warn('Color inválido bloqueado:', color);
+      logger.warn('Color inválido bloqueado:', color);
       return fallback;
     },
 
-    /**
-     * Formatea y sanitiza nombre de categoría
-     * @param {string} text - Texto a formatear
-     * @returns {string} - Texto seguro formateado
-     */
     formatCategoryName(text) {
       if (!text || typeof text !== 'string') {
         return '';
@@ -133,11 +122,6 @@ export default {
       return sanitized.charAt(0).toUpperCase() + sanitized.slice(1).toLowerCase();
     },
 
-    /**
-     * Sanitiza texto para prevenir XSS
-     * @param {string} text - Texto a sanitizar
-     * @returns {string} - Texto seguro
-     */
     sanitizeText(text) {
       if (!text) return '';
       

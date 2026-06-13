@@ -1,28 +1,33 @@
 <template>
-  <div>
-    <footer class="bg-cover footer-area banner-area-4">
-      <div class="footer-top pd-top-115">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-4 col-md-5">
-              <div class="widget widget_contact pr-lg-3">
-                <div class="widget-title">
-                  <img 
-                    :src="buildSafeImageUrl(Institucion.institucion_logo)" 
-                    alt="Logo institucional" 
-                    width="125" 
-                    loading="lazy"
-                  />
-                </div>
-                <ul class="social-media-2">
-                  <li><strong>REDES SOCIALES:</strong></li>
-                  <br>
+  <footer class="footer-area">
+    <!-- Top del footer -->
+    <div class="footer-top">
+      <div class="container">
+        <div class="row gy-4">
+          
+          <!-- Logo y Redes -->
+          <div class="col-lg-4 col-md-5">
+            <div class="footer-widget widget-contact">
+              <div class="widget-logo">
+                <img 
+                  :src="buildSafeImageUrl(Institucion.institucion_logo)" 
+                  alt="Logo institucional" 
+                  width="150"
+                  height="auto"
+                  loading="lazy"
+                  @error="e => e.target.src = require('@/assets/upea.png')"
+                />
+              </div>
+              <div class="social-section">
+                <span class="social-label">REDES SOCIALES:</span>
+                <ul class="social-links">
                   <li>
                     <a 
                       :href="buildSafeUrl(Institucion.institucion_facebook)" 
                       target="_blank" 
                       rel="noopener noreferrer"
                       aria-label="Facebook"
+                      class="social-icon"
                     >
                       <i class="fa fa-facebook" aria-hidden="true"></i>
                     </a>
@@ -33,6 +38,7 @@
                       target="_blank" 
                       rel="noopener noreferrer"
                       aria-label="YouTube"
+                      class="social-icon"
                     >
                       <i class="fa fa-youtube" aria-hidden="true"></i>
                     </a>
@@ -43,6 +49,7 @@
                       target="_blank" 
                       rel="noopener noreferrer"
                       aria-label="Twitter"
+                      class="social-icon"
                     >
                       <i class="fa fa-twitter" aria-hidden="true"></i>
                     </a>
@@ -50,10 +57,13 @@
                 </ul>
               </div>
             </div>
-          
-            <div class="col-lg-3 col-md-3 widget widget_tags">
-              <h4 class="widget-title">Enlaces Externos</h4>
-              <div class="tagcloud">
+          </div>
+        
+          <!-- Enlaces Externos -->
+          <div class="col-lg-3 col-md-3">
+            <div class="footer-widget widget-links">
+              <h4 class="widget-title">Enlaces</h4>
+              <div class="link-cloud">
                 <a 
                   :href="buildSafeUrl(link.url_link)" 
                   target="_blank" 
@@ -61,6 +71,7 @@
                   v-for="(link, index) of Links" 
                   :key="link.id_link || index"
                   :title="sanitizeText(link.tipo)"
+                  class="link-tag"
                 >
                   {{ sanitizeText(link.nombre) }}
                 </a>
@@ -68,216 +79,479 @@
                   href="https://utic.upea.bo/" 
                   target="_blank" 
                   rel="noopener noreferrer"
+                  class="link-tag"
                 >
                   UTIC UPEA
                 </a>
               </div>
             </div>
-            
-            <div class="col-lg-5 col-md-4 col-sm-12 pl-lg-5 pr-5 pr-lg-0">
-              <div class="widget widget_contact pr-lg-3">
-                <h4 class="widget-title">Contacto</h4>
-                <ul class="details style-icon">
-                  <li>
-                    <i class="fa fa-phone"></i> 
-                    +{{ formatPhone(Institucion.institucion_celular1) }}
-                  </li>
-                  <li>
-                    <i class="fa fa-envelope"></i>
-                    <a 
-                      :href="buildMailTo(Institucion.institucion_correo1)"
-                      rel="noopener noreferrer"
-                    >
-                      {{ sanitizeText(Institucion.institucion_correo1) }}
-                    </a>
-                  </li>
-                  <li>
-                    <i class="fa fa-map-marker"></i>
-                    {{ sanitizeText(Institucion.institucion_direccion) }}
-                  </li>
-                </ul>
-              </div>
+          </div>
+          
+          <!-- Contacto -->
+          <div class="col-lg-5 col-md-4">
+            <div class="footer-widget widget-contact">
+              <h4 class="widget-title">Contacto</h4>
+              <ul class="contact-list">
+                <li class="contact-item">
+                  <i class="fa fa-phone contact-icon"></i> 
+                  <span>+{{ formatPhone(Institucion.institucion_celular1) }}</span>
+                </li>
+                <li class="contact-item">
+                  <i class="fa fa-envelope contact-icon"></i>
+                  <a 
+                    :href="buildMailTo(Institucion.institucion_correo1)"
+                    rel="noopener noreferrer"
+                    class="contact-link"
+                  >
+                    {{ sanitizeText(Institucion.institucion_correo1) }}
+                  </a>
+                </li>
+                <li class="contact-item">
+                  <i class="fa fa-map-marker contact-icon"></i>
+                  <span class="contact-address">{{ sanitizeText(Institucion.institucion_direccion) }}</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="">
-        <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-12 text-center align-self-center mt-3">
-              <a 
-                href="https://utic.upea.bo/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                aria-label="Visitar sitio de UTIC UPEA"
-              >
-                <img 
-                  src="@/assets/utic.png" 
-                  width="150" 
-                  alt="UTIC UPEA" 
-                  loading="lazy"
-                />
-              </a>
-              <p class="mb-0">
-                © Copyright {{ currentYear }} UTIC_UPEA | Support by FrehisyM 
-              </p>
-            </div>
+    <!-- Bottom del footer -->
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-12 text-center">
+            <a 
+              href="https://utic.upea.bo/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Visitar sitio de UTIC UPEA"
+              class="utic-link"
+            >
+              <img 
+                src="@/assets/utic.png" 
+                width="150" 
+                alt="UTIC UPEA" 
+                loading="lazy"
+                class="utic-logo"
+              />
+            </a>
+            <p class="copyright">
+              © {{ currentYear }} UTIC_UPEA
+            </p>
           </div>
         </div>
       </div>
-    </footer>
+    </div>
 
-    <div class="whatsapp">
+    <!-- Botón WhatsApp -->
+    <div class="whatsapp-float">
       <a 
-        class="btn_whatsapp" 
+        class="btn-whatsapp" 
         :href="getWhatsAppLink(Institucion.institucion_celular1)"
         target="_blank" 
         title="Contáctanos por WhatsApp"
         rel="noopener noreferrer"
         aria-label="Contactar por WhatsApp"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-whatsapp" width="60" height="60" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-whatsapp" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00b341" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
           <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
           <path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" />
         </svg>
       </a>
     </div>
-  </div>
+  </footer>
 </template>
 
-<style>
+<style scoped>
+/* ===== VARIABLES - Usan colores dinámicos de la API ===== */
 .footer-area {
-  position: relative;
-  background-image: url("@/assets/images/Conta_1.jpg");
-  background-repeat: no-repeat;
-  background-size: 100%;
+  --footer-bg: rgba(10, 15, 30, 0.98);
+  --footer-text: rgba(255, 255, 255, 0.9);
+  --footer-text-muted: rgba(255, 255, 255, 0.75);
+  --footer-accent: var(--main-color, #04246C);        /* Color primario de API */
+  --footer-accent-2: var(--main-color-2, #FC0102);    /* Color secundario de API */
+  --footer-accent-3: var(--main-color-3, #020733);    /* Color terciario de API */
+  --footer-hover: #ffffff;
+  --transition: all 0.3s ease;
+  --radius: 8px;
 }
 
-.footer-area p.copyright-text,
-.footer-area .col-12.text-center p.mb-0 {
-  margin: 0;
-  font-size: 1.5rem !important;
-  color: rgba(255, 255, 255, 0.9);
+/* ===== ESTRUCTURA PRINCIPAL - Tamaño intermedio ===== */
+.footer-area {
+  background: var(--footer-bg);
+  color: var(--footer-text);
+  font-size: 1.25rem;
   line-height: 1.6;
-  font-weight: 500;
 }
 
-.footer-area a img {
+.footer-top {
+  padding: 40px 0 30px 0;  /* Tamaño intermedio */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-bottom {
+  padding: 20px 0;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* ===== WIDGETS ===== */
+.footer-widget {
+  padding: 0 15px;
+}
+
+.widget-logo {
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+.widget-logo img {
+  max-height: 100px;  /* Tamaño intermedio */
+  width: auto;
+  object-fit: contain;
+  transition: var(--transition);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.widget-logo img:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+
+.widget-title {
+  font-size: 1.5rem; 
+  font-weight: 600;
+  color: var(--footer-hover);
+  margin: 0 0 16px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--footer-accent-2);  /* Color secundario API */
+  display: inline-block;
+}
+
+/* ===== REDES SOCIALES ===== */
+.social-section {
+  text-align: center;
+}
+
+.social-label {
   display: block;
-  margin: 0 auto 0.5rem auto;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--footer-text-muted);
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
-.details.style-icon {
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
   list-style: none;
   padding: 0;
   margin: 0;
-  text-align: left;
 }
 
-.details.style-icon li {
+.social-icon {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  text-align: left;
-  justify-content: flex-start;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  color: var(--footer-text);
+  text-decoration: none;
+  transition: var(--transition);
+  font-size: 1.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.details.style-icon li:last-child {
+.social-icon:hover {
+  background: var(--footer-accent-2);  /* Color secundario API */
+  color: white;
+  transform: translateY(-3px);
+  border-color: var(--footer-accent-2);
+}
+
+/* ===== ENLACES ===== */
+.link-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.link-tag {
+  display: inline-block;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--footer-text);
+  text-decoration: none;
+  font-size: 1.25rem;
+  border-radius: var(--radius);
+  transition: var(--transition);
+  border: 1px solid transparent;
+}
+
+.link-tag:hover {
+  background: rgba(4, 36, 108, 0.5);  /* Color primario API con transparencia */
+  border-color: var(--footer-accent);  /* Color primario API */
+  color: var(--footer-hover);
+  transform: translateY(-2px);
+}
+
+/* ===== CONTACTO ===== */
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-size: 1.1rem;
+}
+
+.contact-item:last-child {
   margin-bottom: 0;
 }
 
-.details.style-icon li i {
-  width: 20px;
+.contact-icon {
+  color: var(--footer-accent-2);  /* Color secundario API */
+  font-size: 1.50rem;
+  width: 40px;
   text-align: center;
   flex-shrink: 0;
+  margin-top: 3px;
 }
 
-.widget_contact.pr-lg-3 {
-  text-align: center !important;
+.contact-link {
+  color: var(--footer-text);
+  text-decoration: none;
+  transition: var(--transition);
+  word-break: break-all;
 }
 
-.widget_contact.pr-lg-3 ul {
-  display: inline-block;
-  text-align: left;
+.contact-link:hover {
+  color: var(--footer-hover);
+  text-decoration: underline;
 }
 
-.widget_contact.pr-lg-3 ul li {
-  justify-content: flex-start;
+.contact-address {
+  line-height: 1.5;
 }
 
-@media (max-width: 768px) {
-  .footer-area p {
-    font-size: 0.85rem;
-    padding: 0 1rem;
-  }
-  
-  .footer-area a img {
-    width: 80px;
-    height: auto;
-  }
-  
-  .details.style-icon li {
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-  }
-  
-  .details.style-icon li i {
-    width: 18px;
-  }
+/* ===== FOOTER BOTTOM ===== */
+.copyright {
+  margin: 10px 0 0 0;
+  font-size: 1rem;
+  color: var(--footer-text-muted);
 }
 
-/* ✅ BOTÓN WHATSAPP */
-.whatsapp {
+.utic-logo {
+  opacity: 0.9;
+  transition: var(--transition);
+  margin-bottom: 5px;
+}
+
+.utic-logo:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* ===== WHATSAPP FLOTANTE ===== */
+.whatsapp-float {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 9999;
 }
 
-.btn_whatsapp {
+.btn-whatsapp {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
+  width: 55px;
+  height: 55px;
   background: white;
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: var(--transition);
+  text-decoration: none;
 }
 
-.btn_whatsapp:hover {
+.btn-whatsapp:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 }
 
-.btn_whatsapp svg {
+.icon-whatsapp {
+  width: 32px;
+  height: 32px;
   transition: transform 0.3s ease;
 }
 
-.btn_whatsapp:hover svg {
+.btn-whatsapp:hover .icon-whatsapp {
   transform: scale(1.05);
 }
 
+/* ===== RESPONSIVE ===== */
+@media (max-width: 991px) {
+  .footer-top {
+    padding: 35px 0 25px 0;
+  }
+  
+  .footer-widget {
+    text-align: center;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+  
+  .contact-list {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .contact-item {
+    justify-content: center;
+    white-space: normal; 
+  }
+    .contact-address {
+    max-width: 100%;        
+  }
+}
+
+@media (max-width: 768px) {
+     .contact-list {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .contact-item {
+    justify-content: center;
+  }
+
+  .footer-area {
+    font-size: 1.25rem;
+  }
+  
+  .footer-top {
+    padding: 30px 0 20px 0;
+  }
+  
+  .footer-bottom {
+    padding: 16px 0;
+  }
+  
+  .widget-logo img {
+    max-height: 100px;
+  }
+  
+  .widget-title {
+    font-size: 1.25rem;
+    margin-bottom: 14px;
+  }
+  
+  .social-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+  
+  .link-tag {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+  
+  .contact-icon {
+    width: 60px;
+    font-size: 1.25rem;
+  }
+  
+  .copyright {
+    font-size: 1.50rem;
+  }
+  
+  .utic-logo {
+    width: 100px;
+  }
+
+}
+
 @media (max-width: 576px) {
-  .whatsapp {
+  .footer-top {
+    padding: 25px 0 18px 0;
+  }
+  
+  .widget-logo img {
+    max-height: 100px;
+  }
+  
+  .social-links {
+    gap: 12px;
+  }
+  
+  .social-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+  
+  .contact-item {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .contact-icon {
+    width: 30px;
+  }
+  
+  .btn-whatsapp {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .icon-whatsapp {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .whatsapp-float {
     bottom: 15px;
     right: 15px;
   }
   
-  .btn_whatsapp {
-    width: 50px;
-    height: 50px;
+  .utic-logo {
+    width: 70px;
   }
 }
+
+/* ===== ACCESIBILIDAD ===== */
+.social-icon:focus,
+.link-tag:focus,
+.contact-link:focus,
+.btn-whatsapp:focus {
+  outline: 2px solid var(--footer-accent-2);
+  outline-offset: 2px;
+}
+
+/* ===== UTILIDADES ===== */
+.gy-4 { row-gap: 1.5rem; }
+.text-center { text-align: center !important; }
+.mb-0 { margin-bottom: 0 !important; }
 </style>
 
 <script>
 import { mapState } from "vuex";
-import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default {
   name: "FooterCustom",
@@ -291,93 +565,77 @@ export default {
   },
   
   methods: {
-    /**
-     * @param {string} path - Ruta o URL de la imagen
-     * @returns {string} - URL segura con HTTPS
-     */
-    buildSafeImageUrl(path) {
-      if (!path) return '';
-      
-      const cleaned = String(path).trim();
-      
-      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
-        return cleaned.replace('http://', 'https://');
-      }
-      
-      const base = config.uploads?.baseUrl?.replace(/\/+$/, '');
-      if (!base) return '';
-      
-      const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-      return `${base}${resource}`.replace(/\/+/g, '/');
-    },
+buildSafeImageUrl(path) {
+  if (!path) return require('@/assets/upea.png');
+  
+  const cleaned = String(path).trim();
+  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
+  
+  // ✅ CASO 1: Ya es URL completa de MinIO → solo asegurar HTTPS
+  if (cleaned.includes('archivosminio.upea.bo')) {
+    return cleaned.replace(/^http:\/\//, 'https://');
+  }
+  
+  // ✅ CASO 2: Es nombre de archivo o ruta relativa → construir con base de MinIO
 
-    /**
-     * Construye URL segura para enlaces externos
-     * @param {string} url - URL a validar
-     * @returns {string} - URL segura o '#' si es inválida
-     */
+  const lower = cleaned.toLowerCase();
+  let folder = '/imagenes/'; 
+  
+  if (lower.endsWith('.pdf')) {
+    folder = '/documentos/';
+  } else if (lower.includes('institucion_logo')) {
+    folder = '/imagenes/instituciones/';
+  } else if (lower.includes('portada_imagen')) {
+    folder = '/imagenes/portadas/';
+  } else if (lower.includes('serv_imagen')) {
+    folder = '/imagenes/servicios/';
+  } else if (lower.includes('con_foto_portada')) {
+    folder = '/imagenes/convocatorias/';
+  }
+  
+  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+},
+
     buildSafeUrl(url) {
       if (!url) return '#';
-      
       const cleaned = String(url).trim().toLowerCase();
-
-      if (cleaned.startsWith('javascript:') || cleaned.startsWith('data:')) {
-        return '#';
-      }
-      
+      if (cleaned.startsWith('javascript:') || 
+      cleaned.startsWith('vbscript:') ||
+      cleaned.startsWith('data:')) {
+    logger.warn('URL bloqueada por seguridad:', url);
+    return '#';
+  }
       if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
         return cleaned.replace('http://', 'https://');
       }
-     
       return `https://${String(url).trim()}`;
     },
 
-    /**
-     * Valida si una URL es segura para mostrar
-     * @param {string} url - URL a validar
-     * @returns {boolean} - True si es válida
-     */
     isValidUrl(url) {
       if (!url) return false;
-      
       const cleaned = String(url).trim().toLowerCase();
-      
-
       if (cleaned.startsWith('javascript:') || 
           cleaned.startsWith('data:') || 
           cleaned.startsWith('vbscript:')) {
         return false;
       }
-      
       return cleaned.length > 0;
     },
 
-    /**
-     * Construye enlace mailto seguro
-     * @param {string} email - Correo electrónico
-     * @returns {string} - Enlace mailto o '#'
-     */
     buildMailTo(email) {
       if (!email) return '#';
-      
       const cleaned = String(email).trim();
-
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(cleaned)) {
+        logger.warn('Email inválido:', email);
         return '#';
       }
-      
       return `mailto:${cleaned}`;
     },
 
-    /**
-     * Sanitiza texto para prevenir XSS
-     * @param {string} text - Texto a sanitizar
-     * @returns {string} - Texto seguro
-     */
     sanitizeText(text) {
       if (!text) return '';
-      
       return String(text)
         .trim()
         .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -386,32 +644,20 @@ export default {
         .replace(/on\w+=/gi, '');
     },
 
-    /**
-     * Formatea número de teléfono
-     * @param {string} phone - Número de teléfono
-     * @returns {string} - Teléfono solo con números
-     */
     formatPhone(phone) {
       if (!phone) return '';
       return String(phone).replace(/[^0-9]/g, '');
     },
 
-    /**
-     * @param {string} phone - Número de teléfono
-     * @returns {string} - Enlace de WhatsApp
-     */
     getWhatsAppLink(phone) {
       if (!phone) return '#';
-      
       const cleanPhone = String(phone).replace(/[^0-9]/g, '');
-
       if (cleanPhone.length < 8) {
+        logger.warn('Número de WhatsApp inválido:', phone);
         return '#';
       }
-      
       return `https://wa.me/591${cleanPhone}`;
     },
-
 
     applyDynamicColors() {
       const colors = this.Institucion?.colorinstitucion;

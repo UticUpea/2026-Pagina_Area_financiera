@@ -492,6 +492,7 @@ import SidebarCustom from "@/components/SidebarCustom.vue";
 import { mapState } from "vuex";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default {
   name: "VideosView",
@@ -540,7 +541,6 @@ export default {
       return this.filteredVideos.slice(start, end);
     },
 
-    // Total de páginas
     totalPages() {
       return Math.ceil(this.filteredVideos.length / this.NUM_RESULTS);
     },
@@ -578,7 +578,7 @@ export default {
           .map(this._limpiarObjeto);
         
       } catch (error) {
-        console.error('Error cargando videos:', error);
+        logger.error('Error cargando videos:', error);
         this.videos = [];
       } finally {
         this.loading = false;

@@ -571,6 +571,7 @@ import SidebarCustom from "@/components/SidebarCustom.vue";
 import { mapState } from "vuex";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default {
   name: "GacetaView",
@@ -676,7 +677,7 @@ export default {
         )];
         
       } catch (error) {
-        console.error('Error cargando gacetas:', error);
+        logger.error('Error cargando gacetas:', error);
         this.gacetas = [];
         this.tiposUnicos = [];
       } finally {
@@ -714,7 +715,6 @@ export default {
       this.isSearching = this.searchQuery.trim().length > 0;
       this.currentPage = 1;
       
-      // Scroll a resultados
       if (this.isSearching) {
         this.$nextTick(() => {
           const resultsSection = document.querySelector('.blog-area');
@@ -748,12 +748,10 @@ export default {
       }
     },
 
-
     filtrarPorTipo(tipo) {
       this.filtroTipo = tipo;
       this.currentPage = 1;
     },
-
 
     contarPorTipo(tipo) {
       return this.gacetas.filter(g => g.gaceta_tipo === tipo).length;
@@ -797,7 +795,6 @@ export default {
       return `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`;
     },
 
- 
     _limpiarObjeto(obj) {
       if (!obj || typeof obj !== 'object') return obj;
       const cleaned = { ...obj };

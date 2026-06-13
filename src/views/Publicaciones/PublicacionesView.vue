@@ -515,6 +515,7 @@ import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default {
   name: "PublicacionesView",
@@ -598,7 +599,7 @@ export default {
         this._actualizarPager();
         
       } catch (error) {
-        console.error('Error cargando publicaciones:', error);
+        logger.error('Error cargando publicaciones:', error);
         this.publicaciones = [];
       } finally {
         this.loading = false;
@@ -606,21 +607,37 @@ export default {
       }
     },
 
-    buildSafeImageUrl(path) {
-      if (!path) return '';
-      
-      const cleaned = String(path).trim();
-      
+buildSafeImageUrl(path) {
+  if (!path) return require('@/assets/upea.png');
+  
+  const cleaned = String(path).trim();
+  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
+  
+  // ✅ CASO 1: Ya es URL completa de MinIO → solo asegurar HTTPS
+  if (cleaned.includes('archivosminio.upea.bo')) {
+    return cleaned.replace(/^http:\/\//, 'https://');
+  }
+  
+  // ✅ CASO 2: Es nombre de archivo o ruta relativa → construir con base de MinIO
 
-      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
-        return cleaned.replace('http://', 'https://');
-      }
-
-      const base = config.uploads.baseUrl?.replace(/\/+$/, '');
-      const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-      
-      return `${base}${resource}`.replace(/\/+/g, '/');
-    },
+  const lower = cleaned.toLowerCase();
+  let folder = '/imagenes/'; 
+  
+  if (lower.endsWith('.pdf')) {
+    folder = '/documentos/';
+  } else if (lower.includes('institucion_logo')) {
+    folder = '/imagenes/instituciones/';
+  } else if (lower.includes('portada_imagen')) {
+    folder = '/imagenes/portadas/';
+  } else if (lower.includes('serv_imagen')) {
+    folder = '/imagenes/servicios/';
+  } else if (lower.includes('con_foto_portada')) {
+    folder = '/imagenes/convocatorias/';
+  }
+  
+  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+},
 
     onSearchInput() {
       if (this.searchTimeout) {
@@ -669,7 +686,6 @@ export default {
       }
     },
 
-
     applyDynamicColors() {
       const colors = this.Institucion?.colorinstitucion;
       if (colors && colors.length > 0) {
@@ -715,7 +731,6 @@ export default {
       
       return `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`;
     },
-
 
     _limpiarObjeto(obj) {
       if (!obj || typeof obj !== 'object') return obj;

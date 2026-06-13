@@ -12,6 +12,7 @@ import FooterCustom from "@/components/FooterCustom.vue";
 import { mapState } from "vuex";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default {
   name: "appWrapper",
@@ -86,7 +87,7 @@ export default {
         
         this.$store.commit('setMenuConv', Object.values(tiposUnicos))
       } catch (error) {
-        console.error('Error cargando MenuConv:', error)
+        logger.error('Error cargando MenuConv:', error)
         this.$store.commit('setMenuConv', [])
       }
     },
@@ -117,7 +118,7 @@ export default {
         
         this.$store.commit('setMenuCur', Object.values(tiposUnicos))
       } catch (error) {
-        console.error('Error cargando MenuCur:', error)
+        logger.error('Error cargando MenuCur:', error)
         this.$store.commit('setMenuCur', [])
       }
     },
@@ -134,7 +135,7 @@ export default {
         
         this.$store.commit('setLinks', filterLinks)
       } catch (error) {
-        console.error('Error cargando Links:', error)
+        logger.error('Error cargando Links:', error)
       }
     },
 
@@ -168,7 +169,7 @@ export default {
         }
         
       } catch (error) {
-        console.error('Error cargando institución:', error)
+        logger.error('Error cargando institución:', error)
         if (error.code === "ERR_NETWORK" || error.response?.status >= 500) {
           this.$router.push("/error_network")
         }

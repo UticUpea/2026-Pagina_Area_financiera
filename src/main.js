@@ -1,4 +1,3 @@
-
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -6,12 +5,13 @@ import store from './store'
 import { config } from '@/config/env'
 import api from './plugins/axios'
 import vueAxios from 'vue-axios'
+import logger from '@/utils/logger'  
 
 if (process.env.NODE_ENV === 'production') {
   if (!config.api.baseUrl || !config.uploads.baseUrl) {
-    console.error(' ERROR CRÍTICO: Configuración incompleta')
-    console.error('   La aplicación no puede iniciar sin variables de entorno válidas')
-
+ 
+    logger.error('Configuración incompleta - La aplicación no puede iniciar')
+ 
     document.body.innerHTML = `
       <div style="
         display: flex;
@@ -26,7 +26,7 @@ if (process.env.NODE_ENV === 'production') {
         line-height: 1.6;
       ">
         <div>
-          <h1 style="margin: 0 0 1rem 0; font-size: 1.5rem;"> Error de Configuración</h1>
+          <h1 style="margin: 0 0 1rem 0; font-size: 1.5rem;">Error de Configuración</h1>
           <p style="margin: 0.5rem 0;">La aplicación no puede iniciar.</p>
           <p style="margin: 0.5rem 0; opacity: 0.9;">Contacta al administrador del sistema.</p>
         </div>
@@ -48,11 +48,11 @@ app.config.globalProperties.$api = api
 app.config.globalProperties.$filters = {
   
   /**
+   * 
    * @param {string} path 
    * @returns {string} 
    */
   imageUrl: (path) => {
-
     if (!path) return ''
 
     if (path.startsWith('http://') || path.startsWith('https://')) {
@@ -63,6 +63,7 @@ app.config.globalProperties.$filters = {
   },
 
   /**
+   * 
    * @param {string} isoString 
    * @param {object} options 
    * @returns {string} 
@@ -80,7 +81,7 @@ app.config.globalProperties.$filters = {
     const date = new Date(isoString)
 
     if (isNaN(date.getTime())) {
-      console.warn(`Fecha inválida: ${isoString}`)
+      logger.warn(`Fecha inválida recibida: ${isoString}`)
       return isoString
     }
     

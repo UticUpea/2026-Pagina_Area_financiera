@@ -356,6 +356,7 @@ import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default {
   name: "DetalleSeminario",
@@ -401,20 +402,20 @@ export default {
 
         if (!this.seminario.iddetalle_cursos_academicos) {
           this.errorGet = true
-          console.warn('Seminario no encontrado con ID:', idSem)
+          logger.warn('Seminario no encontrado con ID:', idSem)
           return
         }
 
         this.seminario = this._limpiarObjeto(this.seminario)
         
       } catch (error) {
-        console.error('Error cargando seminario:', error)
+        logger.error('Error cargando seminario:', error)
         this.errorGet = true
 
         if (error.response?.status === 404) {
-          console.warn('Seminario no encontrado (404)')
+          logger.warn('Seminario no encontrado (404)')
         } else if (error.response?.status === 500) {
-          console.error('Error del servidor (500)')
+          logger.error('Error del servidor (500)')
         }
       } finally {
         this.loading = false

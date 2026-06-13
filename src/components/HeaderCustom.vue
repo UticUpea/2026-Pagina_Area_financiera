@@ -1,6 +1,6 @@
 <template>
   <div class="navbar-area">
-    <div class="navbar-top">
+    <div class="navbar-top" :class="{ 'navbar-light': isLightMenu }">
       <div class="container">
         <div class="row">
           <div class="col-6 text-md-left">
@@ -34,47 +34,47 @@
         </div>
       </div>
     </div> 
-    <nav class="navbar navbar-area-1 navbar-area navbar-expand-lg">
+    <nav class="navbar navbar-area-1 navbar-area navbar-expand-lg" :class="{ 'navbar-light-menu': isLightMenu }">
       <div class="container nav-container">
         <div class="responsive-mobile-menu">
-          <button class="menu toggle-btn d-block d-lg-none" data-target="#edumint_main_menu" @click="openMenu()"
+          <button class="menu toggle-btn d-block d-lg-none" :class="{ 'toggle-light': isLightMenu }" data-target="#edumint_main_menu" @click="openMenu()"
             aria-expanded="false" aria-label="Toggle navigation">
             <span class="icon-left"></span>
             <span class="icon-right"></span>
           </button>
         </div>
         
-        <div>
-          <div v-if="idInstitucion === '24'">
-            <router-link to="/">
-              <div class="logo_carrera">
-                <img 
-                  src="@/assets/logoComercio.png" 
-                  alt="Comercio Internacional" 
-                  width="274" 
-                  height="113" 
-                  class="logo-animado"
-                  loading="lazy"
-                />
-              </div>
-            </router-link>
-          </div>
-          <div v-else class="logo">
-            <router-link to="/">
-              <div class="logo_carrera">
-                <img 
-                  :src="buildSafeImageUrl(Institucion?.institucion_logo)" 
-                  :alt="sanitizeText(Institucion?.institucion_nombre) || 'Logo institucional'"
-                  width="100"
-                  height="auto"
-                  @error="e => e.target.src = require('@/assets/upea.png')"
-                  class="logo-animado"
-                  loading="lazy"
-                />
-              </div>
-            </router-link>
-          </div>
-        </div>
+<div class="d-none d-lg-block">
+  <div v-if="idInstitucion === '24'">
+    <router-link to="/">
+      <div class="logo_carrera">
+        <img 
+          src="@/assets/logoComercio.png" 
+          alt="Comercio Internacional" 
+          width="274" 
+          height="113" 
+          class="logo-animado"
+          loading="lazy"
+        />
+      </div>
+    </router-link>
+  </div>
+  <div v-else class="logo">
+    <router-link to="/">
+      <div class="logo_carrera">
+        <img 
+          :src="buildSafeImageUrl(Institucion?.institucion_logo)" 
+          :alt="sanitizeText(Institucion?.institucion_nombre) || 'Logo institucional'"
+          width="100"
+          height="auto"
+          @error="e => e.target.src = require('@/assets/upea.png')"
+          class="logo-animado"
+          loading="lazy"
+        />
+      </div>
+    </router-link>
+  </div>
+</div>
         
         &nbsp;
         
@@ -163,7 +163,7 @@
           </ul>
         </div>
         
-        <div class="nav-right-part nav-right-part-desktop style-white">
+        <div class="nav-right-part nav-right-part-desktop" :class="{ 'style-white': !isLightMenu, 'style-dark': isLightMenu }">
           <ul class="mb-0">
             <li class="ml-2">
               <a 
@@ -224,6 +224,7 @@
   outline-offset: 2px;
 }
 
+/* Navbar top - Dark version (default) */
 .navbar-top {
   background: rgba(0, 0, 0, 0.956);
 }
@@ -239,11 +240,101 @@
   color: white;
   text-decoration: underline;
 }
+
+/* Navbar top - Light version (for institution 22) */
+.navbar-top.navbar-light {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar-top.navbar-light p,
+.navbar-top.navbar-light a {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.navbar-top.navbar-light a:hover {
+  color: var(--main-color, #007bff);
+}
+
+/* Mobile menu toggle - Light version */
+.toggle-light .icon-left,
+.toggle-light .icon-right {
+  background: #333 !important;
+}
+
+/* Navbar light menu */
+.navbar-light-menu .navbar-nav > li > a,
+.navbar-light-menu .navbar-nav > li > router-link {
+  color: #333 !important;
+}
+
+.navbar-light-menu .navbar-nav > li > a:hover,
+.navbar-light-menu .navbar-nav > li > router-link:hover {
+  color: var(--main-color, #007bff) !important;
+}
+
+/* Style dark for button (default) */
+.style-white .btn-red {
+  background: #dc3545;
+  color: white;
+}
+
+/* Style dark button for light menu */
+.style-dark .btn-red {
+  background: var(--main-color, #007bff);
+  color: white;
+}
+/* id 22*/
+.navbar-light-menu .navbar-nav > li > a,
+.navbar-light-menu .navbar-nav > li > router-link,
+.navbar-light-menu .navbar-nav > .menu-item-has-children > a {
+  color: #000000 !important;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.navbar-light-menu .navbar-nav > li > a:hover,
+.navbar-light-menu .navbar-nav > li > router-link:hover {
+  color: var(--main-color, #007bff) !important;
+}
+
+/* Iconos del menú móvil en blanco */
+.navbar-light-menu .toggle-light .icon-left,
+.navbar-light-menu .toggle-light .icon-right {
+  background: #3b3737 !important;
+}
+
+/* Submenús para institución 22 */
+.navbar-light-menu .menu-item-has-children .sub-menu {
+  background: rgba(75, 74, 74, 0.95) !important;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3) !important;
+  border-top: 3px solid var(--main-color, #007bff) !important;
+}
+
+.navbar-light-menu .menu-item-has-children .sub-menu li a,
+.navbar-light-menu .menu-item-has-children .sub-menu li router-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.navbar-light-menu .menu-item-has-children .sub-menu li a:hover,
+.navbar-light-menu .menu-item-has-children .sub-menu li router-link:hover {
+  background: var(--main-color, #007bff) !important;
+  color: white !important;
+  padding-left: 25px !important;
+}
+
+/* Flechas de submenús en blanco */
+.navbar-light-menu .menu-item-has-children > a::after,
+.navbar-light-menu .menu-item-has-children > router-link::after {
+  color: #fff;
+}
+
 </style>
 
 <script>
 import { mapState } from "vuex";
 import { config } from '@/config/env'
+import logger from '@/utils/logger';
 
 export default {
   name: "HeaderCustom",
@@ -266,6 +357,11 @@ export default {
 
     loginUrl() {
       return 'https://servicioadministrador.upea.bo';
+    },
+
+    isLightMenu() {
+      // Institution 22 uses white/light menu with dark text
+      return this.idInstitucion === '22';
     }
   },
 
@@ -285,13 +381,12 @@ export default {
     buildSafeUrl(url) {
       if (!url) return '#';
       const cleaned = String(url).trim().toLowerCase();
-      if (cleaned.startsWith('javascript:') || 
-          cleaned.startsWith('') || 
-          cleaned.startsWith('vbscript:') ||
-          cleaned.startsWith('')) {
-        console.warn('URL bloqueada por seguridad:', url);
-        return '#';
-      }
+     if (cleaned.startsWith('javascript:') || 
+      cleaned.startsWith('vbscript:') ||
+      cleaned.startsWith('data:')) {
+    logger.warn('URL bloqueada por seguridad:', url);
+    return '#';
+  }
       if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
         return cleaned.replace('http://', 'https://');
       }
@@ -408,9 +503,18 @@ export default {
         
         this.$store.commit('setLinks', filterLinks);
       } catch (error) {
-        console.error('Error cargando Links:', error);
+       logger.error('Error cargando Links:', error);
       }
     },
+    isUpeaDomain(url) {
+  const upeaDomains = [
+    'upea.bo',
+    'upea.edu.bo'
+  ];
+  
+  const cleaned = String(url).trim().toLowerCase();
+  return upeaDomains.some(domain => cleaned.includes(domain));
+},
 
     _limpiarObjeto(obj) {
       if (!obj || typeof obj !== 'object') return obj;

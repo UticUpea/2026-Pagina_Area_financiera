@@ -465,6 +465,7 @@ import { mapState } from "vuex";
 import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
+import logger from '@/utils/logger'
 
 export default {
   name: "DetallePublicacion",
@@ -504,20 +505,20 @@ export default {
 
         if (!this.publicacion.publicaciones_id) {
           this.errorGet = true
-          console.warn('Publicación no encontrada con ID:', idPub)
+          logger.warn('Publicación no encontrada con ID:', idPub)
           return
         }
 
         this.publicacion = this._limpiarObjeto(this.publicacion)
         
       } catch (error) {
-        console.error('Error cargando publicación:', error)
+        logger.error('Error cargando publicación:', error)
         this.errorGet = true
 
         if (error.response?.status === 404) {
-          console.warn('Publicación no encontrada (404)')
+          logger.warn('Publicación no encontrada (404)')
         } else if (error.response?.status === 500) {
-          console.error('Error del servidor (500)')
+          logger.error('Error del servidor (500)')
         }
       } finally {
         this.loading = false
@@ -525,20 +526,37 @@ export default {
       }
     },
 
-    buildSafeImageUrl(path) {
-      if (!path) return '';
-      
-      const cleaned = String(path).trim();
-      
-      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
-        return cleaned.replace('http://', 'https://');
-      }
-      
-      const base = config.uploads.baseUrl?.replace(/\/+$/, '');
-      const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-      
-      return `${base}${resource}`.replace(/\/+/g, '/');
-    },
+buildSafeImageUrl(path) {
+  if (!path) return require('@/assets/upea.png');
+  
+  const cleaned = String(path).trim();
+  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
+  
+  // ✅ CASO 1: Ya es URL completa de MinIO → solo asegurar HTTPS
+  if (cleaned.includes('archivosminio.upea.bo')) {
+    return cleaned.replace(/^http:\/\//, 'https://');
+  }
+  
+  // ✅ CASO 2: Es nombre de archivo o ruta relativa → construir con base de MinIO
+
+  const lower = cleaned.toLowerCase();
+  let folder = '/imagenes/'; 
+  
+  if (lower.endsWith('.pdf')) {
+    folder = '/documentos/';
+  } else if (lower.includes('institucion_logo')) {
+    folder = '/imagenes/instituciones/';
+  } else if (lower.includes('portada_imagen')) {
+    folder = '/imagenes/portadas/';
+  } else if (lower.includes('serv_imagen')) {
+    folder = '/imagenes/servicios/';
+  } else if (lower.includes('con_foto_portada')) {
+    folder = '/imagenes/convocatorias/';
+  }
+  
+  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+},
 
     openModal() {
       this.showModal = true;
