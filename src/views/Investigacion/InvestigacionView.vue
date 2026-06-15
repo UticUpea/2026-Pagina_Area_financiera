@@ -335,17 +335,17 @@ export default {
   computed: {
     ...mapState(["Institucion", "url_api"]),
 
-    filteredContent() {
-      if (!this.searchQuery.trim()) {
-        return this.searchableContent;
-      }
-      
-      const query = this.searchQuery.toLowerCase().trim();
-      
-      return this.searchableContent.filter(content => 
-        content.toLowerCase().includes(query)
-      );
-    }
+filteredContent() {
+  if (!this.searchQuery.trim()) {
+    return this.searchableContent;
+  }
+
+  const query = this.normalizeText(this.searchQuery.trim());
+
+  return this.searchableContent.filter(content =>
+    this.normalizeText(content).includes(query)
+  );
+}
   },
 
   methods: {
@@ -354,48 +354,86 @@ export default {
       try {
         this.institucion = this.Institucion || {}
       } catch (error) {
-        logger.error('Error cargando datos:', error)
+       logger.error(
+  'Error cargando datos de investigación',
+  {
+    message: error?.message
+  }
+);
       } finally {
         this.loading = false
       }
     },
 
 buildSafeImageUrl(path) {
-  if (!path) return require('@/assets/upea.png');
-  
-  const cleaned = String(path).trim();
-  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
-  
-  // ✅ CASO 1: Ya es URL completa de MinIO → solo asegurar HTTPS
-  if (cleaned.includes('archivosminio.upea.bo')) {
-    return cleaned.replace(/^http:\/\//, 'https://');
+  if (!path) {
+    return require('@/assets/upea.png');
   }
-  
-  // ✅ CASO 2: Es nombre de archivo o ruta relativa → construir con base de MinIO
+
+  const cleaned = String(path).trim();
+
+  if (
+    cleaned.includes('..') ||
+    cleaned.includes('<') ||
+    cleaned.includes('>') ||
+    cleaned.includes('"') ||
+    cleaned.includes("'")
+  ) {
+    return require('@/assets/upea.png');
+  }
+
+  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
+
+  if (/^https?:\/\//i.test(cleaned)) {
+    try {
+      const url = new URL(cleaned);
+
+      if (url.hostname !== 'archivosminio.upea.bo') {
+        return require('@/assets/upea.png');
+      }
+
+      url.protocol = 'https:';
+      return url.toString();
+    } catch {
+      return require('@/assets/upea.png');
+    }
+  }
 
   const lower = cleaned.toLowerCase();
-  let folder = '/imagenes/'; 
-  
+
+  let folder = '/imagenes';
+
   if (lower.endsWith('.pdf')) {
-    folder = '/documentos/';
+    folder = '/documentos';
   } else if (lower.includes('institucion_logo')) {
-    folder = '/imagenes/instituciones/';
+    folder = '/imagenes/instituciones';
   } else if (lower.includes('portada_imagen')) {
-    folder = '/imagenes/portadas/';
+    folder = '/imagenes/portadas';
   } else if (lower.includes('serv_imagen')) {
-    folder = '/imagenes/servicios/';
+    folder = '/imagenes/servicios';
   } else if (lower.includes('con_foto_portada')) {
-    folder = '/imagenes/convocatorias/';
+    folder = '/imagenes/convocatorias';
   }
-  
-  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+
+  const sanitized = cleaned.replace(/^\/+/, '');
+
+  return `${MINIO_BASE}${folder}/${sanitized}`;
+},
+normalizeText(text) {
+  return String(text || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
 },
 
-    contentMatches(keyword) {
-      if (!this.isSearching) return true;
-      return keyword.toLowerCase().includes(this.searchQuery.toLowerCase().trim());
-    },
+contentMatches(keyword) {
+  if (!this.isSearching) {
+    return true;
+  }
+
+  return this.normalizeText(keyword)
+    .includes(this.normalizeText(this.searchQuery));
+},
 
     onSearchInput() {
       if (this.searchTimeout) {

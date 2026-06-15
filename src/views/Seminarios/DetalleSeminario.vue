@@ -150,7 +150,7 @@
                 >
                   <div class="course-details-content">
                     <h4 class="title">{{ seminario.det_titulo }}</h4>
-                    <p v-html="seminario.det_descripcion"></p>
+                 <p>{{ stripHtml(seminario.det_descripcion) }}</p>
                     <div v-if="seminario.det_lugar_curso" class="mt-4">
                       <b><i class="fa fa-map-marker"></i> Lugar: </b>
                       {{ seminario.det_lugar_curso }}
@@ -422,7 +422,11 @@ export default {
         this.$store.commit("loading")
       }
     },
-
+stripHtml(text) {
+  const div = document.createElement('div')
+  div.innerHTML = String(text || '')
+  return div.textContent || div.innerText || ''
+},
     formatearFecha(fecha) {
       if (!fecha) return ''
 

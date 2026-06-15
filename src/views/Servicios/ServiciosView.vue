@@ -117,9 +117,9 @@
                             {{ serv.serv_nombre }}
                           </router-link>
                         </h5>
-                        <p v-if="serv.serv_descripcion" class="service-description">
-                          {{ serv.serv_descripcion }}
-                        </p>
+<p v-if="serv.serv_descripcion" class="service-description">
+  {{ stripHtml(serv.serv_descripcion) }}
+</p>
                       </div>
                     </div>
                   </div>
@@ -537,7 +537,12 @@ export default {
         this.$store.commit("loading");
       }
     },
-
+stripHtml(html) {
+  return String(html || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+},
 buildSafeImageUrl(path) {
   if (!path) return require('@/assets/upea.png');
   

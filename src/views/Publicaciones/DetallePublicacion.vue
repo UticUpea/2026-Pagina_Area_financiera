@@ -91,7 +91,7 @@
 
                       <div class="publicacion-description" v-if="publicacion.publicaciones_descripcion">
                         <h4>Descripción de la Publicación</h4>
-                        <p v-html="publicacion.publicaciones_descripcion"></p>
+                    <p>{{ stripHtml(publicacion.publicaciones_descripcion) }}</p>
                       </div>
                     </div>
                   </div>
@@ -525,6 +525,14 @@ export default {
         this.$store.commit("loading")
       }
     },
+    stripHtml(html) {
+  if (!html) return '';
+
+  const div = document.createElement('div');
+  div.innerHTML = html;
+
+  return div.textContent || div.innerText || '';
+},
 
 buildSafeImageUrl(path) {
   if (!path) return require('@/assets/upea.png');

@@ -122,9 +122,12 @@
                           {{ pub.publicaciones_titulo }}
                         </router-link>
                       </h4>
-                      <p v-if="pub.publicaciones_descripcion" class="publication-description">
-                        {{ pub.publicaciones_descripcion }}
-                      </p>
+                     <p
+  v-if="pub.publicaciones_descripcion"
+  class="publication-description"
+>
+  {{ stripHtml(pub.publicaciones_descripcion) }}
+</p>
                       <router-link
                         :to="'/detallePublicacion/' + pub.publicaciones_id"
                         @click="$store.commit('clickLink')"
@@ -544,8 +547,10 @@ export default {
       if (!this.searchQuery.trim()) {
         return this.publicaciones;
       }
-      
-      const query = this.searchQuery.toLowerCase().trim();
+      const query = this.searchQuery
+  .toLowerCase()
+  .trim()
+  .substring(0, 100);
       
       return this.publicaciones.filter(pub => {
         const titulo = (pub.publicaciones_titulo || '').toLowerCase();
@@ -608,37 +613,70 @@ export default {
     },
 
 buildSafeImageUrl(path) {
-  if (!path) return require('@/assets/upea.png');
-  
-  const cleaned = String(path).trim();
-  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
-  
-  // ✅ CASO 1: Ya es URL completa de MinIO → solo asegurar HTTPS
-  if (cleaned.includes('archivosminio.upea.bo')) {
-    return cleaned.replace(/^http:\/\//, 'https://');
-  }
-  
-  // ✅ CASO 2: Es nombre de archivo o ruta relativa → construir con base de MinIO
+  const fallback = require('@/assets/upea.png');
 
-  const lower = cleaned.toLowerCase();
-  let folder = '/imagenes/'; 
-  
-  if (lower.endsWith('.pdf')) {
-    folder = '/documentos/';
-  } else if (lower.includes('institucion_logo')) {
-    folder = '/imagenes/instituciones/';
-  } else if (lower.includes('portada_imagen')) {
-    folder = '/imagenes/portadas/';
-  } else if (lower.includes('serv_imagen')) {
-    folder = '/imagenes/servicios/';
-  } else if (lower.includes('con_foto_portada')) {
-    folder = '/imagenes/convocatorias/';
+  if (!path || typeof path !== 'string') {
+    return fallback;
   }
-  
-  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+
+  const cleaned = path.trim();
+
+  const MINIO_BASE =
+    'https://archivosminio.upea.bo/archivospaginasnode';
+
+  try {
+    if (/^https?:\/\//i.test(cleaned)) {
+      const url = new URL(cleaned);
+
+      if (url.hostname !== 'archivosminio.upea.bo') {
+        logger.warn('Host de imagen no permitido:', url.hostname);
+        return fallback;
+      }
+
+      return url.href.replace(/^http:\/\//i, 'https://');
+    }
+
+    const safeFile = cleaned
+      .replace(/\\/g, '/')
+      .replace(/\.\./g, '')
+      .replace(/[^a-zA-Z0-9_\-./]/g, '');
+
+    let folder = '/imagenes/';
+
+    const lower = safeFile.toLowerCase();
+
+    if (lower.endsWith('.pdf')) {
+      folder = '/documentos/';
+    } else if (lower.includes('institucion_logo')) {
+      folder = '/imagenes/instituciones/';
+    } else if (lower.includes('portada_imagen')) {
+      folder = '/imagenes/portadas/';
+    } else if (lower.includes('serv_imagen')) {
+      folder = '/imagenes/servicios/';
+    } else if (lower.includes('con_foto_portada')) {
+      folder = '/imagenes/convocatorias/';
+    }
+
+    return `${MINIO_BASE}${folder}/${safeFile}`
+      .replace(/([^:]\/)\/+/g, '$1');
+
+  } catch (error) {
+    logger.error('URL inválida:', error);
+    return fallback;
+  }
 },
+stripHtml(html) {
+  if (!html || typeof html !== 'string') {
+    return '';
+  }
 
+  return html
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+},
     onSearchInput() {
       if (this.searchTimeout) {
         clearTimeout(this.searchTimeout);
@@ -732,18 +770,31 @@ buildSafeImageUrl(path) {
       return `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`;
     },
 
-    _limpiarObjeto(obj) {
-      if (!obj || typeof obj !== 'object') return obj;
-      const cleaned = { ...obj };
-      Object.keys(cleaned).forEach(key => {
-        if (typeof cleaned[key] === 'string') {
-          cleaned[key] = cleaned[key].trim();
-        } else if (cleaned[key] && typeof cleaned[key] === 'object' && !Array.isArray(cleaned[key])) {
-          cleaned[key] = this._limpiarObjeto(cleaned[key]);
-        }
-      });
-      return cleaned;
-    },
+_limpiarObjeto(obj) {
+  if (!obj || typeof obj !== 'object') {
+    return obj;
+  }
+
+  const cleaned = {};
+
+  Object.keys(obj).forEach(key => {
+    const value = obj[key];
+
+    if (typeof value === 'string') {
+      cleaned[key] = value.trim();
+    } else if (
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      cleaned[key] = this._limpiarObjeto(value);
+    } else {
+      cleaned[key] = value;
+    }
+  });
+
+  return cleaned;
+},
 
     clickBack() {
       this.$store.commit("clickLink");

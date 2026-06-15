@@ -101,10 +101,14 @@
                         </div>
                       </div>
 
-                      <div class="event-description" v-if="evento.evento_descripcion">
-                        <h4>Descripción del Evento</h4>
-                        <p v-html="evento.evento_descripcion"></p>
-                      </div>
+<div class="event-description" v-if="evento.evento_descripcion">
+  <h4>Descripción del Evento</h4>
+
+  <div
+    class="event-description-content"
+    v-html="sanitizeHtml(evento.evento_descripcion)"
+  ></div>
+</div>
                     </div>
                   </div>
                 </div>
@@ -537,6 +541,41 @@
 .btn-base:hover {
   background: var(--main-color-2, #0056b3);
 }
+.event-description-content {
+  line-height: 2;
+  color: #555;
+  font-size: 1.3rem;
+  text-align: justify;
+}
+
+.event-description-content p {
+  margin-bottom: 1rem;
+}
+
+.event-description-content ul,
+.event-description-content ol {
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.event-description-content li {
+  margin-bottom: 0.5rem;
+}
+
+.event-description-content strong,
+.event-description-content b {
+  font-weight: 700;
+}
+
+.event-description-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.event-description-content table {
+  width: 100%;
+  overflow-x: auto;
+}
 </style>
 
 <script>
@@ -545,6 +584,7 @@ import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
 import logger from '@/utils/logger'
+import DOMPurify from 'dompurify'
 
 export default {
   name: "DetalleEvento",
@@ -603,7 +643,9 @@ export default {
         this.$store.commit("loading");
       }
     },
-
+sanitizeHtml(html) {
+  return DOMPurify.sanitize(html || '')
+},
 buildSafeImageUrl(path) {
   if (!path) return require('@/assets/upea.png');
   
@@ -635,6 +677,7 @@ buildSafeImageUrl(path) {
   const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
   return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
 },
+
 
     openModal() {
       this.showModal = true;

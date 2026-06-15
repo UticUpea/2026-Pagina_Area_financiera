@@ -34,7 +34,13 @@
         </div>
       </div>
     </div> 
-    <nav class="navbar navbar-area-1 navbar-area navbar-expand-lg" :class="{ 'navbar-light-menu': isLightMenu }">
+<nav
+  class="navbar navbar-area-1 navbar-area navbar-expand-lg"
+  :class="{
+    'navbar-light-menu': isLightMenu,
+    'menu-scroll': isLightMenu && scrolled
+  }"
+>
       <div class="container nav-container">
         <div class="responsive-mobile-menu">
           <button class="menu toggle-btn d-block d-lg-none" :class="{ 'toggle-light': isLightMenu }" data-target="#edumint_main_menu" @click="openMenu()"
@@ -243,7 +249,7 @@
 
 /* Navbar top - Light version (for institution 22) */
 .navbar-top.navbar-light {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(245, 244, 243, 0.95);
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
@@ -275,21 +281,35 @@
 
 /* Style dark for button (default) */
 .style-white .btn-red {
-  background: #dc3545;
+  background: var(--main-color, #007bff);
   color: white;
 }
 
 /* Style dark button for light menu */
 .style-dark .btn-red {
-  background: var(--main-color, #007bff);
+  background: var(--main-color-2, #0015ff);
   color: white;
 }
 /* id 22*/
-.navbar-light-menu .navbar-nav > li > a,
-.navbar-light-menu .navbar-nav > li > router-link,
-.navbar-light-menu .navbar-nav > .menu-item-has-children > a {
+/* MENU PRINCIPAL */
+.navbar-light-menu .navbar-nav.menu-open > li > a {
+  color: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,.8);
+}
+
+/* SUBMENUS */
+.navbar-light-menu .navbar-nav.menu-open .sub-menu li a {
+  color: #ffffff !important;
+}
+
+/* AL HACER SCROLL */
+.menu-scroll .navbar-nav.menu-open > li > a {
   color: #000000 !important;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  text-shadow: none;
+}
+
+.menu-scroll .navbar-nav.menu-open .sub-menu li a {
+  color: #000000 !important;
 }
 
 .navbar-light-menu .navbar-nav > li > a:hover,
@@ -342,6 +362,7 @@ export default {
   data() {
     return {
       idInstitucion: config.app.idInstitucion || '22',
+      scrolled: false,
       sopen: false,
       m_inicio: false,
       m_informacion: false,
@@ -360,7 +381,7 @@ export default {
     },
 
     isLightMenu() {
-      // Institution 22 uses white/light menu with dark text
+
       return this.idInstitucion === '22';
     }
   },
@@ -392,7 +413,11 @@ export default {
       }
       return `https://${String(url).trim()}`;
     },
-
+handleScroll() {
+  if (this.idInstitucion === '22') {
+    this.scrolled = window.scrollY > 300;
+  }
+},
     buildMailTo(email) {
       if (!email) return '#';
       const cleaned = String(email).trim();
@@ -422,7 +447,6 @@ export default {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(cleaned) && cleaned.length > 5;
     },
-
     isValidPhone(phone) {
       if (!phone) return false;
       const cleaned = String(phone).replace(/[^0-9]/g, '');
@@ -544,14 +568,19 @@ export default {
       immediate: true
     }
   },
+  
 
   created() {
     this.applyDynamicColors();
     this.getLinks();
   },
+beforeUnmount() {
+  window.removeEventListener('scroll', this.handleScroll);
+},
 
   mounted() {
     this.applyDynamicColors();
+     window.addEventListener('scroll', this.handleScroll);
     if (this.getter) {
       this.getLinks();
       this.$store.commit('setGetter', false);

@@ -100,13 +100,18 @@
                 <div class="details">
                   <div class="details-inner">
                     <h5>
-                      <router-link :to="'/detalleVideo/' + vid.video_id">
+                      <router-link
+  :to="`/detalleVideo/${safeVideoId(vid.video_id)}`"
+>
                         {{ vid.video_titulo }}
                       </router-link>
                     </h5>
-                    <p v-if="vid.video_breve_descripcion" class="video-description">
-                      {{ vid.video_breve_descripcion }}
-                    </p>
+<p
+  v-if="vid.video_breve_descripcion"
+  class="video-description"
+>
+  {{ stripHtml(vid.video_breve_descripcion) }}
+</p>
                   </div>
                   <div class="bottom-area">
                     <div class="row align-items-center">
@@ -526,7 +531,9 @@ export default {
       
       return this.videos.filter(vid => {
         const titulo = (vid.video_titulo || '').toLowerCase();
-        const descripcion = (vid.video_breve_descripcion || '').toLowerCase();
+   const descripcion = this.stripHtml(
+  vid.video_breve_descripcion || ''
+).toLowerCase();
         const tipo = (vid.video_tipo || '').toLowerCase();
         
         return titulo.includes(query) || 
@@ -571,11 +578,21 @@ export default {
         const institucionId = this.idInstitucion || config.app.idInstitucion;
         const res = await api.get(`/institucion/${institucionId}/contenido`);
         const data = res.data;
-        const lista = data.upea_videos || [];
+       const lista = Array.isArray(data.upea_videos)
+  ? data.upea_videos
+  : [];
 
-        this.videos = lista
-          .filter(vid => vid.video_estado === "1" || vid.video_estado === 1)
-          .map(this._limpiarObjeto);
+   this.videos = lista
+  .filter(vid => vid.video_estado === "1" || vid.video_estado === 1)
+  .map(video => {
+    const cleaned = this._limpiarObjeto(video);
+
+    cleaned.video_breve_descripcion = this.stripHtml(
+      cleaned.video_breve_descripcion
+    );
+
+    return cleaned;
+  });
         
       } catch (error) {
         logger.error('Error cargando videos:', error);
@@ -585,31 +602,81 @@ export default {
         this.$store.commit("loading");
       }
     },
+stripHtml(html) {
+  if (!html) return '';
 
-    getVideoUrl(url) {
-      if (!url) return '';
-      
-      const cleaned = url.trim();
-   
-      if (cleaned.includes('/embed/')) {
-        return cleaned.replace('http://', 'https://');
-      }
-      
-      const youtubeMatch = cleaned.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
-      if (youtubeMatch && youtubeMatch[1]) {
-        return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-      }
-    
-      if (cleaned.includes('vimeo.com') && !cleaned.includes('/video/')) {
-        const vimeoMatch = cleaned.match(/vimeo\.com\/(\d+)/);
-        if (vimeoMatch && vimeoMatch[1]) {
-          return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
-        }
-      }
-   
-      return cleaned.replace('http://', 'https://');
-    },
+  const div = document.createElement('div');
+  div.innerHTML = html;
 
+  return div.textContent || div.innerText || '';
+},
+getVideoUrl(url) {
+  if (!url || typeof url !== "string") {
+    return "";
+  }
+
+  const cleaned = url.trim();
+
+  try {
+    const parsed = new URL(cleaned);
+
+    const allowedHosts = [
+      "youtube.com",
+      "www.youtube.com",
+      "youtu.be",
+      "player.vimeo.com",
+      "vimeo.com"
+    ];
+
+    if (!allowedHosts.includes(parsed.hostname)) {
+      return "";
+    }
+
+    if (
+      parsed.hostname === "youtube.com" ||
+      parsed.hostname === "www.youtube.com"
+    ) {
+      const videoId = parsed.searchParams.get("v");
+
+      if (videoId) {
+        return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;
+      }
+
+      if (parsed.pathname.startsWith("/embed/")) {
+        return `https://${parsed.hostname}${parsed.pathname}`;
+      }
+    }
+
+    if (parsed.hostname === "youtu.be") {
+      const videoId = parsed.pathname.replace("/", "");
+
+      if (videoId) {
+        return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;
+      }
+    }
+
+    if (parsed.hostname === "vimeo.com") {
+      const match = parsed.pathname.match(/^\/(\d+)$/);
+
+      if (match) {
+        return `https://player.vimeo.com/video/${match[1]}`;
+      }
+    }
+
+    if (parsed.hostname === "player.vimeo.com") {
+      return parsed.href;
+    }
+
+    return "";
+  } catch {
+    return "";
+  }
+},
+safeVideoId(id) {
+  return Number.isInteger(Number(id))
+    ? Number(id)
+    : 0;
+},
     onSearchInput() {
       if (this.searchTimeout) {
         clearTimeout(this.searchTimeout);
@@ -621,20 +688,14 @@ export default {
     },
 
    
-    performSearch() {
-      this.isSearching = this.searchQuery.trim().length > 0;
-      this.currentPage = 1;
-      
-    
-      if (this.isSearching) {
-        this.$nextTick(() => {
-          const resultsSection = document.querySelector('.course-area');
-          if (resultsSection) {
-            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        });
-      }
-    },
+performSearch() {
+  this.searchQuery = this.searchQuery
+    .substring(0, 100)
+    .trim();
+
+  this.isSearching = this.searchQuery.length > 0;
+  this.currentPage = 1;
+},
 
     clearSearch() {
       this.searchQuery = "";

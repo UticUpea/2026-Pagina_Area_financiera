@@ -118,7 +118,9 @@
                             {{ cur.det_titulo }}
                           </router-link>
                         </h5>
-                        <p class="descripcion-curso" v-html="cur.det_descripcion"></p>
+                       <p class="descripcion-curso">
+  {{ stripHtml(cur.det_descripcion) }}
+</p>
                         <template v-if="cur.facilitadores && cur.facilitadores.length > 0">
                           <template v-for="fac of cur.facilitadores" :key="fac.facilitador_id">
                             <div class="author media">
@@ -761,7 +763,13 @@ export default {
         this.tipoCursoId = tipo_cur
       }
     },
-    
+stripHtml(html) {
+  if (!html) return '';
+
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
+},    
     async getCursos(institucionId) {
       try {
         const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
@@ -794,34 +802,39 @@ export default {
     
 buildSafeImageUrl(path) {
   if (!path) return require('@/assets/upea.png');
-  
+
   const cleaned = String(path).trim();
   const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
-  
-  // ✅ CASO 1: Ya es URL completa de MinIO → solo asegurar HTTPS
-  if (cleaned.includes('archivosminio.upea.bo')) {
-    return cleaned.replace(/^http:\/\//, 'https://');
+
+  if (/^https?:\/\//i.test(cleaned)) {
+    return cleaned.replace(/^http:\/\//i, 'https://');
   }
-  
-  // ✅ CASO 2: Es nombre de archivo o ruta relativa → construir con base de MinIO
+
+  if (cleaned.includes('archivosminio.upea.bo')) {
+    return `https://${cleaned.replace(/^https?:\/\//, '')}`;
+  }
 
   const lower = cleaned.toLowerCase();
-  let folder = '/imagenes/'; 
-  
+  let folder = '/imagenes';
+
   if (lower.endsWith('.pdf')) {
-    folder = '/documentos/';
+    folder = '/documentos';
   } else if (lower.includes('institucion_logo')) {
-    folder = '/imagenes/instituciones/';
+    folder = '/imagenes/instituciones';
   } else if (lower.includes('portada_imagen')) {
-    folder = '/imagenes/portadas/';
+    folder = '/imagenes/portadas';
   } else if (lower.includes('serv_imagen')) {
-    folder = '/imagenes/servicios/';
-  } else if (lower.includes('con_foto_portada')) {
-    folder = '/imagenes/convocatorias/';
+    folder = '/imagenes/servicios';
+  } else if (
+    lower.includes('con_foto_portada') ||
+    lower.includes('convocatoria')
+  ) {
+    folder = '/imagenes/convocatorias';
   }
-  
-  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+
+  const resource = cleaned.replace(/^\/+/, '');
+
+  return `${MINIO_BASE}${folder}/${resource}`;
 },
 
     onSearchInput() {

@@ -117,9 +117,9 @@
                             {{ ofer.ofertas_titulo }}
                           </router-link>
                         </h5>
-                        <p v-if="ofer.ofertas_descripcion" class="offer-description">
-                          {{ ofer.ofertas_descripcion }}
-                        </p>
+<p v-if="ofer.ofertas_descripcion" class="offer-description">
+  {{ stripHtml(ofer.ofertas_descripcion) }}
+</p>
                       </div>
                     </div>
                   </div>
@@ -469,20 +469,23 @@ export default {
   computed: {
     ...mapState(["url_api", "Institucion"]),
 
-    filteredOffers() {
-      if (!this.searchQuery.trim()) {
-        return this.ofertas;
-      }
-      
-      const query = this.searchQuery.toLowerCase().trim();
-      
-      return this.ofertas.filter(ofer => {
-        const titulo = (ofer.ofertas_titulo || '').toLowerCase();
-        const descripcion = (ofer.ofertas_descripcion || '').toLowerCase();
-        
-        return titulo.includes(query) || descripcion.includes(query);
-      });
-    },
+filteredOffers() {
+  if (!this.searchQuery.trim()) {
+    return this.ofertas;
+  }
+
+  const query = this.normalizeText(this.searchQuery);
+
+  return this.ofertas.filter(ofer => {
+    const titulo = this.normalizeText(ofer.ofertas_titulo);
+    const descripcion = this.normalizeText(ofer.ofertas_descripcion);
+
+    return (
+      titulo.includes(query) ||
+      descripcion.includes(query)
+    );
+  });
+},
 
     displayOffers() {
       const start = (this.currentPage - 1) * this.NUM_RESULTS;
@@ -525,49 +528,92 @@ export default {
           .filter(ofer => ofer.ofertas_estado === 1 || ofer.ofertas_estado === "1")
           .map(this._limpiarObjeto);
 
-        this._actualizarPager();
+      
         
       } catch (error) {
-        logger.error('Error cargando ofertas:', error);
+        logger.error(
+  'Error cargando ofertas académicas',
+  {
+    message: error?.message,
+    status: error?.response?.status
+  }
+);
         this.ofertas = [];
       } finally {
         this.loading = false;
         this.$store.commit("loading");
       }
     },
+stripHtml(html) {
+  if (!html) return '';
 
+  const div = document.createElement('div');
+  div.innerHTML = html;
+
+  return div.textContent || div.innerText || '';
+},
 buildSafeImageUrl(path) {
-  if (!path) return require('@/assets/upea.png');
-  
-  const cleaned = String(path).trim();
-  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
-  
-  // ✅ CASO 1: Ya es URL completa de MinIO → solo asegurar HTTPS
-  if (cleaned.includes('archivosminio.upea.bo')) {
-    return cleaned.replace(/^http:\/\//, 'https://');
+  if (!path) {
+    return require('@/assets/upea.png');
   }
-  
-  // ✅ CASO 2: Es nombre de archivo o ruta relativa → construir con base de MinIO
+
+  const cleaned = String(path).trim();
+
+  if (
+    cleaned.includes('..') ||
+    cleaned.includes('<') ||
+    cleaned.includes('>') ||
+    cleaned.includes('"') ||
+    cleaned.includes("'")
+  ) {
+    return require('@/assets/upea.png');
+  }
+
+  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
+
+  if (/^https?:\/\//i.test(cleaned)) {
+    try {
+      const url = new URL(cleaned);
+
+      if (url.hostname !== 'archivosminio.upea.bo') {
+        return require('@/assets/upea.png');
+      }
+
+      url.protocol = 'https:';
+
+      return url.toString();
+    } catch {
+      return require('@/assets/upea.png');
+    }
+  }
 
   const lower = cleaned.toLowerCase();
-  let folder = '/imagenes/'; 
-  
+
+  let folder = '/imagenes';
+
   if (lower.endsWith('.pdf')) {
-    folder = '/documentos/';
+    folder = '/documentos';
   } else if (lower.includes('institucion_logo')) {
-    folder = '/imagenes/instituciones/';
+    folder = '/imagenes/instituciones';
   } else if (lower.includes('portada_imagen')) {
-    folder = '/imagenes/portadas/';
+    folder = '/imagenes/portadas';
   } else if (lower.includes('serv_imagen')) {
-    folder = '/imagenes/servicios/';
+    folder = '/imagenes/servicios';
   } else if (lower.includes('con_foto_portada')) {
-    folder = '/imagenes/convocatorias/';
+    folder = '/imagenes/convocatorias';
   }
-  
-  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+
+  const sanitized = cleaned.replace(/^\/+/, '');
+
+  return `${MINIO_BASE}${folder}/${sanitized}`;
 },
 
+normalizeText(text) {
+  return String(text || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+},
     onSearchInput() {
       if (this.searchTimeout) {
         clearTimeout(this.searchTimeout);
@@ -630,13 +676,6 @@ buildSafeImageUrl(path) {
       }
     },
 
-    _actualizarPager() {
-      const total = this.ofertas?.length || 0;
-      this.pager = Math.ceil(total / this.NUM_RESULTS);
-      if (this.pag > this.pager && this.pager > 0) {
-        this.pag = this.pager;
-      }
-    },
 
     formatearFecha(fecha) {
       if (!fecha) return '';

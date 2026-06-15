@@ -114,9 +114,11 @@
                             {{ ev.evento_titulo }}
                           </router-link>
                         </h5>
-                        <p v-if="ev.evento_descripcion" class="event-description">
-                          {{ ev.evento_descripcion }}
-                        </p>
+<p
+  v-if="ev.evento_descripcion"
+  class="event-description"
+  v-html="sanitizeHtml(ev.evento_descripcion)"
+></p>
                       </div>
                     </div>
                   </div>
@@ -524,6 +526,7 @@ import { mapState } from "vuex";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
 import logger from '@/utils/logger'
+import DOMPurify from 'dompurify'
 
 export default {
   name: "EventosView",
@@ -595,6 +598,9 @@ export default {
   },
 
   methods: {
+    sanitizeHtml(html) {
+  return DOMPurify.sanitize(html || '')
+},
     async getEventosAll() {
       this.loading = true;
       try {

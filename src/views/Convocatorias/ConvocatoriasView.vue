@@ -120,7 +120,9 @@
                           {{ conv.con_titulo }}
                         </router-link>
                       </h4>
-                      <p class="descripcion-convocatoria" v-html="conv.con_descripcion"></p>
+                     <p class="descripcion-convocatoria">
+  {{ stripHtml(conv.con_descripcion) }}
+</p>
                       <router-link
                         :to="'/detalleConvocatoria/' + conv.idconvocatorias"
                         @click="$store.commit('clickLink')"
@@ -678,14 +680,21 @@ export default {
           })
           .map(this._limpiarObjeto)
 
-        this._actualizarPager()
+        // this._actualizarPager()
         
       } catch (error) {
         logger.error('Error cargando convocatorias:', error)
         this.convocatorias = []
       }
     },
+stripHtml(html) {
+  if (!html) return '';
 
+  const div = document.createElement('div');
+  div.innerHTML = html;
+
+  return div.textContent || div.innerText || '';
+},
 buildSafeImageUrl(path) {
   if (!path) return require('@/assets/upea.png');
   
@@ -715,7 +724,10 @@ buildSafeImageUrl(path) {
   }
   
   const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+  return `${MINIO_BASE}${folder}${resource}`.replace(
+  /([^:]\/)\/+/g,
+  '$1'
+);
 },
 
     onSearchInput() {
@@ -781,14 +793,14 @@ buildSafeImageUrl(path) {
       }
     },
 
-    _actualizarPager() {
-      const total = this.convocatorias?.length || 0
-      this.pager = Math.ceil(total / this.NUM_RESULTS)
+    // _actualizarPager() {
+    //   const total = this.convocatorias?.length || 0
+    //   this.pager = Math.ceil(total / this.NUM_RESULTS)
 
-      if (this.pag > this.pager && this.pager > 0) {
-        this.pag = this.pager
-      }
-    },
+    //   if (this.pag > this.pager && this.pager > 0) {
+    //     this.pag = this.pager
+    //   }
+    // },
 
     formatearFecha(fecha) {
       if (!fecha) return ''

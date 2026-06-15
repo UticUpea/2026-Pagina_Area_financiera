@@ -84,35 +84,31 @@
                 </div>
               </div>
 
-              <div v-else-if="idInstitucion === '24'">
+              <div v-else-if="idInstitucion === '23'">
                 <div class="avatar api-logo">
                   <img 
                     v-if="institucion.institucion_logo"
                     :src="buildSafeImageUrl(institucion.institucion_logo)" 
                     :alt="institucion.institucion_nombre"
-                    style="background:none!important; max-height: 120px; object-fit: contain;"
+                    style="background:none!important; max-height: 250px; object-fit: contain;"
                     @error="e => e.target.style.display = 'none'"
                   />
                 </div>
                 <h1 class="title_1-2" style="text-transform: uppercase!important; color: #fff !important;">
-                  {{ institucion.institucion_nombre || 'COMERCIO INTERNACIONAL' }}
+                  {{ institucion.institucion_nombre }}
                 </h1>
                 <div>
                   <transition name="text-fade" mode="out-in">
-                    <p 
-                      class="animated-text" 
-                      style="color:#fff!important;" 
-                      :class="{ 'fade-out': isFadingOut }"
-                      @animationend="changeText"
-                    >{{ currentText }}</p>
+               
                   </transition>
                 </div>
                 <br /><br />
-                <div class="cont">
-                  <router-link style="text-align: center !important;" class="btn btn-base" to="/about">
-                    SOBRE NOSOTROS
-                  </router-link>
-                </div>
+<div class="cont">
+<router-link class="btn-banner-outline" to="/about">
+  <span class="btn-text">SOBRE NOSOTROS</span>
+  <span class="btn-border"></span>
+</router-link>
+</div>
               </div>
 
               <div v-else>
@@ -1549,6 +1545,53 @@ button:focus-visible,
   .category-card { padding: 1.5rem 1rem; }
   .category-card-content h5 { font-size: 1rem; }
 }
+
+/* ========================================
+   BOTÓN BANNER - Mejorado con colores API
+   ======================================== */
+/* Botón Outline Elegante */
+.btn-banner-outline {
+  position: relative;
+  display: inline-block;
+  padding: 1.2rem 3rem;
+  color: white !important;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid rgb(255, 255, 255);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  background:  rgba(11, 11, 11, 0.288);
+  z-index: 1;
+}
+
+.btn-banner-outline .btn-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--main-color, #007bff) 0%,
+    var(--main-color-2, #0056b3) 100%
+  );
+  transition: width 0.4s ease;
+  z-index: -1;
+}
+
+.btn-banner-outline:hover .btn-border {
+  width: 100%;
+}
+
+.btn-banner-outline:hover {
+  border-color: var(--main-color, #007bff);
+  box-shadow: 0 10px 30px rgba(0, 123, 255, 0.4);
+  transform: translateY(-3px);
+}
 </style>
 
 <script>
@@ -1629,6 +1672,34 @@ export default {
   },
 
   methods: {
+    applyDynamicColors() {
+  const colors = this.Institucion?.colorinstitucion;
+  if (colors && colors.length > 0) {
+    const colorSet = colors[0];
+    
+    // Colores principales
+    if (colorSet.color_primario) {
+      document.documentElement.style.setProperty('--main-color', colorSet.color_primario);
+    }
+    if (colorSet.color_secundario) {
+      document.documentElement.style.setProperty('--main-color-2', colorSet.color_secundario);
+    }
+    if (colorSet.color_terciario) {
+      document.documentElement.style.setProperty('--main-color-3', colorSet.color_terciario);
+    }
+    
+    // ✅ Variables adicionales para el botón del banner
+    if (colorSet.color_primario) {
+      document.documentElement.style.setProperty('--btn-banner-bg-start', colorSet.color_primario);
+    }
+    if (colorSet.color_secundario) {
+      document.documentElement.style.setProperty('--btn-banner-bg-end', colorSet.color_secundario);
+    }
+    if (colorSet.color_terciario) {
+      document.documentElement.style.setProperty('--btn-banner-shadow', colorSet.color_terciario);
+    }
+  }
+},
 buildSafeImageUrl(path) {
   if (!path) return require('@/assets/upea.png');
   

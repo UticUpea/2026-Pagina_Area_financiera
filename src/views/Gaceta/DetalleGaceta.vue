@@ -49,8 +49,7 @@
 
                   <div class="col-md-6">
                     <div class="pdf-viewer-wrapper">
-                      
-                      <!-- ✅ Iframe nativo con navegación página por página -->
+                    
                       <iframe
                         :src="pdfUrl"
                         class="pdf-iframe"
@@ -109,7 +108,7 @@
 
                       <div class="gaceta-description" v-if="gaceta.gaceta_descripcion">
                         <h4>Descripción del Documento</h4>
-                        <p v-html="gaceta.gaceta_descripcion"></p>
+                        <p v-html="sanitizedDescription"></p>
                       </div>
 
                       <div class="pdf-info-box">
@@ -428,6 +427,7 @@ import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
 import logger from '@/utils/logger'
+import DOMPurify from 'dompurify'
 
 export default {
   name: "DetalleGaceta",
@@ -448,6 +448,10 @@ export default {
   
   computed: {
     ...mapState(["url_api", "Institucion"]),
+
+    sanitizedDescription() {
+  return DOMPurify.sanitize(this.gaceta.gaceta_descripcion || '')
+}
   },
 
   methods: {
@@ -457,22 +461,39 @@ export default {
      * @returns {string} - URL completa con parámetros para el visor nativo
      */
 getSafePdfUrl(path) {
-  if (!path) return '#';
-  
-  const cleaned = String(path).trim();
-  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
-  
-  // ✅ CASO 1: Ya es URL completa de MinIO
-  if (cleaned.includes('archivosminio.upea.bo')) {
-    const httpsUrl = cleaned.replace(/^http:\/\//, 'https://');
-    return httpsUrl + '#toolbar=1&navpanes=1&scrollbar=1';
+  if (!path) return '#'
+
+  try {
+    const cleaned = String(path).trim()
+
+    const MINIO_BASE =
+      'https://archivosminio.upea.bo/archivospaginasnode'
+
+    if (/^https?:\/\//i.test(cleaned)) {
+
+      const url = new URL(cleaned)
+
+      if (
+        url.hostname !== 'archivosminio.upea.bo' ||
+        url.protocol !== 'https:'
+      ) {
+        return '#'
+      }
+
+      return `${url.toString()}#toolbar=1&navpanes=1&scrollbar=1`
+    }
+
+    const safeFileName = cleaned.replace(
+      /[^a-zA-Z0-9._-]/g,
+      ''
+    )
+
+    return `${MINIO_BASE}/documentos/${safeFileName}#toolbar=1&navpanes=1&scrollbar=1`
+
+  } catch (error) {
+    logger.error('URL PDF inválida', error)
+    return '#'
   }
-  
-  // ✅ CASO 2: Es nombre de archivo → construir URL con carpeta de documentos
-  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-  const fullUrl = `${MINIO_BASE}/documentos${resource}`.replace(/\/+/g, '/');
-  
-  return fullUrl + '#toolbar=1&navpanes=1&scrollbar=1';
 },
 
     async getGaceta() {

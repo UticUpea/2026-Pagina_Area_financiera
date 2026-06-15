@@ -157,10 +157,14 @@
                         </div>
                       </div>
 
-                      <div class="course-description" v-if="curso.det_descripcion">
-                        <h4>Descripción del Curso</h4>
-                        <p v-html="curso.det_descripcion"></p>
-                      </div>
+<div class="course-description" v-if="curso.det_descripcion">
+  <h4>Descripción del Curso</h4>
+
+  <div
+    class="course-description-content"
+    v-html="curso.det_descripcion"
+  ></div>
+</div>
 
                       <div v-if="curso.det_grupo_whatssap" class="mt-3">
                         <a 
@@ -305,6 +309,48 @@
   object-fit: cover;
   display: block;
   transition: transform 0.3s ease;
+}
+
+.course-description-content {
+  line-height: 1.8;
+  color: #555;
+  font-size: 1.15rem;
+}
+
+.course-description-content p {
+  margin-bottom: 1rem;
+}
+
+.course-description-content ul,
+.course-description-content ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+.course-description-content li {
+  margin-bottom: 0.5rem;
+}
+
+.course-description-content strong {
+  font-weight: 700;
+}
+
+.course-description-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.course-description-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.course-description-content table td,
+.course-description-content table th {
+  border: 1px solid #ddd;
+  padding: 8px;
 }
 
 .course-image-wrapper:hover .course-main-image {

@@ -91,7 +91,7 @@
 
                       <div class="servicio-description" v-if="servicio.serv_descripcion">
                         <h4>Descripción del Servicio</h4>
-                        <p v-html="servicio.serv_descripcion"></p>
+                    <div v-html="sanitizedDescripcion"></div>
                       </div>
                     </div>
                   </div>
@@ -687,6 +687,7 @@ import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
 import logger from '@/utils/logger'
+import DOMPurify from 'dompurify'
 
 export default {
   name: "DetalleServicio",
@@ -713,6 +714,30 @@ export default {
   computed: {
     ...mapState(["url_api", "Institucion"]),
 
+     sanitizedDescripcion() {
+    return DOMPurify.sanitize(
+      this.servicio?.serv_descripcion || '',
+      {
+        ALLOWED_TAGS: [
+          'p',
+          'br',
+          'strong',
+          'b',
+          'em',
+          'i',
+          'ul',
+          'ol',
+          'li',
+          'h1',
+          'h2',
+          'h3',
+          'h4',
+          'h5',
+          'h6'
+        ]
+      }
+    )
+  },
     displayedImages() {
       if (!this.allImages || this.allImages.length === 0) {
         return [];
@@ -765,9 +790,14 @@ export default {
         const institucionId = this.idInstitucion || config.app.idInstitucion
         
         const res = await api.get(`/institucion/${institucionId}/gacetaEventos`)
-        const data = res.data
-        
-        const lista = data.serviciosCarrera || []
+if (
+  !res.data ||
+  !Array.isArray(res.data.serviciosCarrera)
+) {
+  throw new Error('Respuesta inválida')
+}
+
+const lista = res.data.serviciosCarrera
         this.servicio = lista.find(s => s.serv_id == idServ) || {}
         
         if (!this.servicio.serv_id) {
@@ -829,6 +859,7 @@ buildSafeImageUrl(path) {
   const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
   return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
 },
+
 
     _actualizarPager() {
       const total = this.allImages?.length || 0

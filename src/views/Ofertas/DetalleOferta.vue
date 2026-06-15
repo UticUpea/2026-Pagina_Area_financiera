@@ -102,7 +102,7 @@
 
                       <div class="oferta-description" v-if="oferta.ofertas_descripcion">
                         <h4>Descripción de la Oferta</h4>
-                        <p v-html="oferta.ofertas_descripcion"></p>
+                       <p v-html="sanitizeHtml(oferta.ofertas_descripcion)"></p>
                       </div>
                     </div>
                   </div>
@@ -477,6 +477,7 @@ import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
 import logger from '@/utils/logger'
+import DOMPurify from 'dompurify'
 
 export default {
   name: "DetalleOferta",
@@ -512,8 +513,10 @@ export default {
         const data = res.data
 
         const lista = data.ofertasAcademicas || []
-        this.oferta = lista.find(o => o.ofertas_id == idOfer) || {}
-
+       this.oferta =
+  lista.find(
+    o => String(o.ofertas_id) === String(idOfer)
+  ) || {}
         if (!this.oferta.ofertas_id) {
           this.errorGet = true
           logger.warn('Oferta no encontrada con ID:', idOfer)
@@ -536,50 +539,77 @@ export default {
         this.$store.commit("loading")
       }
     },
-
+sanitizeHtml(html) {
+  return DOMPurify.sanitize(String(html || ''), {
+    USE_PROFILES: { html: true }
+  })
+},
 buildSafeImageUrl(path) {
-  if (!path) return require('@/assets/upea.png');
-  
-  const cleaned = String(path).trim();
-  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode';
-  
-  // ✅ CASO 1: Ya es URL completa de MinIO → solo asegurar HTTPS
-  if (cleaned.includes('archivosminio.upea.bo')) {
-    return cleaned.replace(/^http:\/\//, 'https://');
+  if (!path) {
+    return require('@/assets/upea.png')
   }
-  
-  // ✅ CASO 2: Es nombre de archivo o ruta relativa → construir con base de MinIO
 
-  const lower = cleaned.toLowerCase();
-  let folder = '/imagenes/'; 
-  
-  if (lower.endsWith('.pdf')) {
-    folder = '/documentos/';
-  } else if (lower.includes('institucion_logo')) {
-    folder = '/imagenes/instituciones/';
-  } else if (lower.includes('portada_imagen')) {
-    folder = '/imagenes/portadas/';
-  } else if (lower.includes('serv_imagen')) {
-    folder = '/imagenes/servicios/';
-  } else if (lower.includes('con_foto_portada')) {
-    folder = '/imagenes/convocatorias/';
+  const cleaned = String(path).trim()
+
+  if (
+    cleaned.startsWith('javascript:') ||
+    cleaned.startsWith('data:') ||
+    cleaned.includes('..')
+  ) {
+    logger.warn('Ruta de imagen bloqueada:', cleaned)
+    return require('@/assets/upea.png')
   }
-  
-  const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+
+  const MINIO_BASE =
+    'https://archivosminio.upea.bo/archivospaginasnode'
+
+  if (/^https?:\/\//i.test(cleaned)) {
+    if (!cleaned.includes('archivosminio.upea.bo')) {
+      logger.warn('Dominio externo bloqueado:', cleaned)
+      return require('@/assets/upea.png')
+    }
+
+    return cleaned.replace(/^http:\/\//i, 'https://')
+  }
+
+  const lower = cleaned.toLowerCase()
+
+  let folder = '/imagenes/'
+
+  if (lower.endsWith('.pdf')) {
+    folder = '/documentos/'
+  } else if (lower.includes('institucion_logo')) {
+    folder = '/imagenes/instituciones/'
+  } else if (lower.includes('portada_imagen')) {
+    folder = '/imagenes/portadas/'
+  } else if (lower.includes('serv_imagen')) {
+    folder = '/imagenes/servicios/'
+  } else if (lower.includes('con_foto_portada')) {
+    folder = '/imagenes/convocatorias/'
+  }
+
+  const resource = cleaned.startsWith('/')
+    ? cleaned
+    : `/${cleaned}`
+
+  return `${MINIO_BASE}${folder}${resource}`
 },
 
-    openModal() {
-      this.showModal = true;
-      document.body.style.overflow = 'hidden';
-      
-      this.$nextTick(() => {
-        const modal = document.querySelector('.image-modal-overlay');
-        if (modal) {
-          modal.focus();
-        }
-      });
-    },
+openModal() {
+  if (!this.oferta?.ofertas_imagen) {
+    return
+  }
+
+  this.showModal = true
+  document.body.style.overflow = 'hidden'
+
+  this.$nextTick(() => {
+    const modal = document.querySelector('.image-modal-overlay')
+    if (modal) {
+      modal.focus()
+    }
+  })
+},
 
     closeModal() {
       this.showModal = false;

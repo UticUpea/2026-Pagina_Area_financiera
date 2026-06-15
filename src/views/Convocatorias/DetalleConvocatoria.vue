@@ -98,7 +98,7 @@
 
                       <div class="convocatoria-description" v-if="convocatoria.con_descripcion">
                         <h4>Descripción de la Convocatoria</h4>
-                        <p v-html="convocatoria.con_descripcion"></p>
+                    <p v-html="sanitizeHtml(convocatoria.con_descripcion)"></p>
                       </div>
                     </div>
                   </div>
@@ -473,6 +473,7 @@ import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
 import logger from '@/utils/logger'
+import DOMPurify from 'dompurify'
 
 export default {
   name: "DetalleConvocatoria",
@@ -529,7 +530,9 @@ export default {
         this.$store.commit("loading")
       }
     },
-
+sanitizeHtml(html) {
+  return DOMPurify.sanitize(html || '');
+},
 buildSafeImageUrl(path) {
   if (!path) return require('@/assets/upea.png');
   
@@ -559,7 +562,10 @@ buildSafeImageUrl(path) {
   }
   
   const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-  return `${MINIO_BASE}${folder}${resource}`.replace(/\/+/g, '/');
+ return `${MINIO_BASE}${folder}${resource}`.replace(
+  /^https?:\/\/.+$/,
+  match => match.replace(/([^:]\/)\/+/g, '$1')
+);
 },
 
     openModal() {
@@ -587,28 +593,42 @@ buildSafeImageUrl(path) {
       }
     },
 
-    formatearFecha(fecha) {
-      if (!fecha) return ''
+formatearFecha(fecha) {
+  if (!fecha) return '';
 
-      if (typeof fecha === 'string' && fecha.includes('de')) return fecha
-      
-      const meses = [
-        "enero", "febrero", "marzo", "abril", "mayo", "junio",
-        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
-      ]
-      
-      let fechaObj
-      if (fecha.includes('T')) {
-        fechaObj = new Date(fecha)
-      } else {
-        const partes = fecha.substr(0, 10).split("-")
-        fechaObj = new Date(partes[0], parseInt(partes[1]) - 1, partes[2])
-      }
-      
-      if (isNaN(fechaObj.getTime())) return fecha
-      
-      return `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`
-    },
+  const fechaStr = String(fecha);
+
+  if (fechaStr.includes('de')) return fechaStr;
+
+  const meses = [
+    "enero","febrero","marzo","abril","mayo","junio",
+    "julio","agosto","septiembre","octubre","noviembre","diciembre"
+  ];
+
+  let fechaObj;
+
+  if (fechaStr.includes('T')) {
+    fechaObj = new Date(fechaStr);
+  } else {
+    const partes = fechaStr.substring(0, 10).split('-');
+
+    if (partes.length !== 3) {
+      return fechaStr;
+    }
+
+    fechaObj = new Date(
+      partes[0],
+      parseInt(partes[1], 10) - 1,
+      partes[2]
+    );
+  }
+
+  if (isNaN(fechaObj.getTime())) {
+    return fechaStr;
+  }
+
+  return `${fechaObj.getDate()} de ${meses[fechaObj.getMonth()]} de ${fechaObj.getFullYear()}`;
+},
 
     _limpiarObjeto(obj) {
       if (!obj || typeof obj !== 'object') return obj

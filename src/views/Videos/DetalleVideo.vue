@@ -78,9 +78,9 @@
                 <h4 class="mb-0">{{ video.video_titulo }}</h4>
               </div>
             </div>
-            <div class="blog-content-inner">
-              <p v-html="video.video_breve_descripcion"></p>
-            </div>
+<div class="blog-content-inner">
+  <div v-html="safeDescription()"></div>
+</div>
           </div>
           
         </div>
@@ -171,6 +171,7 @@ import SidebarCustom from "@/components/SidebarCustom.vue";
 import api from '@/plugins/axios'
 import { config } from '@/config/env'
 import logger from '@/utils/logger'
+import DOMPurify from 'dompurify'
 
 export default {
   name: "DetalleVideo",
@@ -234,51 +235,32 @@ export default {
         this.$store.commit("loading")
       }
     },
+safeDescription() {
+  return DOMPurify.sanitize(
+    this.video.video_breve_descripcion || ''
+  )
+},
+getSafeVideoUrl(url) {
+  if (!url) return '';
 
-    getSafeVideoUrl(url) {
-      if (!url) return '';
-      
-      const cleaned = String(url).trim();
-      
-      if (!cleaned) return '';
-      
-      try {
-  
-        if (cleaned.includes('youtube.com/watch?v=') || cleaned.includes('youtu.be/')) {
-          const videoId = this.extractYouTubeId(cleaned);
-          if (videoId) {
+  const cleaned = String(url).trim();
 
-            return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&enablejsapi=1`;
-          }
-        }
+  const youtubeId = this.extractYouTubeId(cleaned);
 
-        if (cleaned.includes('youtube.com/embed/') || cleaned.includes('youtube-nocookie.com/embed/')) {
-          return cleaned.replace('http://', 'https://');
-        }
+  if (youtubeId) {
+    return `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1`;
+  }
 
-        if (cleaned.includes('vimeo.com')) {
-          const videoId = cleaned.match(/vimeo\.com\/(\d+)/)?.[1];
-          if (videoId) {
-            return `https://player.vimeo.com/video/${videoId}?title=0&byline=0&portrait=0`;
-          }
-        }
-        if (cleaned.startsWith('https://')) {
-          return cleaned;
-        }
-   
-        if (cleaned.startsWith('http://')) {
-          return cleaned.replace('http://', 'https://');
-        }
-    
-        const base = config.uploads.baseUrl?.replace(/\/+$/, '');
-        const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-        return `${base}${resource}`.replace(/\/+/g, '/');
-        
-      } catch (error) {
-        logger.error('Error procesando URL de video:', error);
-        return '';
-      }
-    },
+  const vimeoMatch = cleaned.match(
+    /^https?:\/\/(?:www\.)?vimeo\.com\/(\d+)$/i
+  );
+
+  if (vimeoMatch) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  }
+
+  return '';
+},
 
     extractYouTubeId(url) {
       const patterns = [

@@ -122,6 +122,7 @@
   </router-link>
 </h4>
 <a
+  v-if="getPdfUrl(gaceta.gaceta_documento) !== '#'"
   :href="getPdfUrl(gaceta.gaceta_documento)"
   target="_blank"
   rel="noopener noreferrer"
@@ -602,7 +603,11 @@ export default {
       let result = this.gacetas;
 
       if (this.filtroTipo) {
-        result = result.filter(g => g.gaceta_tipo === this.filtroTipo);
+       result = result.filter(
+  g =>
+    String(g.gaceta_tipo || '').trim().toLowerCase() ===
+    String(this.filtroTipo || '').trim().toLowerCase()
+);
       }
       
       if (this.searchQuery.trim()) {
@@ -686,20 +691,42 @@ export default {
       }
     },
 
-    getPdfUrl(nombreArchivo) {
-      if (!nombreArchivo) return '#';
-      
-      const cleaned = String(nombreArchivo).trim();
+getPdfUrl(nombreArchivo) {
+  if (!nombreArchivo) return '#';
 
-      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
-        return cleaned.replace('http://', 'https://');
+  const cleaned = String(nombreArchivo).trim();
+
+  const MINIO_BASE = 'https://archivosminio.upea.bo/archivospaginasnode/documentos';
+
+  if (/^https?:\/\//i.test(cleaned)) {
+    try {
+      const url = new URL(cleaned);
+
+      if (url.protocol !== 'https:') {
+        url.protocol = 'https:';
       }
- 
-      const base = config.uploads.baseUrl?.replace(/\/+$/, '');
-      const resource = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-      
-      return `${base}${resource}`.replace(/\/+/g, '/');
-    },
+
+      return url.href;
+    } catch {
+      return '#';
+    }
+  }
+
+  if (
+    cleaned.includes('javascript:') ||
+    cleaned.includes('data:') ||
+    cleaned.includes('vbscript:')
+  ) {
+    return '#';
+  }
+
+  const safeFile = cleaned
+    .replace(/\\/g, '/')
+    .replace(/\.\./g, '')
+    .replace(/[^a-zA-Z0-9_\-./]/g, '');
+
+  return `${MINIO_BASE}/${safeFile.replace(/^\/+/, '')}`;
+},
 
     onSearchInput() {
       if (this.searchTimeout) {
