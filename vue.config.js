@@ -68,7 +68,7 @@ module.exports = defineConfig({
       }
     },
     
-    // ✅ SIN PROXY - Como solicitaste
+    
   },
   
   productionSourceMap: false,
