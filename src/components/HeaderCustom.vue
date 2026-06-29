@@ -2,45 +2,44 @@
   <div class="navbar-area">
     <div class="navbar-top" :class="{ 'navbar-light': isLightMenu }">
       <div class="container">
-        <div class="row">
+        <div class="row align-items-center">
           <div class="col-6 text-md-left">
-            <ul>
+            <ul class="topbar-list">
               <li class="d-none d-md-inline-block" v-if="isValidEmail(Institucion.institucion_correo1)">
-                <p>
-                  <i class="fa fa-envelope-o"></i>
-                  <a :href="buildMailTo(Institucion.institucion_correo1)" rel="noopener noreferrer">
-                    {{ sanitizeText(Institucion.institucion_correo1) }}
-                  </a>
-                </p>
+                <a :href="buildMailTo(Institucion.institucion_correo1)" rel="noopener noreferrer" class="topbar-link">
+                  <i class="fa fa-envelope-o icon-margin"></i>
+                  {{ sanitizeText(Institucion.institucion_correo1) }}
+                </a>
               </li>
             </ul>
           </div>
           <div class="col-6">
-            <ul class="text-right">
+            <ul class="topbar-list text-right">
               <li class="d-lg-inline-block d-none" v-if="isValidPhone(Institucion.institucion_celular1)">
-                <p>
-                  <i class="fa fa-phone"></i>
+                <span class="topbar-link">
+                  <i class="fa fa-phone icon-margin"></i>
                   +591 {{ formatPhone(Institucion.institucion_celular1) }}
-                </p>
+                </span>
               </li>
               <li class="d-lg-inline-block d-none" v-if="isValidPhone(Institucion.institucion_telefono1)">
-                <p>
-                  <i class="fa fa-phone"></i>
+                <span class="topbar-link">
+                  <i class="fa fa-phone icon-margin"></i>
                   +591 {{ formatPhone(Institucion.institucion_telefono1) }}
-                </p>
+                </span>
               </li>
             </ul>
           </div>
         </div>
       </div>
     </div> 
-<nav
-  class="navbar navbar-area-1 navbar-area navbar-expand-lg"
-  :class="{
-    'navbar-light-menu': isLightMenu,
-    'menu-scroll': isLightMenu && scrolled
-  }"
->
+
+    <nav
+      class="navbar navbar-area-1 navbar-area navbar-expand-lg"
+      :class="{
+        'navbar-light-menu': isLightMenu,
+        'menu-scroll': isLightMenu && scrolled
+      }"
+    >
       <div class="container nav-container">
         <div class="responsive-mobile-menu">
           <button class="menu toggle-btn d-block d-lg-none" :class="{ 'toggle-light': isLightMenu }" data-target="#edumint_main_menu" @click="openMenu()"
@@ -50,77 +49,60 @@
           </button>
         </div>
         
-<div class="d-none d-lg-block">
-  <div v-if="idInstitucion === '24'">
-    <router-link to="/">
-      <div class="logo_carrera">
-        <img 
-          src="@/assets/logoComercio.png" 
-          alt="Comercio Internacional" 
-          width="274" 
-          height="113" 
-          class="logo-animado"
-          loading="lazy"
-        />
-      </div>
-    </router-link>
-  </div>
-  <div v-else class="logo">
-    <router-link to="/">
-      <div class="logo_carrera">
-        <img 
-          :src="buildSafeImageUrl(Institucion?.institucion_logo)" 
-          :alt="sanitizeText(Institucion?.institucion_nombre) || 'Logo institucional'"
-          width="100"
-          height="auto"
-          @error="e => e.target.src = require('@/assets/upea.png')"
-          class="logo-animado"
-          loading="lazy"
-        />
-      </div>
-    </router-link>
-  </div>
-</div>
+        <div class="d-none d-lg-block brand-logo">
+          <div v-if="idInstitucion === '24'">
+            <router-link to="/">
+              <div class="logo_carrera">
+                <img 
+                  src="@/assets/logoComercio.png" 
+                  alt="Comercio Internacional" 
+                  width="274" 
+                  height="113" 
+                  class="logo-animado"
+                  loading="lazy"
+                />
+              </div>
+            </router-link>
+          </div>
+          <div v-else class="logo">
+            <router-link to="/">
+              <div class="logo_carrera">
+                <img 
+                  :src="buildSafeImageUrl(Institucion?.institucion_logo)" 
+                  :alt="sanitizeText(Institucion?.institucion_nombre) || 'Logo institucional'"
+                  width="100"
+                  height="auto"
+                  @error="e => e.target.src = require('@/assets/upea.png')"
+                  class="logo-animado"
+                  loading="lazy"
+                />
+              </div>
+            </router-link>
+          </div>
+        </div>
         
         &nbsp;
         
         <div class="collapse navbar-collapse" :class="[sopen ? 'sopen' : '']" id="edumint_main_menu">
           <ul class="navbar-nav menu-open">
             
-            <!-- Inicio -->
             <li @mouseover="showSubMenu('m_inicio')">
-              <router-link to="/">INICIO</router-link>
+              <router-link to="/" class="nav-link-custom">INICIO</router-link>
             </li>
             
             <li class="menu-item-has-children" @mouseover="showSubMenu('m_informacion')">
-              <router-link to="/about">INFORMACIÓN</router-link>
-              <ul class="sub-menu" :style="[m_informacion ? 'display:block' : 'display:none']">
-                <li>
-                  <router-link to="/about#nosotros" @click="handleInfoNav">
-                    SOBRE NOSOTROS
-                  </router-link>
-                </li>
-                <li>
-                  <router-link to="/about#mision" @click="handleInfoNav">
-                    MISIÓN Y VISIÓN
-                  </router-link>
-                </li>
-                <li>
-                  <router-link to="/about#autoridades" @click="handleInfoNav">
-                    AUTORIDADES
-                  </router-link>
-                </li>
-                <li>
-                  <router-link to="/about#contacto" @click="handleInfoNav">
-                    CONTACTO
-                  </router-link>
-                </li>
+              <router-link to="/about" class="nav-link-custom">INFORMACIÓN</router-link>
+              <ul class="sub-menu shadow-modern" :style="[m_informacion ? 'display:block' : 'display:none']">
+                <li><router-link to="/about#nosotros" @click="handleInfoNav">SOBRE NOSOTROS</router-link></li>
+                <li><router-link to="/about#mision" @click="handleInfoNav">MISIÓN Y VISIÓN</router-link></li>
+                <li><router-link to="/about#autoridades" @click="handleInfoNav">AUTORIDADES</router-link></li>
+                <li><router-link to="/about#contacto" @click="handleInfoNav">CONTACTO</router-link></li>
               </ul>
             </li>
 
             <li class="menu-item-has-children" @mouseover="showSubMenu('m_conv')">
-              <a href="#" aria-haspopup="true" aria-expanded="false">COMUNICADOS</a>
-              <ul class="sub-menu" :style="[m_conv ? 'display:block' : 'display:none']">
+              <a href="#" aria-haspopup="true" aria-expanded="false" class="nav-link-custom">COMUNICADOS</a>
+              <ul class="sub-menu shadow-modern" :style="[m_conv ? 'display:block' : 'display:none']">
                 <li v-for="mc of MenuConv" :key="mc.idtipo_conv_comun">
                   <router-link :to="'/convocatorias/' + mc.idtipo_conv_comun" @click="click_m()">
                     {{ sanitizeText(mc.tipo_conv_comun_titulo) }}
@@ -130,14 +112,13 @@
             </li>
 
             <li class="menu-item-has-children" @mouseover="showSubMenu('m_mas')">
-              <a href="#" aria-haspopup="true" aria-expanded="false">MÁS</a>
-              <ul class="sub-menu" :style="[m_mas ? 'display:block' : 'display:none']">
+              <a href="#" aria-haspopup="true" aria-expanded="false" class="nav-link-custom">MÁS</a>
+              <ul class="sub-menu shadow-modern" :style="[m_mas ? 'display:block' : 'display:none']">
                 <li v-for="mc of MenuCur" :key="'curso-' + mc.idtipo_curso_otros">
                   <router-link :to="'/cursos/' + mc.idtipo_curso_otros" @click="click_m()">
                     {{ sanitizeText(mc.tipo_conv_curso_nombre) }}
                   </router-link>
                 </li>
-
                 <li><router-link to="/servicios" @click="click_m()">SERVICIOS</router-link></li>
                 <li><router-link to="/ofertas" @click="click_m()">OFERTAS ACADÉMICAS</router-link></li>
                 <li><router-link to="/publicaciones" @click="click_m()">PUBLICACIONES</router-link></li>
@@ -150,10 +131,9 @@
               </ul>
             </li>
             
-            <!-- Enlaces -->
             <li class="menu-item-has-children" @mouseover="showSubMenu('m_link')">
-              <a href="#" aria-haspopup="true" aria-expanded="false">ENLACES</a>
-              <ul class="sub-menu" :style="[m_link ? 'display:block' : 'display:none']">
+              <a href="#" aria-haspopup="true" aria-expanded="false" class="nav-link-custom">ENLACES</a>
+              <ul class="sub-menu shadow-modern" :style="[m_link ? 'display:block' : 'display:none']">
                 <li v-for="link of Links" :key="link.id_link">
                   <a 
                     :href="buildSafeUrl(link.url_link)" 
@@ -173,20 +153,21 @@
           <ul class="mb-0">
             <li class="ml-2">
               <a 
-                class="btn btn-red" 
+                class="btn btn-action-login" 
                 :href="loginUrl" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 aria-label="Iniciar sesión en el sistema administrativo"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-login-2" width="24"
-                  height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-login-2" width="20"
+                  height="20" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"
                   stroke-linecap="round" stroke-linejoin="round">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                   <path d="M9 8v-2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-2"></path>
                   <path d="M3 12h13l-3 -3"></path>
                   <path d="M13 15l3 -3"></path>
-                </svg> Iniciar Sesión
+                </svg> 
+                <span>Iniciar Sesión</span>
               </a>
             </li>
           </ul>
@@ -197,22 +178,27 @@
 </template>
 
 <style scoped>
-.logo-animado {
-  animation: flip-horizontal 5s ease-in-out infinite;
-  transform-style: preserve-3d;
+/* ==========================
+   VARIABLES GLOBALES & UTILS
+========================== */
+.icon-margin {
+  margin-right: 6px;
 }
 
-@keyframes flip-horizontal {
-  0% {
-    transform: perspective(400px) rotateY(0deg);
-  }
-  100% {
-    transform: perspective(400px) rotateY(360deg);
-  }
+/* ==========================
+   LOGO Y BRANDING
+========================== */
+.brand-logo {
+  padding: 5px 0;
+}
+
+.logo-animado {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));
 }
 
 .logo-animado:hover {
-  animation-play-state: paused;
+  transform: scale(1.08) rotate(-1deg);
 }
 
 .logo_carrera {
@@ -220,133 +206,206 @@
   align-items: center;
 }
 
-.logo_carrera h3 {
-  color: white;
-  padding: 5px;
-}
-
-.navbar-nav a:focus {
-  outline: 2px solid var(--main-color, #007bff);
-  outline-offset: 2px;
-}
-
-/* Navbar top - Dark version (default) */
+/* ==========================
+   TOP BAR (Barra Superior)
+========================== */
 .navbar-top {
-  background: rgba(0, 0, 0, 0.956);
+  background: var(--main-color-3, #020733); /* Utiliza el terciario para contraste */
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.navbar-top p,
-.navbar-top a {
-  color: rgba(255, 255, 255, 0.9);
+.topbar-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.topbar-link {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.2rem;
+  font-weight: 600;
   text-decoration: none;
   transition: color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
 }
 
-.navbar-top a:hover {
-  color: white;
-  text-decoration: underline;
+.topbar-link:hover {
+  color: #ffffff;
 }
 
-/* Navbar top - Light version (for institution 22) */
 .navbar-top.navbar-light {
-  background: rgba(245, 244, 243, 0.95);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  background: #f8f9fa;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.navbar-top.navbar-light p,
-.navbar-top.navbar-light a {
-  color: rgba(0, 0, 0, 0.9);
+.navbar-top.navbar-light .topbar-link {
+  color: #4b5563;
 }
 
-.navbar-top.navbar-light a:hover {
-  color: var(--main-color, #007bff);
+.navbar-top.navbar-light .topbar-link:hover {
+  color: var(--main-color);
 }
 
-/* Mobile menu toggle - Light version */
-.toggle-light .icon-left,
-.toggle-light .icon-right {
-  background: #333 !important;
+/* ==========================
+   NAVEGACIÓN PRINCIPAL
+========================== */
+
+.navbar-area-1 {
+  background: rgba(0, 0, 0, 0.36) !important; 
+  backdrop-filter: blur(10px); 
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+  padding: 0rem 0;
+  transition: all 0.3s ease;
 }
 
-/* Navbar light menu */
-.navbar-light-menu .navbar-nav > li > a,
-.navbar-light-menu .navbar-nav > li > router-link {
-  color: #333 !important;
+.navbar-nav.menu-open > li {
+  position: relative;
+  margin: 0 8px;
 }
 
-.navbar-light-menu .navbar-nav > li > a:hover,
-.navbar-light-menu .navbar-nav > li > router-link:hover {
-  color: var(--main-color, #007bff) !important;
+.nav-link-custom {
+  position: relative;
+  font-size: 1.5rem; 
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 10px 15px !important;
+  color: #ffffff !important; 
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
-/* Style dark for button (default) */
-.style-white .btn-red {
-  background: var(--main-color, #007bff);
-  color: white;
+.nav-link-custom::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--main-color, #04246C);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
 }
 
-/* Style dark button for light menu */
-.style-dark .btn-red {
-  background: var(--main-color-2, #0015ff);
-  color: white;
-}
-/* id 22*/
-/* MENU PRINCIPAL */
-.navbar-light-menu .navbar-nav.menu-open > li > a {
-  color: #ffffff !important;
-  text-shadow: 0 2px 4px rgba(0,0,0,.8);
+.nav-link-custom:hover::after,
+.router-link-exact-active::after {
+  width: 70%;
 }
 
-/* SUBMENUS */
-.navbar-light-menu .navbar-nav.menu-open .sub-menu li a {
-  color: #ffffff !important;
+/* Ajuste para el efecto hover (cuando pasas el mouse) */
+.nav-link-custom:hover {
+  color: #ffcccc !important; 
+  background: rgba(255, 255, 255, 0.1); 
 }
 
-/* AL HACER SCROLL */
-.menu-scroll .navbar-nav.menu-open > li > a {
-  color: #000000 !important;
-  text-shadow: none;
+/* ==========================
+   SUBMENÚS MODERNOS
+========================== */
+.shadow-modern {
+  min-width: 260px;
+  background: #ffffff; /* Mantiene el fondo blanco */
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 15px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  z-index: 999; /* Asegura que esté encima de todo */
 }
 
-.menu-scroll .navbar-nav.menu-open .sub-menu li a {
-  color: #000000 !important;
+.menu-item-has-children .sub-menu li {
+  margin-bottom: 4px;
 }
 
-.navbar-light-menu .navbar-nav > li > a:hover,
-.navbar-light-menu .navbar-nav > li > router-link:hover {
-  color: var(--main-color, #007bff) !important;
+.menu-item-has-children .sub-menu li:last-child {
+  margin-bottom: 0;
 }
 
-/* Iconos del menú móvil en blanco */
-.navbar-light-menu .toggle-light .icon-left,
-.navbar-light-menu .toggle-light .icon-right {
-  background: #3b3737 !important;
+.menu-item-has-children .sub-menu li a {
+  display: block;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem; /* Aumentado ligeramente para mejor lectura */
+  font-weight: 600;
+  color: #1f2937 !important; /* CAMBIO: Color más oscuro para asegurar que sea visible sobre fondo blanco */
+  transition: all 0.25s ease;
 }
 
-/* Submenús para institución 22 */
-.navbar-light-menu .menu-item-has-children .sub-menu {
-  background: rgba(75, 74, 74, 0.95) !important;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.3) !important;
-  border-top: 3px solid var(--main-color, #007bff) !important;
+/* Efecto al pasar el mouse por el submenú */
+.menu-item-has-children .sub-menu li a:hover {
+  background: rgba(4, 36, 108, 0.1); 
+  color: var(--main-color, #04246C) !important;
 }
 
-.navbar-light-menu .menu-item-has-children .sub-menu li a,
-.navbar-light-menu .menu-item-has-children .sub-menu li router-link {
-  color: rgba(255, 255, 255, 0.9) !important;
-  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+/* ==========================
+   BOTÓN DE ACCIÓN (LOGIN)
+========================== */
+.btn-action-login {
+  background-color: var(--main-color-2, #FC0102); /* Color secundario */
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(252, 1, 2, 0.3);
+  border: 2px solid transparent;
 }
 
-.navbar-light-menu .menu-item-has-children .sub-menu li a:hover,
-.navbar-light-menu .menu-item-has-children .sub-menu li router-link:hover {
-  background: var(--main-color, #007bff) !important;
-  color: white !important;
-  padding-left: 25px !important;
+.btn-action-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(252, 1, 2, 0.4);
+  color: #ffffff;
 }
 
-/* Flechas de submenús en blanco */
-.navbar-light-menu .menu-item-has-children > a::after,
-.navbar-light-menu .menu-item-has-children > router-link::after {
-  color: #fff;
+.style-dark .btn-action-login {
+  background-color: var(--main-color-3);
+  box-shadow: 0 4px 14px rgba(2, 7, 51, 0.3);
+}
+
+/* ==========================
+   MÓVIL / RESPONSIVE
+========================== */
+.toggle-btn {
+  background: transparent;
+  border: none;
+}
+.toggle-btn .icon-left,
+.toggle-btn .icon-right {
+  background: var(--main-color-3) !important;
+  height: 3px;
+  border-radius: 3px;
+}
+@media (max-width: 991px) {
+  
+  .mobile-menu-container, 
+  .navbar-collapse {
+    background-color: #ffffffe3 !important;
+  }
+
+  .mobile-menu-container a,
+  .navbar-collapse a {
+    color: #ffffff !important; 
+    font-size: 16px !important;
+    font-weight: 700 !important;
+  }
+
+  .mobile-menu-container .sub-menu li a,
+  .navbar-collapse .sub-menu li a {
+    color: #e4e6e8 !important;
+  }
+  .navbar-collapse {
+    position: absolute; 
+    top: 60px; 
+    left: 0;
+    width: 100%;
+    background: #000000e5 !important; 
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.704);
+  }
 }
 
 </style>
@@ -381,7 +440,6 @@ export default {
     },
 
     isLightMenu() {
-
       return this.idInstitucion === '22';
     }
   },
@@ -475,11 +533,9 @@ handleScroll() {
     },
 
     handleInfoNav() {
-
       if (this.sopen) {
         this.sopen = false;
       }
-
     },
 
     click_m() {
@@ -490,7 +546,6 @@ handleScroll() {
     click_ma() {
       this.$store.commit("clickLink");
       this.openMenu();
-
     },
 
     showSubMenu(id) {
@@ -569,7 +624,6 @@ handleScroll() {
     }
   },
   
-
   created() {
     this.applyDynamicColors();
     this.getLinks();

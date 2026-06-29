@@ -175,67 +175,39 @@
     </section>
 
     <!-- Sobre Nosotros -->
-    <section class="section-about">
-      <div class="container">
-        <div class="section-header text-center">
-          <h2 class="section-title-main">{{ institucion.institucion_nombre }}</h2>
-          <div class="section-divider"></div>
-        </div>
-        <div class="row align-items-center">
-          <div class="col-lg-6 mb-4 mb-lg-0">
-            <div class="image-slider-wrapper">
-              <div class="slider-container">
-                <ul>
-                  <li><img class="slider-item" src="@/assets/fondo_upea.jpg" alt="Campus"></li>
-                  <li><img class="slider-item" src="@/assets/images/fondo_ciencias_economicas.jpg" alt="Facultad"></li>
-                  <li><img class="slider-item" src="@/assets/images/Contaduria-Publica-UPEA.jpg" alt="Estudiantes"></li>
-                  <li><img class="slider-item" src="@/assets/images/adm.jpg" alt="Administración"></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="content-card-scroll">
-              <p 
-                v-if="institucion.institucion_objetivos"
-                class="content-text" 
-                v-html="institucion.institucion_objetivos"
-              ></p>
-            </div>
-          </div>
+<section class="section-about py-5">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      
+      <!-- Columna Izquierda: Galería más amplia -->
+      <div class="col-lg-6">
+        <div class="about-image-wrapper">
+          <Carousel :items-to-show="1" :autoplay="5000" :wrap-around="true">
+            <Slide v-for="(img, index) in portadasList" :key="index">
+              <img :src="buildSafeImageUrl(img.portada_imagen)" class="img-fluid rounded-4 shadow-lg" alt="Imagen Institucional">
+            </Slide>
+          </Carousel>
         </div>
       </div>
-    </section>
 
-    <!-- Plan de Estudios -->
-    <section class="section-plan">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-8 text-center">
-            <div class="section-header">
-              <h2 class="section-title-main">Plan de Estudios</h2>
-              <div class="section-divider"></div>
-            </div>
-            <div class="plan-card">
-              <div class="plan-card-icon">
-                <i class="fa fa-graduation-cap"></i>
-              </div>
-              <p class="plan-card-text">
-                Consulta la malla curricular completa de nuestra carrera y planifica tu formación académica.
-              </p>
-              <a 
-                :href="buildSafeImageUrl(institucion.institucion_organigrama)" 
-                target="_blank"
-                rel="noopener noreferrer"
-                class="btn-download"
-              >
-                <i class="fa fa-download"></i> Descargar Malla Curricular
-              </a>
-            </div>
-          </div>
+      <!-- Columna Derecha: Contenido con letra más grande -->
+      <div class="col-lg-6">
+        <div class="about-content-wrapper">
+          <span class="badge-label">Institución</span>
+          <h2 class="section-title-big">{{ institucion.institucion_nombre }}</h2>
+          <div class="divider-line"></div>
+          
+          <div class="content-text-large" v-html="institucion.institucion_objetivos"></div>
+          
+        
         </div>
       </div>
-    </section>
+      
+    </div>
+  </div>
+</section>
+
+
 
     <div id="intro-area"></div>
 
@@ -243,8 +215,8 @@
     <section class="section-categories">
       <div class="container">
         <div class="section-title text-center">
-          <h5 class="sub-title">Categorías</h5>
-          <h2 class="title">Explorar contenido</h2>
+          <span class="badge-label">CATEGORIAS</span>
+          <h2 class="title-main">Explorar contenido</h2>
           <div class="section-divider"></div>
         </div>
         <div class="row justify-content-center">
@@ -374,111 +346,7 @@
         </div>
       </div>
     </section>
-
-    <section class="event-area pd-top-50 mg-bottom-120">
-      <div class="container">
-        <div class="section-title text-center">
-          <h5 class="sub-title">Redes Sociales</h5>
-          <h2 class="title">Facebook</h2>
-        </div>
-        <div class="row no-gutters">
-          <div class="col-xl-7 col-lg-6 banner-area-3 bg-cover bg-cover-img-fb">
-            <div class="event-section-title">
-              <div class="section-title mb-0 pt-xl-5 style-white"></div>
-            </div>
-          </div>
-          <div class="col-xl-5 col-lg-7 area-fb">
-            <div class="event-area-inner bg-base-fb">
-              <div class="facebook" id="facebook"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Autoridades -->
-    <section class="section-authorities">
-      <div class="container">
-        <div class="section-header text-center">
-          <h2 class="section-title-main">Nuestras autoridades</h2>
-          <div class="section-divider"></div>
-        </div>
-        <div class="row justify-content-center">
-          <div 
-            v-for="(autoridad, index) of autoridades" 
-            :key="autoridad.id_autoridad || index"
-            class="col-lg-4 col-md-6 mb-4"
-            v-show="(pag - 1) * NUM_RESULTS <= index && pag * NUM_RESULTS > index"
-          >
-            <div class="authority-card">
-              <div class="authority-card-image">
-                <img 
-                  :src="buildSafeImageUrl(autoridad.foto_autoridad)" 
-                  :alt="autoridad.nombre_autoridad"
-                  class="authority-card-img"
-                  loading="lazy"
-                />
-                <div class="authority-card-overlay">
-                  <div class="authority-card-social">
-                    <a 
-                      v-if="autoridad.celular_autoridad"
-                      :href="'https://wa.me/' + autoridad.celular_autoridad.replace(/[^0-9]/g, '')" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="social-link whatsapp"
-                    >
-                      <i class="fa fa-whatsapp"></i>
-                    </a>
-                    <a 
-                      v-if="autoridad.facebook_autoridad && autoridad.facebook_autoridad !== '_'"
-                      :href="autoridad.facebook_autoridad?.trim()" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="social-link facebook"
-                    >
-                      <i class="fa fa-facebook"></i>
-                    </a>
-                    <a 
-                      v-if="autoridad.twiter_autoridad && autoridad.twiter_autoridad !== '_'"
-                      :href="autoridad.twiter_autoridad?.trim()" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="social-link twitter"
-                    >
-                      <i class="fa fa-twitter"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="authority-card-content">
-                <h4 class="authority-card-name">{{ autoridad.nombre_autoridad }}</h4>
-                <span class="authority-card-role">{{ autoridad.cargo_autoridad }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <nav v-if="pager > 1" class="td-page-navigation text-center mt-5">
-          <ul class="pagination-elegant justify-content-center">
-            <li class="page-item" :class="{ disabled: pag === 1 }">
-              <a class="page-link" href="#" @click.prevent="pag > 1 ? pag -= 1 : null">
-                <i class="fa fa-angle-left"></i>
-              </a>
-            </li>
-            <li v-for="(i, index) of pager" :key="index">
-              <a href="#" :class="[i == pag ? 'active' : '']" @click.prevent="pag = i">{{ i }}</a>
-            </li>
-            <li class="page-item" :class="{ disabled: pag === pager }">
-              <a class="page-link" href="#" @click.prevent="pag < pager ? pag += 1 : null">
-                <i class="fa fa-angle-right"></i>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </section>
-
-    <section class="section-recent">
+        <section class="section-recent">
       <div class="container">
         <div class="section-header text-center">
           <h2 class="section-title-main">Convocatorias y comunicados recientes</h2>
@@ -599,6 +467,65 @@
         </div>
       </div>
     </section>
+
+<section class="section-facebook pd-top-50 mg-bottom-120">
+  <div class="container">
+    <div class="section-title text-center">
+      <span class="badge-label">Redes Sociales</span>
+      <h2 class="title-main">Síguenos en Facebook</h2>
+      <div class="section-divider"></div>
+    </div>
+    
+    <div class="row align-items-center justify-content-center">
+      <div class="col-lg-10">
+        <div class="facebook-card">
+          <div class="row g-0">
+            <div class="col-md-5 bg-cover-img-fb d-none d-md-block"></div>
+            <div class="col-md-7 area-fb">
+              <div class="facebook-wrapper">
+                <div id="facebook"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section v-if="videos.length > 0" class="section-video">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 class="section-title-main">Multimedia Destacada</h2>
+      <div class="section-divider"></div>
+    </div>
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="video-card">
+          <div class="video-wrapper">
+            <iframe 
+              width="100%" 
+              height="450" 
+              :src="videos[0].video_enlace" 
+              :title="videos[0].video_titulo"
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="video-content">
+            <h4 class="video-title">{{ videos[0].video_titulo }}</h4>
+            <div class="video-desc" v-html="videos[0].video_breve_descripcion"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
   </div>
 </template>
 
@@ -610,7 +537,155 @@
   --card-shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.12);
   --transition: all 0.3s ease;
 }
+.about-image-frame {
+  position: relative;
+  padding: 20px;
+}
+/* Título con estilo tipográfico moderno y elegante */
+.section-title-big {
+  font-size: clamp(2.2rem, 5vw, 3.5rem); 
+  font-weight: 800;
+  color: #4d88fe; 
+  line-height: 1.1;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em; 
+  text-transform: capitalize;
+}
+.section-video { padding: 80px 0; background: #f8f9fa; }
 
+.video-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(54, 98, 219, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+.video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+.video-content { padding: 2rem; text-align: center; }
+.video-title { font-weight: 700; color: #53a1f0; margin-bottom: 1rem; }
+.video-desc { color: #6c757d; line-height: 1.6; }
+
+/* Cuerpo de texto con mejor legibilidad */
+.content-text-large {
+  font-size: 2,5rem; 
+  line-height: 1.75;
+  color: #4a5568;
+  text-align: justify;
+  max-width: 800px; 
+  margin: 0 auto;  
+}
+
+/* Espaciado limpio para los párrafos dentro del contenedor */
+.content-text-large :deep(p) {
+  margin-bottom: 1.8rem;
+  transition: color 0.3s ease;
+}
+
+/* Opcional: Mejora el color al pasar el cursor o selección */
+.content-text-large :deep(p):hover {
+  color: #658dd2;
+}
+
+/* Decoración elegante */
+.badge-label {
+  display: inline-block;
+  background: var(--main-color-2);
+  color: white;
+  padding: 0.3rem 1rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.divider-line {
+  width: 80px;
+  height: 6px;
+  background: var(--main-color-2);
+  margin-bottom: 2rem;
+  border-radius: 3px;
+}
+
+/* Botón personalizado */
+.btn-primary-custom {
+  background: linear-gradient(135deg, var(--main-color), var(--main-color-2));
+  color: white;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.image-wrapper {
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  transform: rotate(-2deg);
+  transition: transform 0.5s ease;
+}
+
+.image-wrapper:hover {
+  transform: rotate(0deg);
+}
+
+.accent-box {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 150px;
+  height: 150px;
+  background: var(--main-color);
+  opacity: 0.1;
+  border-radius: 20px;
+  z-index: -1;
+  transform: translate(20px, 20px);
+}
+
+.section-divider-left {
+  width: 60px;
+  height: 4px;
+  background: var(--main-color);
+  border-radius: 2px;
+}
+
+.content-card-scroll {
+  background: #ffffff;
+  padding: 0; /* Quitamos padding excesivo para dejar el scroll limpio */
+  border: none;
+  box-shadow: none;
+}
+
+.content-text {
+  font-size: 1.05rem;
+  color: #555;
+  line-height: 1.9;
+}
+
+.btn-more {
+  background: transparent;
+  border: 2px solid var(--main-color);
+  color: var(--main-color);
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-more:hover {
+  background: var(--main-color);
+  color: white;
+}
 /* Banner - SIN MODIFICAR */
 .banner-outer {
   width: 100%;
@@ -786,7 +861,7 @@
 }
 
 .bg-cover-img-inicio {
-  background-image: url("@/assets/images/fondo_inicio2.jpg");
+  background-image: url("@/assets/upea_fondo.jpg");
   background-repeat: no-repeat;
   object-fit: cover;
   background-size: 100%;
@@ -942,16 +1017,16 @@
 }
 
 .section-title-main {
-  font-size: clamp(1.8rem, 4vw, 2.2rem);
+  font-size: clamp(2.3rem, 4vw, 2.2rem);
   font-weight: 700;
-  color: #2c3e50;
+  color: #6a9fd3;
   margin-bottom: 1rem;
 }
 
 .section-divider {
   width: 80px;
   height: 4px;
-  background: linear-gradient(90deg, var(--main-color, #007bff), transparent);
+  background: linear-gradient(90deg, var(--main-color-1, #007bff), transparent);
   margin: 0 auto;
   border-radius: 2px;
 }
@@ -1166,104 +1241,92 @@
 }
 
 /* Categorías */
+/* Contenedor de la sección */
 .section-categories {
-  background-image: url("@/assets/images/fondo_inicio2.jpg") !important;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                    url("@/assets/upea_fondo.jpg") !important;
   background-repeat: no-repeat !important;
-  background-size: 100% !important;
+  background-size: cover !important;
+  background-position: center !important;
   position: relative;
+  padding: 80px 0;
 }
 
+/* Tarjeta Estilo Glassmorphism */
 .category-card {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1); /* Transparencia base */
+  backdrop-filter: blur(12px); /* Efecto cristal */
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 2.5rem 1.5rem;
   text-align: center;
-  text-decoration: none;
-  color: inherit;
-  box-shadow: var(--card-shadow);
-  transition: var(--transition);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
-  overflow: hidden;
   height: 100%;
-  border-top: 4px solid var(--card-accent, var(--main-color, #007bff));
+  color: white; /* Texto blanco para el fondo oscuro */
 }
 
 .category-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-12px);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-.category-card-primary { --card-accent: #007bff; }
-.category-card-secondary { --card-accent: #6c757d; }
-.category-card-red { --card-accent: #dc3545; }
-.category-card-purple { --card-accent: #6f42c1; }
-.category-card-pink { --card-accent: #e83e8c; }
-.category-card-blue { --card-accent: #17a2b8; }
-.category-card-green { --card-accent: #28a745; }
-.category-card-orange { --card-accent: #fd7e14; }
-
+/* Icono elegante */
 .category-card-icon {
-  width: 60px;
-  height: 60px;
-  background: rgba(0, 123, 255, 0.1);
-  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px; /* Bordes redondeados modernos */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
-  transition: var(--transition);
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
 }
 
 .category-card:hover .category-card-icon {
-  background: var(--card-accent, var(--main-color, #007bff));
+  background: var(--card-accent);
+  transform: rotate(5deg) scale(1.1);
 }
 
 .category-card-icon img {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
+  width: 35px;
+  height: 35px;
   transition: filter 0.3s ease;
 }
 
-.category-card:hover .category-card-icon img {
-  filter: brightness(0) invert(1);
-}
-
-.category-card-content {
-  flex: 1;
-}
-
+/* Tipografía y Contador */
 .category-card-content h5 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin: 0;
-  line-height: 1.4;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .category-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: var(--card-accent, var(--main-color, #007bff));
-  color: white;
-  border-radius: 50%;
-  font-size: 0.85rem;
-  font-weight: 600;
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: var(--card-accent); /* El número resalta con el color de acento */
 }
 
-.card-intro:hover h5 {
-  color: var(--card-accent, var(--main-color, #007bff));
-}
+/* Variables de acento (mantienen tu lógica actual) */
+.category-card-primary { --card-accent: #3498db; }
+.category-card-secondary { --card-accent: #95a5a6; }
+.category-card-red { --card-accent: #e74c3c; }
+.category-card-purple { --card-accent: #9b59b6; }
+.category-card-pink { --card-accent: #ff6b6b; }
+.category-card-blue { --card-accent: #00d2d3; }
+.category-card-green { --card-accent: #2ecc71; }
+.category-card-orange { --card-accent: #f39c12; }
 
 /* Autoridades */
 .authority-card {
@@ -1276,7 +1339,139 @@
   display: flex;
   flex-direction: column;
 }
+/* ========================================
+   SECCIÓN FACEBOOK - Fondo estático
+   ======================================== */
+.section-facebook {
+  position: relative;
+  padding: 80px 0;
+  background-image: url('@/assets/upea_fondo.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
 
+/* Overlay oscuro MÁS INTENSO */
+.section-facebook::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(0, 0, 0, 0.75) !important; /* 75% oscuro - MÁS INTENSO */
+  z-index: 0 !important;
+}
+
+/* Contenido por encima del overlay */
+.section-facebook > .container {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Badge label - MÁS VISIBLE */
+.section-facebook .section-title .badge-label {
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  color: #ffffff !important;
+  padding: 0.4rem 1.2rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  display: inline-block !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Título principal - BLANCO PURO Y GRANDE */
+.section-facebook .section-title .title-main,
+.section-facebook .section-title-main {
+  color: #ffffff !important;
+  font-size: 3rem !important;
+  font-weight: 800 !important;
+  text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.8) !important;
+  margin-bottom: 1rem !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Divider blanco */
+.section-facebook .section-divider {
+  background: linear-gradient(90deg, #ffffff, transparent) !important;
+  width: 100px !important;
+  height: 5px !important;
+  margin: 1.5rem auto !important;
+  border-radius: 3px !important;
+}
+
+/* Tarjeta de Facebook */
+.section-facebook .facebook-card {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(15px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  transition: transform 0.3s ease !important;
+}
+
+.section-facebook .facebook-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Imagen lateral */
+.section-facebook .bg-cover-img-fb {
+  background-image: url("@/assets/images/imagen-fb.png") !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center !important;
+  min-height: 500px !important;
+}
+
+/* Área del widget */
+.section-facebook .area-fb {
+  padding: 25px !important;
+  background: #ffffff !important;
+}
+
+.section-facebook .facebook-wrapper {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .section-facebook {
+    background-attachment: scroll !important;
+    padding: 50px 0 !important;
+  }
+  
+  .section-facebook .section-title-main {
+    font-size: 2.5rem !important;
+  }
+  
+  .section-facebook .facebook-card {
+    border-radius: 15px !important;
+  }
+  
+  .section-facebook .bg-cover-img-fb {
+    min-height: 300px !important;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .section-facebook {
+    background-attachment: scroll; /* Mejor rendimiento en móvil */
+    padding: 50px 0;
+  }
+  
+  .section-facebook .facebook-card {
+    border-radius: 15px;
+  }
+}
 .authority-card:hover {
   transform: translateY(-10px);
   box-shadow: var(--card-shadow-hover);
@@ -1521,7 +1716,7 @@ button:focus-visible,
 
 /* Responsive */
 @media (max-width: 991px) {
-  .section-title-main { font-size: 1.8rem; }
+  .section-title-main { font-size: 2.5rem; }
   .plan-card { padding: 2rem; }
 }
 
@@ -1613,7 +1808,7 @@ export default {
     Navigation,
   },
   
-  data() {
+data() {
     return {
       idInstitucion: config.app.idInstitucion || '22',
       
@@ -1764,7 +1959,7 @@ buildSafeImageUrl(path) {
         const data = res.data.Descripcion
         this.institucion = this._limpiarObjeto(data)
 
-        this.$store.commit('setInstitucion', this.institucion)
+        this.$store.commit('setInstitucion', this.  institucion)
         
         if (this.institucion.colorinstitucion?.[0]) {
           const colores = this.institucion.colorinstitucion[0]
@@ -1807,7 +2002,7 @@ buildSafeImageUrl(path) {
         const institucionId = this.idInstitucion || config.app.idInstitucion
         const res = await api.get(`/institucion/${institucionId}/contenido`)
         const data = res.data
-        
+        this.videos = data.upea_videos?.map(this._limpiarObjeto) || []
         this.portadas = data.portada?.map(this._limpiarObjeto) || []
         
         if (this.portadas.length > 0) {
