@@ -5,29 +5,39 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   
-  <!-- ✅ CSP corregida para PDF + iframes + workers -->
+  <!-- ✅ CSP OPTIMIZADA PARA CHROME + FIREFOX + EDGE + SAFARI -->
   <meta http-equiv="Content-Security-Policy" 
-        content="default-src 'self'; 
-                 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.facebook.com https://connect.facebook.net https://cdn.jsdelivr.net; 
+        content="default-src 'self' data:; 
+                 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.facebook.com https://connect.facebook.net https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com https://maps.googleapis.com; 
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; 
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; 
-                 img-src 'self' data: https: blob:; 
-                 frame-src 'self' https://www.google.com https://maps.google.com https://maps.googleapis.com https://www.facebook.com https://facebook.com https://m.facebook.com https://connect.facebook.net https://www.youtube.com https://youtube.com https://youtu.be https://www.youtube-nocookie.com https://player.vimeo.com https://vimeo.com https://archivosminio.upea.bo blob:; 
+                 img-src 'self' data: https: blob: filesystem: https://archivosminio.upea.bo https://*.upea.bo https://*.upea.edu.bo https://www.facebook.com https://*.facebook.com https://graph.facebook.com https://*.googleapis.com https://*.gstatic.com https://i.ytimg.com https://*.ytimg.com https://i.imgur.com; 
+                 frame-src 'self' https://www.google.com https://maps.google.com https://maps.googleapis.com https://www.facebook.com https://facebook.com https://m.facebook.com https://connect.facebook.net https://www.youtube.com https://youtube.com https://youtu.be https://www.youtube-nocookie.com https://player.vimeo.com https://vimeo.com https://archivosminio.upea.bo https://*.upea.bo blob:; 
                  child-src 'self' blob:; 
                  object-src 'self' https://archivosminio.upea.bo blob:; 
                  worker-src 'self' blob:; 
-                 connect-src 'self' https://apiadministrador.upea.bo https://archivosminio.upea.bo https://www.google.com https://maps.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com ws://localhost:* ws://127.0.0.1:* ws://*:* wss://*:*; 
+                 connect-src 'self' https://apiadministrador.upea.bo https://archivosminio.upea.bo https://www.google.com https://maps.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.facebook.com https://graph.facebook.com ws://localhost:* ws://127.0.0.1:* ws://*:* wss://*:*; 
                  base-uri 'self'; 
-                 form-action 'self';">
+                 form-action 'self'; 
+                 upgrade-insecure-requests;
+                 block-all-mixed-content;">
 
- <link rel="icon" type="image/png" href="<%= BASE_URL %>upea.png" id="ico">
+  <!-- ✅ Favicon con fallback y versión para evitar caché -->
+<link rel="icon" type="image/png" href="/upea.png" id="ico">
+<link rel="shortcut icon" href="/upea.png" type="image/png">
+<link rel="apple-touch-icon" href="/upea.png">
+  <link rel="apple-touch-icon" href="<%= BASE_URL %>upea.png">
 
-  <!-- Preconexión a fuentes -->
+  <!-- Preconexión a fuentes y dominios críticos -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://archivosminio.upea.bo" crossorigin>
+  <link rel="preconnect" href="https://apiadministrador.upea.bo" crossorigin>
+  
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100;9..40,200;9..40,400&family=Dancing+Script:wght@400;500;600&family=Krub:wght@400;700&family=Staatliches&display=swap" rel="stylesheet">
   
-  <title id="title-page">UPEA</title>
+  <!-- ✅ Título dinámico - se actualizará con JS -->
+  <title id="title-page">Cargando...</title>
 
   <!-- Estilos -->
   <link rel="preload" href="<%= BASE_URL %>./assets/css/normalize.css" as="style">
@@ -37,13 +47,48 @@
   <link rel="stylesheet" href="<%= BASE_URL %>./assets/css/style.css">
   <link rel="stylesheet" href="<%= BASE_URL %>./assets/css/responsive.css">
   
-  <!-- ✅ Font Awesome 6 (solo una vez, con all.min.css) -->
+  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- ✅ Script para actualizar título y logo al cargar -->
+  <script>
+    // Función para actualizar título de la página
+    window.updatePageTitle = function(institutionName) {
+      if (institutionName) {
+        const title = document.getElementById('title-page');
+        if (title) {
+          title.textContent = institutionName.trim() + ' - UPEA';
+          document.title = institutionName.trim() + ' - UPEA';
+        }
+      }
+    };
+    
+    // Función para actualizar favicon dinámicamente
+    window.updateFavicon = function(logoUrl) {
+      if (!logoUrl) return;
+      
+      const link = document.getElementById('ico');
+      if (link) {
+        // Asegurar HTTPS y añadir parámetro para evitar caché
+        const cleanUrl = logoUrl.replace(/^http:\/\//i, 'https://') + '?v=' + Date.now();
+        link.href = cleanUrl;
+      }
+    };
+     window.addEventListener('load', function() {
+    const link = document.getElementById('ico');
+    if (link) {
+      // Añadir timestamp para evitar caché
+      const href = link.href.split('?')[0];
+      link.href = href + '?v=' + Date.now();
+    
+    }
+  });
+  </script>
 </head>
 
 <body>
   <noscript>
-    <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    <strong>Lo sentimos, esta aplicación requiere JavaScript habilitado para funcionar correctamente.</strong>
   </noscript>
 
   <!-- Preloader -->
