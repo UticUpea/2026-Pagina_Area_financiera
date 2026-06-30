@@ -199,7 +199,6 @@
           
           <div class="content-text-large" v-html="institucion.institucion_objetivos"></div>
           
-        
         </div>
       </div>
       
@@ -728,6 +727,91 @@
   background-repeat: no-repeat !important;
 }
 
+/* ========================================
+   ESTILOS PARA TÍTULOS DENTRO DEL CONTENIDO
+   ======================================== */
+
+/* Títulos h2 dentro del contenido de objetivos */
+.content-text-large :deep(h2) {
+  font-size: clamp(2rem, 4vw, 2.8rem) !important;
+  font-weight: 800 !important;
+  color: #04246C !important; /* Azul institucional */
+  text-align: center !important;
+  margin: 2.5rem 0 1.5rem 0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  position: relative !important;
+  padding-bottom: 1rem !important;
+}
+
+/* Línea decorativa debajo de los h2 */
+.content-text-large :deep(h2)::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 100px !important;
+  height: 4px !important;
+  background: linear-gradient(90deg, #04246C, #FC0102) !important;
+  border-radius: 2px !important;
+}
+
+/* Strong dentro de h2 */
+.content-text-large :deep(h2 strong) {
+  font-weight: 800 !important;
+  color: inherit !important;
+}
+
+/* Primer h2 (Objetivo General) - Color diferente opcional */
+.content-text-large :deep(h2:first-of-type) {
+  color: #04246C !important;
+  margin-top: 1rem !important;
+}
+
+/* Segundo h2 (Objetivos Específicos) */
+.content-text-large :deep(h2:nth-of-type(2)) {
+  color: #04246C !important;
+}
+
+/* Párrafos después de los h2 */
+.content-text-large :deep(h2 + p) {
+  margin-top: 1.5rem !important;
+  text-align: justify !important;
+}
+
+/* Listas dentro del contenido */
+.content-text-large :deep(ul),
+.content-text-large :deep(ol) {
+  padding-left: 2rem !important;
+  margin: 1.5rem 0 !important;
+}
+
+.content-text-large :deep(li) {
+  margin-bottom: 1rem !important;
+  line-height: 1.8 !important;
+  color: #495057 !important;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .content-text-large :deep(h2) {
+    font-size: 1.8rem !important;
+    margin: 2rem 0 1rem 0 !important;
+  }
+  
+  .content-text-large :deep(h2)::after {
+    width: 80px !important;
+    height: 3px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .content-text-large :deep(h2) {
+    font-size: 1.5rem !important;
+  }
+}
+
 .banner-static,
 .banner-fallback {
   position: absolute;
@@ -991,6 +1075,68 @@
   height: 12px !important;
   margin: 0 6px !important;
   border-radius: 50% !important;
+}
+/* ========================================
+   FORZAR ESTILOS PARA H2 EN OBJETIVOS
+   ======================================== */
+
+/* Selector más específico y directo */
+.section-about .content-text-large h2,
+.content-text-large h2 {
+  font-size: 2.5rem !important;
+  font-weight: 800 !important;
+  color: #04246C !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+  margin: 2.5rem 0 1.5rem 0 !important;
+  padding: 0 0 1rem 0 !important;
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Línea decorativa después de h2 */
+.section-about .content-text-large h2::after,
+.content-text-large h2::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 100px !important;
+  height: 4px !important;
+  background: linear-gradient(90deg, #04246C, #FC0102) !important;
+  border-radius: 2px !important;
+  display: block !important;
+}
+
+/* Strong dentro de h2 */
+.content-text-large h2 strong {
+  font-weight: 800 !important;
+  color: inherit !important;
+}
+
+/* Primer h2 */
+.content-text-large h2:first-of-type {
+  margin-top: 1rem !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content-text-large h2 {
+    font-size: 1.8rem !important;
+  }
+  
+  .content-text-large h2::after {
+    width: 80px !important;
+    height: 3px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .content-text-large h2 {
+    font-size: 1.5rem !important;
+  }
 }
 
 .banner-carousel :deep(.carousel__pagination-button--active) {

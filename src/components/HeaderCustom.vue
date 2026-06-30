@@ -345,7 +345,7 @@
   background-color: var(--main-color-2, #FC0102); /* Color secundario */
   color: #ffffff;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 1.5rem;
   padding: 10px 20px;
   border-radius: 8px;
   display: inline-flex;

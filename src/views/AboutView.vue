@@ -57,27 +57,53 @@
         </div>
       </div>
 
-      <!-- Historia -->
-      <div class="container py-5">
-        <div class="row align-items-center">
-          <div class="col-lg-3">
-            <div class="icon-box">
-              <img 
-                :src="buildSafeImageUrl(institucion.institucion_logo)" 
-                alt="Logo institucional" 
-                class="logo-elegant"
-                loading="lazy"
-              />
-            </div>
-          </div>
-          <div class="col-lg-9">
-            <div class="content-card">
-              <h3 class="subsection-title">Historia de la institución</h3>
-              <p class="content-text" v-html="sanitizeHtml(institucion.institucion_historia)"></p>
-            </div>
+<!-- Historia Institucional - Diseño Elegante -->
+<div class="container py-5">
+  <div class="row align-items-center g-4">
+    
+    <!-- Columna Izquierda: Logo con marco decorativo -->
+    <div class="col-lg-4 col-md-5">
+      <div class="history-logo-wrapper">
+        <div class="logo-frame">
+          <img 
+            :src="buildSafeImageUrl(institucion.institucion_logo)" 
+            alt="Logo institucional" 
+            class="logo-institutional"
+            loading="lazy"
+          />
+          <div class="logo-accent"></div>
+        </div>
+        <div class="founding-year">
+          <span class="year-number">2000</span>
+          <span class="year-label">Año de Fundación</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Columna Derecha: Contenido de Historia -->
+    <div class="col-lg-8 col-md-7">
+      <div class="history-card">
+        <div class="history-header">
+          <span class="history-badge">
+            <i class="fa fa-history"></i> Nuestra Trayectoria
+          </span>
+          <h3 class="history-title">Historia de la institución</h3>
+          <div class="history-divider"></div>
+        </div>
+        
+        <div class="history-content" v-html="sanitizeHtml(institucion.institucion_historia)"></div>
+        
+        <div class="history-footer">
+          <div class="milestone">
+            <i class="fa fa-calendar-check"></i>
+            <span>Desde septiembre de 2000 formando profesionales</span>
           </div>
         </div>
       </div>
+    </div>
+    
+  </div>
+</div>
     </section>
     
     <section id="mision" class="section-elegant section-alt">
@@ -386,6 +412,362 @@
 
 .section-alt {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+/* ========================================
+   SECCIÓN HISTORIA - Diseño Institucional
+   ======================================== */
+
+/* Contenedor del logo con marco */
+.history-logo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.logo-frame {
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 24px;
+  box-shadow: 
+    0 10px 40px rgba(4, 36, 108, 0.15),
+    0 0 0 1px rgba(4, 36, 108, 0.1);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.logo-frame:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 20px 60px rgba(4, 36, 108, 0.25),
+    0 0 0 1px rgba(252, 1, 2, 0.3);
+}
+
+.logo-frame::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  background: linear-gradient(135deg, #04246C, #FC0102, #04246C);
+  border-radius: 26px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.logo-frame:hover::before {
+  opacity: 1;
+}
+
+.logo-institutional {
+  max-width: 100%;
+  max-height: 180px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
+}
+
+.logo-frame:hover .logo-institutional {
+  transform: scale(1.03);
+}
+
+/* Acento decorativo en el logo */
+.logo-accent {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  width: 40px;
+  height: 40px;
+  background: #FC0102;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(252, 1, 2, 0.4);
+}
+
+/* Badge de año de fundación */
+.founding-year {
+  text-align: center;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #04246C 0%, #020733 100%);
+  border-radius: 16px;
+  color: white;
+  min-width: 180px;
+}
+
+.year-number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #FC0102;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.year-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.9;
+  margin-top: 0.3rem;
+}
+
+/* Tarjeta de Historia */
+.history-card {
+  background: white;
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 15px 50px rgba(4, 36, 108, 0.12);
+  border: 1px solid rgba(4, 36, 108, 0.08);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.history-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 25px 70px rgba(4, 36, 108, 0.18);
+}
+
+/* Header de la tarjeta */
+.history-header {
+  margin-bottom: 1.8rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 2px solid rgba(4, 36, 108, 0.1);
+}
+
+.history-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  background: rgba(4, 36, 108, 0.08);
+  color: #04246C;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 1rem;
+}
+
+.history-badge i {
+  color: #FC0102;
+}
+
+.history-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #04246C;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.history-divider {
+  width: 70px;
+  height: 4px;
+  background: linear-gradient(90deg, #FC0102, #04246C);
+  margin-top: 1rem;
+  border-radius: 2px;
+}
+
+/* Contenido de la historia */
+.history-content {
+  flex: 1;
+  font-size: 1.1rem;
+  line-height: 1.9;
+  color: #495057;
+  text-align: justify;
+}
+
+.history-content :deep(p) {
+  margin-bottom: 1.2rem;
+  color: #495057;
+}
+
+.history-content :deep(p):last-child {
+  margin-bottom: 0;
+}
+
+.history-content :deep(strong) {
+  color: #04246C;
+  font-weight: 600;
+}
+
+.history-content :deep(em) {
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Footer con hito */
+.history-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed rgba(4, 36, 108, 0.15);
+}
+
+.milestone {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.95rem;
+  color: #6c757d;
+}
+
+.milestone i {
+  color: #FC0102;
+  font-size: 1.1rem;
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 991px) {
+  .history-logo-wrapper {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .logo-frame {
+    max-width: 180px;
+    padding: 1.2rem;
+  }
+  
+  .logo-institutional {
+    max-height: 140px;
+  }
+  
+  .founding-year {
+    min-width: 160px;
+    padding: 0.8rem 1.2rem;
+  }
+  
+  .year-number {
+    font-size: 2rem;
+  }
+  
+  .history-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .history-title {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .history-logo-wrapper {
+    flex-direction: column;
+  }
+  
+  .logo-frame {
+    max-width: 200px;
+  }
+  
+  .history-card {
+    padding: 1.8rem;
+  }
+  
+  .history-title {
+    font-size: 1.3rem;
+  }
+  
+  .history-content {
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+  
+  .history-badge {
+    font-size: 0.85rem;
+    padding: 0.4rem 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .logo-frame {
+    max-width: 160px;
+    padding: 1rem;
+  }
+  
+  .logo-institutional {
+    max-height: 120px;
+  }
+  
+  .founding-year {
+    min-width: 140px;
+    padding: 0.7rem 1rem;
+  }
+  
+  .year-number {
+    font-size: 1.8rem;
+  }
+  
+  .year-label {
+    font-size: 0.8rem;
+  }
+  
+  .history-card {
+    padding: 1.5rem;
+  }
+  
+  .history-title {
+    font-size: 1.2rem;
+  }
+}
+/* ========================================
+   SECCIÓN MISIÓN/VISIÓN - Fondo personalizado
+   ======================================== */
+#mision .bg-cover.about-area {
+  background-image: url('@/assets/upea_fondo.jpg') !important; 
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important; 
+  position: relative;
+}
+
+/* Overlay oscuro para que el texto sea legible */
+#mision .bg-cover.about-area::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.73); /* Fondo blanco semi-transparente */
+  z-index: 0;
+}
+
+/* Asegurar que el contenido esté por encima del overlay */
+#mision .bg-cover.about-area > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ajustar colores de texto para contraste */
+#mision .section-title-main {
+  color: #04246C !important; /* Azul institucional */
+}
+
+#mision .section-divider {
+  background: linear-gradient(90deg, #FC0102, transparent) !important; /* Rojo institucional */
+}
+
+#mision .card-elegant {
+  background: rgba(255, 255, 255, 0.95) !important; /* Tarjetas con ligero transparencia */
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(4, 36, 108, 0.1);
 }
 
 /* Header de sección */
