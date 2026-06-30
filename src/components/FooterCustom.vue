@@ -21,41 +21,46 @@
                 Formando profesionales competentes con excelencia académica y compromiso social.
               </p>
               
-              <div class="social-block">
-                <span class="social-title">Síguenos</span>
-                <div class="social-icons">
-                  <a 
-                    v-if="Institucion.institucion_facebook"
-                    :href="buildSafeUrl(Institucion.institucion_facebook)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="social-btn facebook"
-                    aria-label="Facebook"
-                  >
-                    <i class="fa fa-facebook-f"></i>
-                  </a>
-                  <a 
-                    v-if="Institucion.institucion_youtube"
-                    :href="buildSafeUrl(Institucion.institucion_youtube)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="social-btn youtube"
-                    aria-label="YouTube"
-                  >
-                    <i class="fa fa-youtube"></i>
-                  </a>
-                  <a 
-                    v-if="isValidUrl(Institucion.institucion_twitter)"
-                    :href="buildSafeUrl(Institucion.institucion_twitter)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="social-btn twitter"
-                    aria-label="Twitter"
-                  >
-                    <i class="fa fa-twitter"></i>
-                  </a>
-                </div>
-              </div>
+<div class="social-block">
+  <span class="social-title">Síguenos</span>
+
+  <div class="social-icons">
+    
+    <a 
+      v-if="Institucion.institucion_facebook"
+      :href="buildSafeUrl(Institucion.institucion_facebook)"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="social-btn facebook"
+      aria-label="Facebook"
+    >
+      <i class="fa-brands fa-facebook-f"></i>
+    </a>
+
+    <a 
+      v-if="Institucion.institucion_youtube"
+      :href="buildSafeUrl(Institucion.institucion_youtube)"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="social-btn youtube"
+      aria-label="YouTube"
+    >
+      <i class="fa-brands fa-youtube"></i>
+    </a>
+
+    <a 
+      v-if="isValidUrl(Institucion.institucion_twitter)"
+      :href="buildSafeUrl(Institucion.institucion_twitter)"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="social-btn twitter"
+      aria-label="Twitter"
+    >
+      <i class="fa-brands fa-x-twitter"></i>
+    </a>
+
+  </div>
+</div>
             </div>
           </div>
           
@@ -176,22 +181,22 @@
       </div>
     </div>
 
-    <!-- Botón WhatsApp Flotante -->
-    <transition name="fade-up">
-      <div class="whatsapp-float" v-if="Institucion.institucion_celular1">
-        <a 
-          :href="getWhatsAppLink(Institucion.institucion_celular1)"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="whatsapp-btn"
-          aria-label="Contáctanos por WhatsApp"
-          title="Chat en WhatsApp"
-        >
-          <i class="fa fa-whatsapp"></i>
-          <span class="whatsapp-tooltip">¡Escríbenos!</span>
-        </a>
-      </div>
-    </transition>
+<!-- Botón WhatsApp Flotante -->
+<transition name="fade-up">
+  <div class="whatsapp-float" v-if="Institucion.institucion_celular1">
+    <a 
+      :href="getWhatsAppLink(Institucion.institucion_celular1)"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="whatsapp-btn"
+      aria-label="Contáctanos por WhatsApp"
+      title="Chat en WhatsApp"
+    >
+      <i class="fa-brands fa-whatsapp"></i>
+      <span class="whatsapp-tooltip">¡Escríbenos!</span>
+    </a>
+  </div>
+</transition>
     
     <!-- Botón "Volver arriba" -->
     <transition name="fade-up">
