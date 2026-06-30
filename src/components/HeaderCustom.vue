@@ -342,8 +342,8 @@
    BOTÓN DE ACCIÓN (LOGIN)
 ========================== */
 .btn-action-login {
-  background-color: var(--main-color-2, #FC0102); /* Color secundario */
-  color: #ffffff;
+  background-color: var(--main-color-3, #FC0102); /* Color secundario */
+  color: #520505;
   font-weight: 700;
   font-size: 1.5rem;
   padding: 10px 20px;

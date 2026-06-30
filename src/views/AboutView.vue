@@ -74,8 +74,8 @@
           <div class="logo-accent"></div>
         </div>
         <div class="founding-year">
-          <span class="year-number">2000</span>
-          <span class="year-label">Año de Fundación</span>
+          <span class="year-number"></span>
+          <span class="year-label">FORMANDO PROFECIONALES</span>
         </div>
       </div>
     </div>
@@ -96,7 +96,7 @@
         <div class="history-footer">
           <div class="milestone">
             <i class="fa fa-calendar-check"></i>
-            <span>Desde septiembre de 2000 formando profesionales</span>
+            <span>formando profesionales</span>
           </div>
         </div>
       </div>
@@ -384,7 +384,147 @@
   position: relative;
   z-index: 2;
 }
+/* ========================================
+   SECCIÓN "NUESTRA HISTORIA" - Fondo Institucional
+   ======================================== */
 
+/* Fondo elegante para toda la sección */
+#nosotros {
+  position: relative;
+  background: linear-gradient(135deg, rgba(4, 36, 108, 0.05) 0%, rgba(2, 7, 51, 0.08) 100%);
+  overflow: hidden;
+}
+
+/* Patrón decorativo sutil de fondo */
+#nosotros::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(4, 36, 108, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(252, 1, 2, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(4, 36, 108, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Líneas decorativas institucionales */
+#nosotros::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    #04246C 20%, 
+    #FC0102 50%, 
+    #04246C 80%, 
+    transparent 100%);
+  opacity: 0.6;
+}
+
+/* Asegurar que el contenido esté por encima del fondo */
+#nosotros .about-area,
+#nosotros .container,
+#nosotros .row,
+#nosotros .col-lg-6,
+#nosotros .content-card,
+#nosotros .image-card {
+  position: relative;
+  z-index: 1;
+}
+
+/* Header de sección con fondo sutil */
+#nosotros .section-header {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid rgba(4, 36, 108, 0.1);
+  box-shadow: 0 4px 20px rgba(4, 36, 108, 0.08);
+}
+
+/* Badge con estilo institucional */
+#nosotros .section-badge {
+  background: linear-gradient(135deg, #04246C 0%, #020733 100%) !important;
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(4, 36, 108, 0.3) !important;
+}
+
+/* Título principal */
+#nosotros .section-title-main {
+  text-shadow: 2px 2px 4px rgba(4, 36, 108, 0.1);
+}
+
+/* Divider más elegante */
+#nosotros .section-divider {
+  background: linear-gradient(90deg, #04246C, #FC0102, #04246C) !important;
+  height: 5px !important;
+  box-shadow: 0 2px 8px rgba(252, 1, 2, 0.3);
+}
+
+/* Tarjeta de contenido - Glassmorphism */
+#nosotros .content-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(4, 36, 108, 0.1) !important;
+  box-shadow: 0 15px 50px rgba(4, 36, 108, 0.12) !important;
+}
+
+/* Imagen con marco institucional */
+#nosotros .image-card {
+  border: 3px solid rgba(4, 36, 108, 0.1);
+  box-shadow: 0 20px 60px rgba(4, 36, 108, 0.2);
+}
+
+#nosotros .image-card::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(135deg, #04246C, #FC0102);
+  border-radius: 16px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#nosotros .image-card:hover::before {
+  opacity: 1;
+}
+
+/* Botón "Ver más" institucional */
+#nosotros .btn-read-more {
+  background: linear-gradient(135deg, #04246C 0%, #020733 100%) !important;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 15px rgba(4, 36, 108, 0.3) !important;
+}
+
+#nosotros .btn-read-more:hover {
+  background: linear-gradient(135deg, #020733 0%, #04246C 100%) !important;
+  border-color: #FC0102;
+  box-shadow: 0 6px 20px rgba(4, 36, 108, 0.4), 0 0 0 3px rgba(252, 1, 2, 0.2) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #nosotros::before {
+    background-image: 
+      radial-gradient(circle at 20% 50%, rgba(4, 36, 108, 0.02) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(252, 1, 2, 0.02) 0%, transparent 50%);
+  }
+  
+  #nosotros .section-header {
+    padding: 1.5rem;
+  }
+}
 .breadcrumb-inner {
   padding: 80px 0;
   color: white;
@@ -665,6 +805,162 @@
     font-size: 1.4rem;
   }
 }
+/* ========================================
+   UNIFICAR DISEÑO: "Nuestra Historia" = "Historia Institucional"
+   ======================================== */
+
+/* Badge "Nuestra Historia" - Igual que history-badge */
+#nosotros .section-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  padding: 0.5rem 1.2rem !important;
+  background: rgba(4, 36, 108, 0.08) !important;
+  color: #04246C !important;
+  border-radius: 50px !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  margin-bottom: 1rem !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Título "Sobre la carrera" - Igual que history-title */
+#nosotros .section-title-main {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #04246C !important;
+  margin: 0 0 0 0 !important;
+  line-height: 1.3 !important;
+  text-align: center !important;
+}
+
+/* Divider - Igual que history-divider */
+#nosotros .section-divider {
+  width: 70px !important;
+  height: 4px !important;
+  background: linear-gradient(90deg, #FC0102, #04246C) !important;
+  margin: 1rem auto 0 auto !important;
+  border-radius: 2px !important;
+}
+
+/* Content card - Igual que history-card */
+#nosotros .content-card {
+  background: white !important;
+  border-radius: 24px !important;
+  padding: 2.5rem !important;
+  box-shadow: 0 15px 50px rgba(4, 36, 108, 0.12) !important;
+  border: 1px solid rgba(4, 36, 108, 0.08) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+#nosotros .content-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 25px 70px rgba(4, 36, 108, 0.18) !important;
+}
+
+/* Texto del contenido - Igual que history-content */
+#nosotros .content-text,
+#nosotros .content-text-about {
+  font-size: 1.5rem !important;
+  line-height: 1.9 !important;
+  color: #495057 !important;
+  text-align: justify !important;
+}
+
+#nosotros .content-text :deep(p),
+#nosotros .content-text-about :deep(p) {
+  margin-bottom: 1.2rem !important;
+  color: #495057 !important;
+}
+
+#nosotros .content-text :deep(strong),
+#nosotros .content-text-about :deep(strong) {
+  color: #04246C !important;
+  font-weight: 600 !important;
+}
+
+#nosotros .content-text :deep(em),
+#nosotros .content-text-about :deep(em) {
+  color: #6c757d !important;
+  font-style: italic !important;
+}
+
+/* Botón "Ver más" - Ajustado al nuevo diseño */
+#nosotros .btn-read-more {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  margin-top: 1.5rem !important;
+  padding: 0.6rem 1.5rem !important;
+  background: linear-gradient(135deg, #04246C 0%, #020733 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 25px !important;
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(4, 36, 108, 0.3) !important;
+}
+
+#nosotros .btn-read-more:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(4, 36, 108, 0.4) !important;
+}
+
+/* Footer decorativo para content-card (opcional, como history-footer) */
+#nosotros .content-card::after {
+  content: '' !important;
+  display: block !important;
+  margin-top: 1.5rem !important;
+  padding-top: 1.5rem !important;
+  border-top: 1px dashed rgba(4, 36, 108, 0.15) !important;
+}
+
+/* Responsive - Mantener consistencia */
+@media (max-width: 991px) {
+  #nosotros .section-title-main {
+    font-size: 1.4rem !important;
+  }
+  
+  #nosotros .content-card {
+    padding: 2rem 1.5rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #nosotros .section-title-main {
+    font-size: 1.3rem !important;
+  }
+  
+  #nosotros .content-card {
+    padding: 1.8rem !important;
+  }
+  
+  #nosotros .content-text,
+  #nosotros .content-text-about {
+    font-size: 1rem !important;
+    line-height: 1.8 !important;
+  }
+}
+
+@media (max-width: 576px) {
+  #nosotros .section-title-main {
+    font-size: 1.2rem !important;
+  }
+  
+  #nosotros .content-card {
+    padding: 1.5rem !important;
+  }
+  
+  #nosotros .content-text,
+  #nosotros .content-text-about {
+    font-size: 0.95rem !important;
+  }
+}
 
 @media (max-width: 768px) {
   .history-logo-wrapper {
@@ -680,16 +976,16 @@
   }
   
   .history-title {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
   }
   
   .history-content {
-    font-size: 1rem;
+    font-size: 1.5rem;
     line-height: 1.8;
   }
   
   .history-badge {
-    font-size: 0.85rem;
+    font-size: 1.85rem;
     padding: 0.4rem 1rem;
   }
 }
@@ -718,11 +1014,11 @@
   }
   
   .history-card {
-    padding: 1.5rem;
+    padding: 2.3rem;
   }
   
   .history-title {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
   }
 }
 /* ========================================
